@@ -7,7 +7,6 @@ import { SignupDto } from '../dto/signup.dto';
 import { AuthService } from './auth.service';
 import { RolesGuard } from './guard/role.guard';
 
-
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -28,25 +27,5 @@ export class AuthController {
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN, Role.BRANCH_MANAGER)
   getSuperAdminResource() {
     return { message: 'This is a Super Admin resource' };
-  }
-
-  @Get('subadmin')
-  getSubAdminResource() {
-    return { message: 'This is a sub Admin resource' };
-  }
-
-  @Get('branchmanager')
-  getBranchManagerResource() {
-    return { message: 'This is a Branch Manager resource' };
-  }
-
-  @Get('deliveryboy')
-  getDeliveryBoyResource() {
-    return { message: 'This is a Delivery Boy resource' };
-  }
-
-  @Get('customer')
-  getcustomerResource() {
-    return { message: 'This is a Delivery Boy resource' };
   }
 }
