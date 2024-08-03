@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SignupDto } from 'src/dto/signup.dto';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
+import { SignupDto } from 'src/modules/user/dto/signup.dto';
 import { Repository } from 'typeorm';
-import { LoginDto } from '../dto/login.dto';
+import { LoginDto } from '../user/dto/login.dto';
 import { UserService } from '../user/user.service';
 
 @Injectable()

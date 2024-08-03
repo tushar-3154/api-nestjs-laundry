@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/decorator/roles.decorator';
-import { LoginDto } from 'src/dto/login.dto';
 import { Role } from 'src/enum/role.enum';
-import { SignupDto } from '../dto/signup.dto';
+import { LoginDto } from 'src/modules/user/dto/login.dto';
+import { SignupDto } from '../user/dto/signup.dto';
 import { AuthService } from './auth.service';
 import { RolesGuard } from './guard/role.guard';
 
