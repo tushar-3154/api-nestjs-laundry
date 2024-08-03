@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { type } from 'os';
 import { SignupDto } from 'src/dto/signup.dto';
 import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
@@ -32,7 +31,6 @@ export class AuthService {
       email: user.email,
       id: user.id,
       role_id: user.role_id,
-      type: type,
     });
     return { token };
   }
