@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
-    ValidationArguments,
-    ValidatorConstraint,
-    ValidatorConstraintInterface,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { EntityManager } from 'typeorm';
 import { IsUniqueConstraintInput } from './is-unique';
@@ -14,17 +14,15 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
   async validate(value: any, args?: ValidationArguments): Promise<boolean> {
     const { tablename, column }: IsUniqueConstraintInput = args.constraints[0];
 
-    // const field = args.property;
     const exists = await this.entitymanager
       .getRepository(tablename)
       .createQueryBuilder(tablename)
       .where({ [column]: value })
       .getExists();
-    //   console.log(result);
 
     return exists ? false : true;
   }
   defaultMessage(): string {
-    return 'user already exixts.';
+    return 'user mobile number already registered with us.';
   }
 }

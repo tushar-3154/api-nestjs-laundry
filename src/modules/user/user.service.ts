@@ -16,36 +16,26 @@ export class UserService {
 
   async signup(signUpDto: SignupDto): Promise<User> {
     const {
-      firstname,
-      lastname,
+      first_name,
+      last_name,
       email,
-      mobilenumber,
+      mobile_number,
       password,
       role_id,
       gender,
     } = signUpDto;
-    const existinguser = await this.userRepository.findOne({
-      where: { mobilenumber },
-    });
-
-    const role = await this.roleRepository.findOne({ where: { id: role_id } });
-    if (!role) throw new Error('Role not found');
-    if (existinguser) {
-      throw new Error('User is already exists');
-    }
     const salt = await bcrypt.genSalt(10);
 
     const hashedpassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
-      firstname,
-      lastname,
-      mobilenumber,
-
+      first_name,
+      last_name,
+      mobile_number,
       email,
       password: hashedpassword,
       gender,
-      role,
+      role_id,
     });
     const result = await this.userRepository.save(user);
 
@@ -53,12 +43,12 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<User> {
-    const { mobilenumber, email, password } = loginDto;
-    
+    const { mobile_number, email, password } = loginDto;
+
     let user: User;
 
-    if (mobilenumber) {
-      user = await this.userRepository.findOne({ where: { mobilenumber } });
+    if (mobile_number) {
+      user = await this.userRepository.findOne({ where: { mobile_number } });
     } else if (email) {
       user = await this.userRepository.findOne({ where: { email } });
     } else {

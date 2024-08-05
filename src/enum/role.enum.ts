@@ -3,6 +3,6 @@ export enum Role {
   SUB_ADMIN = 2,
   BRANCH_MANAGER = 3,
   DELIVERY_BOY = 4,
-  Customer = 5,
-  Workshop_Manager = 6,
+  CUSTOMER = 5,
+  WORKSHOP_MANAGER = 6,
 }

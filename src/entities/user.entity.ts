@@ -7,28 +7,28 @@ import {
 } from 'typeorm';
 import { Role } from './role.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  firstname: string;
+  first_name: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  lastname: string;
+  last_name: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email: string;
 
   @Column({ type: 'decimal', nullable: true })
-  mobilenumber: number;
+  mobile_number: number;
 
   @Column()
   password: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  gender: string;
+  @Column({ type: 'int', nullable: true })
+  gender: number;
 
   @Column()
   role_id: number;

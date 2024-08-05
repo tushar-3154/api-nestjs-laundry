@@ -1,18 +1,22 @@
+import { Transform } from 'class-transformer';
 import {
   IsDecimal,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
-  MinLength,
+  MinLength
 } from 'class-validator';
+import { User } from 'src/entities/user.entity';
+import { Gender } from 'src/enum/gender.enum';
 import { IsUnique } from 'src/modules/validator/is-unique';
 
 export class SignupDto {
   @IsNotEmpty()
-  firstname: string;
+  first_name: string;
 
   @IsNotEmpty()
-  lastname: string;
+  last_name: string;
 
   @IsEmail()
   @IsOptional()
@@ -20,15 +24,17 @@ export class SignupDto {
 
   @IsNotEmpty()
   @IsDecimal()
-  @IsUnique({ tablename: 'user', column: 'mobilenumber' })
-  mobilenumber: number;
+  @IsUnique({ tablename: User.name, column: 'mobile_number' })
+  mobile_number: number;
 
   @IsNotEmpty()
   @MinLength(6)
   password: string;
 
   @IsNotEmpty()
-  gender: string;
+  @Transform(({ value }) => parseInt(value))
+  @IsEnum(Gender)
+  gender: number;
 
   @IsNotEmpty()
   role_id: number;
