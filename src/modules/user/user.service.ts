@@ -15,24 +15,12 @@ export class UserService {
   ) {}
 
   async signup(signUpDto: SignupDto): Promise<User> {
-    const { email, password, role_id } = signUpDto;
-    const existinguser = await this.userRepository.findOne({
-      where: { email },
-    });
-
-    const role = await this.roleRepository.findOne({ where: { id: role_id } });
-    if (!role) throw new Error('Role not found');
-    if (existinguser) {
-      throw new Error('User is already exists');
-    }
     const salt = await bcrypt.genSalt(10);
 
-    const hashedpassword = await bcrypt.hash(password, salt);
-
+    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
     const user = this.userRepository.create({
-      email,
+      ...signUpDto,
       password: hashedpassword,
-      role,
     });
     const result = await this.userRepository.save(user);
 
@@ -40,20 +28,32 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<User> {
-    const { email, password } = loginDto;
-    const user = await this.userRepository.findOne({ where: { email } });
+    const { username, password } = loginDto;
+    let mobileCondition = {};
+    if (Number(username)) {
+      mobileCondition = {
+        mobile_number: Number(username),
+      };
+    }
+    const user = await this.userRepository.findOne({
+      where: [
+        {
+          email: username,
+        },
+        mobileCondition,
+      ],
+    });
     if (!user) {
-      throw new UnauthorizedException('Invalid Credintials');
+      throw new UnauthorizedException(
+        'Your username and password do not match with our records',
+      );
     }
-
-    if (!password) {
-      throw new UnauthorizedException('Password or stored password is missing');
-    }
-
     const pass = await bcrypt.compare(password, user.password);
 
     if (!pass) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(
+        'Your username and password do not match with our records',
+      );
     }
     return user;
   }

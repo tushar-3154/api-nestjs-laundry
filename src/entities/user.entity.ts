@@ -1,3 +1,4 @@
+import { Gender } from 'src/enum/gender.enum';
 import {
   Column,
   Entity,
@@ -7,16 +8,28 @@ import {
 } from 'typeorm';
 import { Role } from './role.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  first_name: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  last_name: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
   email: string;
+
+  @Column({ type: 'decimal', nullable: true })
+  mobile_number: number;
 
   @Column()
   password: string;
+
+  @Column({ type: 'int', nullable: true })
+  gender: Gender;
 
   @Column()
   role_id: number;
