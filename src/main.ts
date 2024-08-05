@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-import { ValidationPipe } from '@nestjs/common';
-import { useContainer } from 'class-validator';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { useContainer, ValidationError } from 'class-validator';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,6 +12,14 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        if (validationErrors.length === 0) {
+          return new BadRequestException('Validation failed');
+        }
+        const firstError = validationErrors[0];
+        const firstConstraint = Object.values(firstError.constraints || {})[0];
+        return new BadRequestException(firstConstraint || 'Validation failed');
+      },
     }),
   );
 
