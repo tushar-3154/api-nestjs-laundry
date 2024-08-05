@@ -22,7 +22,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
 
     return exists ? false : true;
   }
-  defaultMessage(): string {
-    return 'user mobile number already registered with us.';
+  defaultMessage(args?: ValidationArguments): string {
+    return `user ${args.property} already registered with us.`;
   }
 }

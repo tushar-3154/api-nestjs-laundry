@@ -1,3 +1,4 @@
+import { Gender } from 'src/enum/gender.enum';
 import {
   Column,
   Entity,
@@ -28,7 +29,7 @@ export class User {
   password: string;
 
   @Column({ type: 'int', nullable: true })
-  gender: number;
+  gender: Gender;
 
   @Column()
   role_id: number;

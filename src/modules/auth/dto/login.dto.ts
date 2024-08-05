@@ -1,13 +1,8 @@
-import { IsDecimal, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
-  @IsDecimal()
-  @IsOptional()
-  mobile_number: number;
-
-  @IsEmail()
-  @IsOptional()
-  email: string;
+  @IsNotEmpty()
+  username: string;
 
   @IsNotEmpty()
   password: string;

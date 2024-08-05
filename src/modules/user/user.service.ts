@@ -15,27 +15,12 @@ export class UserService {
   ) {}
 
   async signup(signUpDto: SignupDto): Promise<User> {
-    const {
-      first_name,
-      last_name,
-      email,
-      mobile_number,
-      password,
-      role_id,
-      gender,
-    } = signUpDto;
     const salt = await bcrypt.genSalt(10);
 
-    const hashedpassword = await bcrypt.hash(password, salt);
-
+    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
     const user = this.userRepository.create({
-      first_name,
-      last_name,
-      mobile_number,
-      email,
+      ...signUpDto,
       password: hashedpassword,
-      gender,
-      role_id,
     });
     const result = await this.userRepository.save(user);
 
@@ -43,30 +28,32 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<User> {
-    const { mobile_number, email, password } = loginDto;
-
-    let user: User;
-
-    if (mobile_number) {
-      user = await this.userRepository.findOne({ where: { mobile_number } });
-    } else if (email) {
-      user = await this.userRepository.findOne({ where: { email } });
-    } else {
-      throw new UnauthorizedException('Username or mobilenumber is required');
+    const { username, password } = loginDto;
+    let mobileCondition = {};
+    if (Number(username)) {
+      mobileCondition = {
+        mobile_number: Number(username),
+      };
     }
-
+    const user = await this.userRepository.findOne({
+      where: [
+        {
+          email: username,
+        },
+        mobileCondition,
+      ],
+    });
     if (!user) {
-      throw new UnauthorizedException('Invalid Credintials');
+      throw new UnauthorizedException(
+        'Your username and password do not match with our records',
+      );
     }
-
-    if (!password) {
-      throw new UnauthorizedException('Password or stored password is missing');
-    }
-
     const pass = await bcrypt.compare(password, user.password);
 
     if (!pass) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(
+        'Your username and password do not match with our records',
+      );
     }
     return user;
   }

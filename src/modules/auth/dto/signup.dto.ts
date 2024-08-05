@@ -5,7 +5,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  MinLength
+  MinLength,
 } from 'class-validator';
 import { User } from 'src/entities/user.entity';
 import { Gender } from 'src/enum/gender.enum';
@@ -20,6 +20,7 @@ export class SignupDto {
 
   @IsEmail()
   @IsOptional()
+  @IsUnique({ tablename: User.name, column: 'email' })
   email: string;
 
   @IsNotEmpty()
