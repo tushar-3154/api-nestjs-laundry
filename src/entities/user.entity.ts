@@ -12,11 +12,23 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  firstname: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  lastname: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
   email: string;
+
+  @Column({ type: 'decimal', nullable: true })
+  mobilenumber: number;
 
   @Column()
   password: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  gender: string;
 
   @Column()
   role_id: number;

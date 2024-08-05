@@ -15,9 +15,17 @@ export class UserService {
   ) {}
 
   async signup(signUpDto: SignupDto): Promise<User> {
-    const { email, password, role_id } = signUpDto;
+    const {
+      firstname,
+      lastname,
+      email,
+      mobilenumber,
+      password,
+      role_id,
+      gender,
+    } = signUpDto;
     const existinguser = await this.userRepository.findOne({
-      where: { email },
+      where: { mobilenumber },
     });
 
     const role = await this.roleRepository.findOne({ where: { id: role_id } });
@@ -30,8 +38,13 @@ export class UserService {
     const hashedpassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
+      firstname,
+      lastname,
+      mobilenumber,
+
       email,
       password: hashedpassword,
+      gender,
       role,
     });
     const result = await this.userRepository.save(user);
@@ -40,8 +53,18 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<User> {
-    const { email, password } = loginDto;
-    const user = await this.userRepository.findOne({ where: { email } });
+    const { mobilenumber, email, password } = loginDto;
+    
+    let user: User;
+
+    if (mobilenumber) {
+      user = await this.userRepository.findOne({ where: { mobilenumber } });
+    } else if (email) {
+      user = await this.userRepository.findOne({ where: { email } });
+    } else {
+      throw new UnauthorizedException('Username or mobilenumber is required');
+    }
+
     if (!user) {
       throw new UnauthorizedException('Invalid Credintials');
     }
