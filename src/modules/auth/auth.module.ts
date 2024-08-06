@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { config } from 'dotenv';
-import { Role } from 'src/entities/role.entity';
 import { User } from 'src/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { AuthController } from './auth.controller';
@@ -13,11 +12,11 @@ config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   providers: [AuthService, UserService, JwtStrategy],
   controllers: [AuthController],

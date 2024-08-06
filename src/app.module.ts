@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/user/user.module';
 import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
@@ -25,6 +26,7 @@ import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
     }),
     AuthModule,
     UsersModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
