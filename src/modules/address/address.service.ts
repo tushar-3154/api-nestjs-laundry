@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Repository } from 'typeorm';
-import { CreateAddressDto } from './dto/addresses.dto';
+import { CreateAddressDto } from './dto/create-addresses.dto';
 import { UpdateUserAddressDto } from './dto/update-address.dto';
 
 @Injectable()
@@ -13,8 +13,10 @@ export class AddressService {
     private userAddressRepository: Repository<UserAddress>,
   ) {}
 
-  async getAll(): Promise<Response> {
-    const result = await this.userAddressRepository.find();
+  async getAll(user_Id: number): Promise<Response> {
+    const result = await this.userAddressRepository.find({
+      where: { user_id: user_Id },
+    });
 
     return {
       statusCode: 200,
@@ -23,8 +25,10 @@ export class AddressService {
     };
   }
 
-  async findOne(id: number): Promise<Response> {
-    const result = await this.userAddressRepository.findOne({ where: { id } });
+  async findOne(user_id: number, id: number): Promise<Response> {
+    const result = await this.userAddressRepository.findOne({
+      where: { id, user_id: user_id },
+    });
 
     if (!result) {
       throw new NotFoundException('Address not found');
@@ -37,8 +41,16 @@ export class AddressService {
     };
   }
 
-  async create(createAddressdto: CreateAddressDto): Promise<Response> {
-    const result = await this.userAddressRepository.save(createAddressdto);
+  async create(
+    user_id: number,
+    createAddressdto: CreateAddressDto,
+  ): Promise<Response> {
+    const newAddress = this.userAddressRepository.create({
+      ...createAddressdto,
+      user_id: user_id,
+    });
+    const result = await this.userAddressRepository.save(newAddress);
+    console.log(result);
 
     return {
       statusCode: 201,
@@ -48,11 +60,12 @@ export class AddressService {
   }
 
   async update(
+    user_id: number,
     id: number,
     updateAddressdto: UpdateUserAddressDto,
   ): Promise<Response> {
-    const address = await this.userAddressRepository.findOneBy({
-      id: id,
+    const address = await this.userAddressRepository.findOne({
+      where: { id, user_id: user_id },
     });
 
     if (!address) {
@@ -65,9 +78,11 @@ export class AddressService {
 
     await this.userAddressRepository.update(id, updateAddressdto);
 
-    const updatedAddress = await this.userAddressRepository.findOneBy({
-      id: id,
+    const updatedAddress = await this.userAddressRepository.findOne({
+      where: { id, user_id: user_id },
     });
+
+    console.log(updatedAddress);
     return {
       statusCode: 200,
       message: 'Address updated successfully',
@@ -75,8 +90,11 @@ export class AddressService {
     };
   }
 
-  async remove(id: number): Promise<Response> {
-    const result = await this.userAddressRepository.delete(id);
+  async remove(user_id: number, id: number): Promise<Response> {
+    const result = await this.userAddressRepository.delete({
+      id,
+      user_id: user_id,
+    });
 
     if (result.affected === 0) {
       return {

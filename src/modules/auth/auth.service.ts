@@ -19,15 +19,17 @@ export class AuthService {
     return {
       message: 'User signup successfully',
       statusCode: 200,
+
       data: { token, user },
     };
   }
 
   async login(loginDto: LoginDto): Promise<Response> {
     const responseData = await this.userService.login(loginDto);
-
     if (responseData.statusCode === 200) {
-      responseData.data.token = await this.generateJwtToken(responseData);
+      responseData.data.token = await this.generateJwtToken(
+        responseData.data.user,
+      );
       delete responseData.data.user.password;
     }
     return responseData;
