@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateAddressDto {
   @IsNumber()
@@ -35,7 +35,8 @@ export class CreateAddressDto {
 
   @IsString()
   @IsOptional()
-  pincode: string;
+  @MinLength(6)
+  pincode: number;
 
   @IsString()
   @IsOptional()

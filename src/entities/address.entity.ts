@@ -29,7 +29,7 @@ export class UserAddress extends BaseEntity {
   long: number;
 
   @Column({ nullable: true })
-  pincode: string;
+  pincode: number;
 
   @Column({ nullable: true })
   city?: string;
