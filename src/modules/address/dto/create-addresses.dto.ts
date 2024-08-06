@@ -15,7 +15,7 @@ export class CreateAddressDto {
 
   @IsString()
   @IsOptional()
-  building_numbers: string;
+  building_number: string;
 
   @IsString()
   @IsOptional()

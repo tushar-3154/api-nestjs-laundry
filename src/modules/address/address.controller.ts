@@ -44,7 +44,6 @@ export class AddressController {
     @Body() userAddress: CreateAddressDto,
   ): Promise<Response> {
     const user = req.user;
-    
 
     return this.userAddressService.create(user.user_id, userAddress);
   }
@@ -56,8 +55,7 @@ export class AddressController {
     @Body() updateAddressDto: UpdateUserAddressDto,
   ): Promise<Response> {
     const user = req.user;
-   
-    console.log(updateAddressDto);
+
     return this.userAddressService.update(user.user_id, id, updateAddressDto);
   }
 
