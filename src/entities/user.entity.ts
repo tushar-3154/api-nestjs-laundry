@@ -4,12 +4,16 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { UserAddress } from './address.entity';
+import { BaseEntity } from './base.entity';
 import { Role } from './role.entity';
 
 @Entity({ name: 'users' })
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -40,4 +44,10 @@ export class User {
   })
   @JoinColumn({ name: 'role_id' })
   role: Role;
+
+  @OneToMany(() => UserAddress, (address) => address.user, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  addresses: UserAddress[];
 }
