@@ -13,9 +13,9 @@ export class AddressService {
     private userAddressRepository: Repository<UserAddress>,
   ) {}
 
-  async getAll(user_Id: number): Promise<Response> {
+  async getAll(user_id: number): Promise<Response> {
     const result = await this.userAddressRepository.find({
-      where: { user_id: user_Id },
+      where: { user_id: user_id },
     });
 
     return {
@@ -50,7 +50,6 @@ export class AddressService {
       user_id: user_id,
     });
     const result = await this.userAddressRepository.save(newAddress);
-    console.log(result);
 
     return {
       statusCode: 201,
@@ -82,7 +81,6 @@ export class AddressService {
       where: { id, user_id: user_id },
     });
 
-    console.log(updatedAddress);
     return {
       statusCode: 200,
       message: 'Address updated successfully',

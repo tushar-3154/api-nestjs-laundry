@@ -19,7 +19,6 @@ export class AuthService {
     return {
       message: 'User signup successfully',
       statusCode: 200,
-
       data: { token, user },
     };
   }

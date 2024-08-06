@@ -14,7 +14,7 @@ export class UserAddress extends BaseEntity {
   phone_number: string;
 
   @Column({ nullable: true })
-  building_numbers: string;
+  building_number: string;
 
   @Column({ nullable: true })
   area: string;
