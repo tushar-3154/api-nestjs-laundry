@@ -15,7 +15,7 @@ import { Role } from './role.entity';
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  user_id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   first_name: string;

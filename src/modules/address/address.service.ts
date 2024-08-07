@@ -27,7 +27,7 @@ export class AddressService {
 
   async findOne(user_id: number, id: number): Promise<Response> {
     const result = await this.userAddressRepository.findOne({
-      where: { id, user_id: user_id },
+      where: { address_id: id, user_id: user_id },
     });
 
     if (!result) {
@@ -64,7 +64,7 @@ export class AddressService {
     updateAddressdto: UpdateUserAddressDto,
   ): Promise<Response> {
     const address = await this.userAddressRepository.findOne({
-      where: { id, user_id: user_id },
+      where: { address_id: id, user_id: user_id },
     });
 
     if (!address) {
@@ -78,7 +78,7 @@ export class AddressService {
     await this.userAddressRepository.update(id, updateAddressdto);
 
     const updatedAddress = await this.userAddressRepository.findOne({
-      where: { id, user_id: user_id },
+      where: { address_id: id, user_id: user_id },
     });
 
     return {
@@ -88,9 +88,9 @@ export class AddressService {
     };
   }
 
-  async remove(user_id: number, id: number): Promise<Response> {
+  async delete(user_id: number, id: number): Promise<Response> {
     const result = await this.userAddressRepository.delete({
-      id,
+      address_id: id,
       user_id: user_id,
     });
 
@@ -105,7 +105,7 @@ export class AddressService {
     return {
       statusCode: 200,
       message: 'Address deleted successfully',
-      data: null,
+      data: result,
     };
   }
 }
