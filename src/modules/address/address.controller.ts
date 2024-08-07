@@ -44,7 +44,6 @@ export class AddressController {
     @Body() userAddress: CreateAddressDto,
   ): Promise<Response> {
     const user = req.user;
-
     return this.userAddressService.create(user.user_id, userAddress);
   }
 
@@ -60,8 +59,8 @@ export class AddressController {
   }
 
   @Delete(':id')
-  remove(@Request() req, @Param('id') id: number): Promise<Response> {
+  async delete(@Request() req, @Param('id') id: number): Promise<Response> {
     const user = req.user;
-    return this.userAddressService.remove(user.user_id, id);
+    return this.userAddressService.delete(user.user_id, id);
   }
 }

@@ -5,7 +5,7 @@ import { User } from './user.entity';
 @Entity({ name: 'user_addresses' })
 export class UserAddress extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  address_id: number;
 
   @Column({ nullable: true })
   full_name: string;

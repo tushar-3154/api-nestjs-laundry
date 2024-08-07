@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'src/dto/response.dto';
@@ -6,6 +6,7 @@ import { User } from 'src/entities/user.entity';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
 import { Repository } from 'typeorm';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -57,6 +58,39 @@ export class UserService {
     return {
       statusCode: 200,
       message: 'User Loggedin succssfully',
+      data: { user },
+    };
+  }
+
+  async changePassword(
+    user_id: number,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<Response> {
+    const { old_password, new_password } = changePasswordDto;
+    const user = await this.userRepository.findOne({
+      where: { user_id: user_id },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const isOldPasswordValid = await bcrypt.compare(
+      old_password,
+      user.password,
+    );
+
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(new_password, salt);
+    await this.userRepository.save(user);
+    delete user.password;
+    return {
+      statusCode: 200,
+      message: 'password change succssfully',
       data: { user },
     };
   }
