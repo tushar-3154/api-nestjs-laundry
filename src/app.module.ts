@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -8,6 +8,7 @@ import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/user/user.module';
 import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
+import { MorganMiddleware } from './morgan.middleware';
 
 @Module({
   imports: [
@@ -31,4 +32,8 @@ import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MorganMiddleware).forRoutes('*');
+  }
+}
