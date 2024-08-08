@@ -24,7 +24,9 @@ export class CategoryService {
   }
 
   async findOne(id: number): Promise<Response> {
-    const result = await this.categoryRepository.findOne({ where: { id } });
+    const result = await this.categoryRepository.findOne({
+      where: { category_id: id },
+    });
 
     if (!result) {
       throw new NotFoundException('Category not found');
@@ -52,7 +54,7 @@ export class CategoryService {
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Response> {
     const category = await this.categoryRepository.findOne({
-      where: { id },
+      where: { category_id: id },
     });
 
     if (!category) {
@@ -65,7 +67,7 @@ export class CategoryService {
     await this.categoryRepository.update(id, updateCategoryDto);
 
     const update_category = await this.categoryRepository.findOne({
-      where: { id },
+      where: { category_id: id },
     });
 
     return {
@@ -76,18 +78,23 @@ export class CategoryService {
   }
 
   async delete(id: number): Promise<Response> {
-    const result = await this.categoryRepository.delete({ id: id });
-    if (result.affected === 0) {
+    const category = await this.categoryRepository.findOne({
+      where: { category_id: id, deleted_at: null },
+    });
+    if (!category) {
       return {
         statusCode: 404,
         message: 'Category not found',
         data: null,
       };
     }
+    category.deleted_at = new Date();
+    await this.categoryRepository.save(category);
+
     return {
       statusCode: 200,
       message: 'Category deleted successfully',
-      data: result,
+      data: category,
     };
   }
 }

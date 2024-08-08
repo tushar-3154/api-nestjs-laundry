@@ -24,7 +24,7 @@ export class ProductService {
 
   async findOne(id: number): Promise<Response> {
     const product = await this.productRepository.findOne({
-      where: { id },
+      where: { product_id: id },
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -50,7 +50,7 @@ export class ProductService {
     updateProductDto: UpdateProductDto,
   ): Promise<Response> {
     const product = await this.productRepository.findOne({
-      where: { id },
+      where: { product_id: id },
     });
     if (!product) {
       return {
@@ -62,7 +62,7 @@ export class ProductService {
     await this.productRepository.update(id, updateProductDto);
 
     const update_product = await this.productRepository.findOne({
-      where: { id },
+      where: { product_id: id },
     });
 
     return {
@@ -73,18 +73,22 @@ export class ProductService {
   }
 
   async delete(id: number): Promise<Response> {
-    const result = await this.productRepository.delete(id);
-    if (result.affected === 0) {
+    const product = await this.productRepository.findOne({
+      where: { product_id: id, deleted_at: null },
+    });
+    if (!product) {
       return {
         statusCode: 404,
         message: 'Product not found',
         data: null,
       };
     }
+    product.deleted_at = new Date();
+    await this.productRepository.save(product);
     return {
       statusCode: 200,
       message: 'Product deleted successfully',
-      data: result,
+      data: product,
     };
   }
 }
