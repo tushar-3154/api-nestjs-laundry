@@ -14,7 +14,9 @@ export class ServicesService {
   ) {}
 
   async findAll(): Promise<Response> {
-    const result = await this.serviceRepository.find();
+    const result = await this.serviceRepository.find({
+      where: { deleted_at: null },
+    });
     return {
       statusCode: 200,
       message: 'Service retrieved successfully',
@@ -24,7 +26,7 @@ export class ServicesService {
 
   async findOne(id: number): Promise<Response> {
     const product = await this.serviceRepository.findOne({
-      where: { service_id: id },
+      where: { service_id: id, deleted_at: null },
     });
     if (!product) {
       throw new NotFoundException(`Service with ID ${id} not found`);
@@ -50,7 +52,7 @@ export class ServicesService {
     updateServicetDto: UpdateServiceDto,
   ): Promise<Response> {
     const product = await this.serviceRepository.findOne({
-      where: { service_id: id },
+      where: { service_id: id, deleted_at: null },
     });
     if (!product) {
       return {
@@ -62,7 +64,7 @@ export class ServicesService {
     await this.serviceRepository.update(id, updateServicetDto);
 
     const update_service = await this.serviceRepository.findOne({
-      where: { service_id: id },
+      where: { service_id: id, deleted_at: null },
     });
 
     return {

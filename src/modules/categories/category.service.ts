@@ -14,7 +14,9 @@ export class CategoryService {
   ) {}
 
   async findAll(): Promise<Response> {
-    const result = await this.categoryRepository.find();
+    const result = await this.categoryRepository.find({
+      where: { deleted_at: null },
+    });
 
     return {
       statusCode: 200,
@@ -25,7 +27,7 @@ export class CategoryService {
 
   async findOne(id: number): Promise<Response> {
     const result = await this.categoryRepository.findOne({
-      where: { category_id: id },
+      where: { category_id: id, deleted_at: null },
     });
 
     if (!result) {
@@ -54,7 +56,7 @@ export class CategoryService {
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Response> {
     const category = await this.categoryRepository.findOne({
-      where: { category_id: id },
+      where: { category_id: id, deleted_at: null },
     });
 
     if (!category) {
@@ -67,7 +69,7 @@ export class CategoryService {
     await this.categoryRepository.update(id, updateCategoryDto);
 
     const update_category = await this.categoryRepository.findOne({
-      where: { category_id: id },
+      where: { category_id: id, deleted_at: null },
     });
 
     return {

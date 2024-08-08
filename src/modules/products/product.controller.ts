@@ -48,6 +48,6 @@ export class ProductController {
 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number): Promise<Response> {
-    return await this.productService.delete(+id);
+    return await this.productService.delete(id);
   }
 }

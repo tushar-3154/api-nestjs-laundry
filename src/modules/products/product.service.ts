@@ -14,7 +14,9 @@ export class ProductService {
   ) {}
 
   async findAll(): Promise<Response> {
-    const result = await this.productRepository.find();
+    const result = await this.productRepository.find({
+      where: { deleted_at: null },
+    });
     return {
       statusCode: 200,
       message: 'product retrieved successfully',
@@ -24,7 +26,7 @@ export class ProductService {
 
   async findOne(id: number): Promise<Response> {
     const product = await this.productRepository.findOne({
-      where: { product_id: id },
+      where: { product_id: id, deleted_at: null },
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -50,7 +52,7 @@ export class ProductService {
     updateProductDto: UpdateProductDto,
   ): Promise<Response> {
     const product = await this.productRepository.findOne({
-      where: { product_id: id },
+      where: { product_id: id, deleted_at: null },
     });
     if (!product) {
       return {
@@ -62,7 +64,7 @@ export class ProductService {
     await this.productRepository.update(id, updateProductDto);
 
     const update_product = await this.productRepository.findOne({
-      where: { product_id: id },
+      where: { product_id: id, deleted_at: null },
     });
 
     return {

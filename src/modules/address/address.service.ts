@@ -15,7 +15,7 @@ export class AddressService {
 
   async getAll(user_id: number): Promise<Response> {
     const result = await this.userAddressRepository.find({
-      where: { user_id: user_id },
+      where: { user_id: user_id, deleted_at: null },
     });
 
     return {
@@ -27,7 +27,7 @@ export class AddressService {
 
   async findOne(user_id: number, id: number): Promise<Response> {
     const result = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     if (!result) {
@@ -64,7 +64,7 @@ export class AddressService {
     updateAddressdto: UpdateUserAddressDto,
   ): Promise<Response> {
     const address = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     if (!address) {
@@ -78,7 +78,7 @@ export class AddressService {
     await this.userAddressRepository.update(id, updateAddressdto);
 
     const updatedAddress = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     return {
