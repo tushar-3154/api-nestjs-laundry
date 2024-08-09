@@ -19,7 +19,7 @@ import { FilePath } from 'src/constants/FilePath';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
-import { fileUpload } from '../../multer-file-upload/multer-file-upload';
+import { fileUpload } from '../../multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
