@@ -1,7 +1,8 @@
 # compiled output
 /dist
 /node_modules
-/images
+/images/product/
+images/service/
 /build
 src/images/product/
 src/images/service/
