@@ -3,19 +3,25 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { fileUpload } from './product-file-upload/product-file-upload.config';
 import { ProductService } from './product.service';
 
 @Controller('products')
@@ -34,16 +40,30 @@ export class ProductController {
     return await this.productService.findOne(id);
   }
   @Post()
-  create(@Body() createProductDto: CreateProductDto): Promise<Response> {
-    return this.productService.create(createProductDto);
+  @UseInterceptors(FileInterceptor('image', fileUpload))
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<Response> {
+    if (!file) {
+      throw new HttpException('File must be provide', HttpStatus.BAD_REQUEST);
+    }
+    const imagepath = file.path;
+    return this.productService.create(createProductDto, imagepath);
   }
 
   @Put(':id')
+  @UseInterceptors(FileInterceptor('image', fileUpload))
   async update(
     @Param('id') id: number,
     @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    return await this.productService.update(id, updateProductDto);
+    let imagePath = updateProductDto.image;
+    if (file) {
+      imagePath = file.path;
+    }
+    return await this.productService.update(id, updateProductDto, imagePath);
   }
 
   @Delete(':id')

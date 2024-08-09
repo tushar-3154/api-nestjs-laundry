@@ -4,6 +4,5 @@ export class UpdateServiceDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
-  image?: string;
+  image: string;
 }

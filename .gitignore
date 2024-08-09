@@ -2,7 +2,8 @@
 /dist
 /node_modules
 /build
-
+src/images/product/
+src/images/service/
 # Logs
 logs
 *.log

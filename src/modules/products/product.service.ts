@@ -37,8 +37,15 @@ export class ProductService {
       data: { product },
     };
   }
-  async create(createProductDto: CreateProductDto): Promise<Response> {
-    const product = this.productRepository.create(createProductDto);
+  async create(
+    createProductDto: CreateProductDto,
+    imagePath: string,
+  ): Promise<Response> {
+    const product = this.productRepository.create({
+      ...createProductDto,
+      image: imagePath,
+    });
+
     const result = await this.productRepository.save(product);
     return {
       statusCode: 201,
@@ -50,6 +57,7 @@ export class ProductService {
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
+    imagePath: string,
   ): Promise<Response> {
     const product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },
@@ -61,7 +69,10 @@ export class ProductService {
         data: null,
       };
     }
-    await this.productRepository.update(id, updateProductDto);
+    await this.productRepository.update(id, {
+      ...updateProductDto,
+      image: imagePath,
+    });
 
     const update_product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },

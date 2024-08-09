@@ -37,8 +37,15 @@ export class ServicesService {
       data: { product },
     };
   }
-  async create(createServiceDto: CreateServiceDto): Promise<Response> {
-    const product = this.serviceRepository.create(createServiceDto);
+  async create(
+    createServiceDto: CreateServiceDto,
+    imagePath: string,
+  ): Promise<Response> {
+    const product = this.serviceRepository.create({
+      ...createServiceDto,
+      image: imagePath,
+    });
+
     const result = await this.serviceRepository.save(product);
     return {
       statusCode: 201,
