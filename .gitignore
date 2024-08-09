@@ -1,11 +1,9 @@
 # compiled output
 /dist
 /node_modules
-/images/product/
-images/service/
+/images
 /build
-src/images/product/
-src/images/service/
+
 # Logs
 logs
 *.log
