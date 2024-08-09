@@ -6,6 +6,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CategoryModule } from './modules/categories/category.module';
+import { ProductModule } from './modules/products/product.module';
+import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/user/user.module';
 import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
 import { MorganMiddleware } from './morgan.middleware';
@@ -28,6 +31,9 @@ import { MorganMiddleware } from './morgan.middleware';
     AuthModule,
     UsersModule,
     AddressModule,
+    CategoryModule,
+    ProductModule,
+    ServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],

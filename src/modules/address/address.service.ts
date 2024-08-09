@@ -15,7 +15,7 @@ export class AddressService {
 
   async getAll(user_id: number): Promise<Response> {
     const result = await this.userAddressRepository.find({
-      where: { user_id: user_id },
+      where: { user_id: user_id, deleted_at: null },
     });
 
     return {
@@ -27,7 +27,7 @@ export class AddressService {
 
   async findOne(user_id: number, id: number): Promise<Response> {
     const result = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     if (!result) {
@@ -64,7 +64,7 @@ export class AddressService {
     updateAddressdto: UpdateUserAddressDto,
   ): Promise<Response> {
     const address = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     if (!address) {
@@ -78,7 +78,7 @@ export class AddressService {
     await this.userAddressRepository.update(id, updateAddressdto);
 
     const updatedAddress = await this.userAddressRepository.findOne({
-      where: { address_id: id, user_id: user_id },
+      where: { address_id: id, user_id: user_id, deleted_at: null },
     });
 
     return {
@@ -89,12 +89,15 @@ export class AddressService {
   }
 
   async delete(user_id: number, id: number): Promise<Response> {
-    const result = await this.userAddressRepository.delete({
-      address_id: id,
-      user_id: user_id,
+    const address = await this.userAddressRepository.findOne({
+      where: {
+        address_id: id,
+        user_id: user_id,
+        deleted_at: null,
+      },
     });
 
-    if (result.affected === 0) {
+    if (!address) {
       return {
         statusCode: 404,
         message: 'Address not found',
@@ -102,10 +105,13 @@ export class AddressService {
       };
     }
 
+    address.deleted_at = new Date();
+    await this.userAddressRepository.save(address);
+
     return {
       statusCode: 200,
       message: 'Address deleted successfully',
-      data: result,
+      data: address,
     };
   }
 }
