@@ -19,11 +19,10 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { fileUpload } from '../file-upload/file-upload.config';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
-import { fileUpload } from './service-file-upload/service-file-upload.config';
 import { ServicesService } from './services.service';
-
 @Controller('services')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
@@ -43,7 +42,7 @@ export class ServicesController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('image', fileUpload))
+  @UseInterceptors(FileInterceptor('image', fileUpload('/service')))
   async create(
     @Body() createserviceDto: CreateServiceDto,
     @UploadedFile() file: Express.Multer.File,
@@ -57,7 +56,7 @@ export class ServicesController {
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('image', fileUpload))
+  @UseInterceptors(FileInterceptor('image', fileUpload('/service')))
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateServiceDto: UpdateServiceDto,

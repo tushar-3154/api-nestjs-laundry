@@ -1,13 +1,17 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import * as fs from 'fs';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import * as path from 'path';
 
-export const fileUpload = {
+export const fileUpload = (destination: string) => ({
   storage: diskStorage({
-    destination:
-      '/Users/tusharsolanki/Documents/api-nestjs-laundry/src/images/service',
+    destination: (req, file, cb) => {
+      const uploadPath = path.join(process.cwd(), 'src', 'images', destination);
+      fs.mkdirSync(uploadPath, { recursive: true });
+      cb(null, uploadPath);
+    },
     filename: (req, file, cb) => {
-      const filename = `${Date.now()}${extname(file.originalname)}`;
+      const filename = `${Date.now()}${path.extname(file.originalname)}`;
       cb(null, filename);
     },
   }),
@@ -18,7 +22,7 @@ export const fileUpload = {
     if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
       cb(
         new HttpException(
-          'Only image files are allowed!',
+          'Only JPEG, JPG, or PNG image files are allowed!',
           HttpStatus.BAD_REQUEST,
         ),
         false,
@@ -27,4 +31,4 @@ export const fileUpload = {
       cb(null, true);
     }
   },
-};
+});

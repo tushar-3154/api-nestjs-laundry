@@ -19,9 +19,9 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { fileUpload } from '../file-upload/file-upload.config';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { fileUpload } from './product-file-upload/product-file-upload.config';
 import { ProductService } from './product.service';
 
 @Controller('products')
@@ -40,7 +40,7 @@ export class ProductController {
     return await this.productService.findOne(id);
   }
   @Post()
-  @UseInterceptors(FileInterceptor('image', fileUpload))
+  @UseInterceptors(FileInterceptor('image', fileUpload('/product')))
   async create(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file: Express.Multer.File,
@@ -53,7 +53,7 @@ export class ProductController {
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('image', fileUpload))
+  @UseInterceptors(FileInterceptor('image', fileUpload('/product')))
   async update(
     @Param('id') id: number,
     @Body() updateProductDto: UpdateProductDto,
