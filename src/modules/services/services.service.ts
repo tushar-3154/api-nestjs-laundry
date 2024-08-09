@@ -41,12 +41,14 @@ export class ServicesService {
     createServiceDto: CreateServiceDto,
     imagePath: string,
   ): Promise<Response> {
-    const product = this.serviceRepository.create({
+    const service = this.serviceRepository.create({
       ...createServiceDto,
       image: imagePath,
     });
 
-    const result = await this.serviceRepository.save(product);
+    const result = await this.serviceRepository.save(service);
+    if (service?.image)
+      service.image = process.env.BASE_URL + '/' + service.image;
     return {
       statusCode: 201,
       message: 'Service added successfully',
@@ -57,23 +59,28 @@ export class ServicesService {
   async update(
     id: number,
     updateServicetDto: UpdateServiceDto,
+    imagePath: string,
   ): Promise<Response> {
-    const product = await this.serviceRepository.findOne({
+    const service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
     });
-    if (!product) {
+    if (!service) {
       return {
         statusCode: 404,
         message: 'Service not found',
         data: null,
       };
     }
-    await this.serviceRepository.update(id, updateServicetDto);
+    await this.serviceRepository.update(id, {
+      ...updateServicetDto,
+      image: imagePath,
+    });
 
     const update_service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
     });
-
+    if (update_service?.image)
+      update_service.image = process.env.BASE_URL + '/' + update_service.image;
     return {
       statusCode: 200,
       message: 'Service updated successfully',

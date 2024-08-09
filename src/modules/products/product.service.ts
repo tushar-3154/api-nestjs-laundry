@@ -47,6 +47,8 @@ export class ProductService {
     });
 
     const result = await this.productRepository.save(product);
+    if (product?.image)
+      product.image = process.env.BASE_URL + '/' + product.image;
     return {
       statusCode: 201,
       message: 'product added successfully',
@@ -77,6 +79,8 @@ export class ProductService {
     const update_product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },
     });
+    if (update_product?.image)
+      update_product.image = process.env.BASE_URL + '/' + update_product.image;
 
     return {
       statusCode: 200,

@@ -15,11 +15,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FilePath } from 'src/constants/FilePath';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
+import { fileUpload } from '../../multer-file-upload/multer-file-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
-import { fileUpload } from '../file-upload/file-upload.config';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
@@ -42,7 +43,9 @@ export class ServicesController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('image', fileUpload('/service')))
+  @UseInterceptors(
+    FileInterceptor('image', fileUpload(FilePath.SERVICE_IMAGES)),
+  )
   async create(
     @Body() createserviceDto: CreateServiceDto,
     @UploadedFile() file: Express.Multer.File,
@@ -51,26 +54,21 @@ export class ServicesController {
       throw new HttpException('File must be provided', HttpStatus.BAD_REQUEST);
     }
 
-    const imagepath = file.path;
+    const imagepath = FilePath.SERVICE_IMAGES + '/' + file.filename;
     return this.serviceService.create(createserviceDto, imagepath);
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('image', fileUpload('/service')))
+  @UseInterceptors(
+    FileInterceptor('image', fileUpload(FilePath.SERVICE_IMAGES)),
+  )
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateServiceDto: UpdateServiceDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    let imagePath = updateServiceDto.image;
-
-    if (file) {
-      imagePath = file.path;
-    }
-    return await this.serviceService.update(id, {
-      ...updateServiceDto,
-      image: imagePath,
-    });
+    const imagePath = FilePath.SERVICE_IMAGES + '/' + file.filename;
+    return await this.serviceService.update(id, updateServiceDto, imagePath);
   }
 
   @Delete(':id')

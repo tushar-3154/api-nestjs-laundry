@@ -15,11 +15,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FilePath } from 'src/constants/FilePath';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
+import { fileUpload } from '../../multer-file-upload/multer-file-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
-import { fileUpload } from '../file-upload/file-upload.config';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
@@ -40,7 +41,9 @@ export class ProductController {
     return await this.productService.findOne(id);
   }
   @Post()
-  @UseInterceptors(FileInterceptor('image', fileUpload('/product')))
+  @UseInterceptors(
+    FileInterceptor('image', fileUpload(FilePath.PRODUCT_IMAGES)),
+  )
   async create(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file: Express.Multer.File,
@@ -48,21 +51,20 @@ export class ProductController {
     if (!file) {
       throw new HttpException('File must be provide', HttpStatus.BAD_REQUEST);
     }
-    const imagepath = file.path;
+    const imagepath = FilePath.PRODUCT_IMAGES + '/' + file.filename;
     return this.productService.create(createProductDto, imagepath);
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('image', fileUpload('/product')))
+  @UseInterceptors(
+    FileInterceptor('image', fileUpload(FilePath.PRODUCT_IMAGES)),
+  )
   async update(
     @Param('id') id: number,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    let imagePath = updateProductDto.image;
-    if (file) {
-      imagePath = file.path;
-    }
+    const imagePath = FilePath.PRODUCT_IMAGES + '/' + file.filename;
     return await this.productService.update(id, updateProductDto, imagePath);
   }
 

@@ -6,7 +6,7 @@ import * as path from 'path';
 export const fileUpload = (destination: string) => ({
   storage: diskStorage({
     destination: (req, file, cb) => {
-      const uploadPath = path.join(process.cwd(), 'src', 'images', destination);
+      const uploadPath = path.join(process.cwd(), destination);
       fs.mkdirSync(uploadPath, { recursive: true });
       cb(null, uploadPath);
     },
