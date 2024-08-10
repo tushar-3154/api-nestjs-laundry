@@ -28,17 +28,19 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<Response> {
-    const { username, password } = loginDto;
+    const { username, password, role_id } = loginDto;
     let mobileCondition = {};
     if (Number(username)) {
       mobileCondition = {
         mobile_number: Number(username),
+        role_id: role_id,
       };
     }
     const user = await this.userRepository.findOne({
       where: [
         {
           email: username,
+          role_id: role_id,
         },
         mobileCondition,
       ],
@@ -55,6 +57,7 @@ export class UserService {
     if (!pass) {
       return loginErrrorMessage;
     }
+
     return {
       statusCode: 200,
       message: 'User Loggedin succssfully',
