@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { useContainer, ValidationError } from 'class-validator';
+import * as cors from 'cors';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 
@@ -30,6 +31,7 @@ async function bootstrap() {
     index: false,
     prefix: '/images',
   });
+  app.use(cors({ origin: '*' }));
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   const port = process.env.PORT;
