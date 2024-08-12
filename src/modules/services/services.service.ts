@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Service } from 'src/entities/service.entity';
+import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -18,28 +19,21 @@ export class ServicesService {
       where: { deleted_at: null },
     });
 
-    services.map((service) => {
-      if (service.image) {
-        service.image = process.env.BASE_URL + '/' + service.image;
-      }
-    });
-
+    const service = appendBaseUrlToImages(services);
     return {
       statusCode: 200,
       message: 'Services retrieved successfully',
-      data: { services },
+      data: { services: service },
     };
   }
 
   async findAll(): Promise<Response> {
-    const service = await this.serviceRepository.find({
+    const services = await this.serviceRepository.find({
       where: { deleted_at: null },
     });
-    service.forEach((service) => {
-      if (service.image) {
-        service.image = process.env.BASE_URL + '/' + service.image;
-      }
-    });
+
+    const service = appendBaseUrlToImages(services);
+
     return {
       statusCode: 200,
       message: 'Service retrieved successfully',
@@ -54,13 +48,13 @@ export class ServicesService {
     if (!service) {
       throw new NotFoundException(`Service with ID ${id} not found`);
     }
-    if (service.image) {
-      service.image = process.env.BASE_URL + '/' + service.image;
-    }
+
+    const services = appendBaseUrlToImages([service])[0];
+
     return {
       statusCode: 200,
       message: 'Service retrieved successfully',
-      data: { service },
+      data: { service: services },
     };
   }
 
@@ -74,12 +68,13 @@ export class ServicesService {
     });
 
     const result = await this.serviceRepository.save(service);
-    if (service?.image)
-      service.image = process.env.BASE_URL + '/' + service.image;
+
+    const services = appendBaseUrlToImages([result])[0];
+
     return {
       statusCode: 201,
       message: 'Service added successfully',
-      data: { result },
+      data: { result: services },
     };
   }
 
@@ -106,12 +101,13 @@ export class ServicesService {
     const update_service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
     });
-    if (update_service?.image)
-      update_service.image = process.env.BASE_URL + '/' + update_service.image;
+
+    const services = appendBaseUrlToImages([update_service])[0];
+
     return {
       statusCode: 200,
       message: 'Service updated successfully',
-      data: { update_service },
+      data: { update_service: services },
     };
   }
 
