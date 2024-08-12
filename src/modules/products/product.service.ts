@@ -13,14 +13,36 @@ export class ProductService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async findAll(): Promise<Response> {
-    const result = await this.productRepository.find({
+  async getAll(): Promise<Response> {
+    const product = await this.productRepository.find({
       where: { deleted_at: null },
+    });
+    product.map((product) => {
+      if (product.image) {
+        product.image = process.env.BASE_URL + '/' + product.image;
+      }
+    });
+
+    return {
+      statusCode: 200,
+      message: 'Product retrieved successfully',
+      data: { product },
+    };
+  }
+
+  async findAll(): Promise<Response> {
+    const product = await this.productRepository.find({
+      where: { deleted_at: null },
+    });
+    product.forEach((product) => {
+      if (product.image) {
+        product.image = process.env.BASE_URL + '/' + product.image;
+      }
     });
     return {
       statusCode: 200,
       message: 'product retrieved successfully',
-      data: { result },
+      data: { product },
     };
   }
 
@@ -31,12 +53,16 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    if (product.image) {
+      product.image = process.env.BASE_URL + '/' + product.image;
+    }
     return {
       statusCode: 200,
       message: 'product retrieved successfully',
       data: { product },
     };
   }
+
   async create(
     createProductDto: CreateProductDto,
     imagePath: string,

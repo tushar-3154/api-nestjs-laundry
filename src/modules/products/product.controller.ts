@@ -31,6 +31,12 @@ import { ProductService } from './product.service';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Get('mobile')
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.productService.getAll();
+  }
+
   @Get()
   async findAll(): Promise<Response> {
     return await this.productService.findAll();
@@ -40,6 +46,7 @@ export class ProductController {
   async findOne(@Param('id') id: number): Promise<Response> {
     return await this.productService.findOne(id);
   }
+
   @Post()
   @UseInterceptors(
     FileInterceptor('image', fileUpload(FilePath.PRODUCT_IMAGES)),

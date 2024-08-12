@@ -13,28 +13,54 @@ export class ServicesService {
     private serviceRepository: Repository<Service>,
   ) {}
 
-  async findAll(): Promise<Response> {
-    const result = await this.serviceRepository.find({
+  async getAll(): Promise<Response> {
+    const services = await this.serviceRepository.find({
       where: { deleted_at: null },
+    });
+
+    services.map((service) => {
+      if (service.image) {
+        service.image = process.env.BASE_URL + '/' + service.image;
+      }
+    });
+
+    return {
+      statusCode: 200,
+      message: 'Services retrieved successfully',
+      data: { services },
+    };
+  }
+
+  async findAll(): Promise<Response> {
+    const service = await this.serviceRepository.find({
+      where: { deleted_at: null },
+    });
+    service.forEach((service) => {
+      if (service.image) {
+        service.image = process.env.BASE_URL + '/' + service.image;
+      }
     });
     return {
       statusCode: 200,
       message: 'Service retrieved successfully',
-      data: { result },
+      data: { service },
     };
   }
 
   async findOne(id: number): Promise<Response> {
-    const product = await this.serviceRepository.findOne({
+    const service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
     });
-    if (!product) {
+    if (!service) {
       throw new NotFoundException(`Service with ID ${id} not found`);
+    }
+    if (service.image) {
+      service.image = process.env.BASE_URL + '/' + service.image;
     }
     return {
       statusCode: 200,
       message: 'Service retrieved successfully',
-      data: { product },
+      data: { service },
     };
   }
 

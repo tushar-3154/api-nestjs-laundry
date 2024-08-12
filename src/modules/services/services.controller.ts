@@ -33,6 +33,12 @@ import { ServicesService } from './services.service';
 export class ServicesController {
   constructor(private readonly serviceService: ServicesService) {}
 
+  @Get('mobile')
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.serviceService.getAll();
+  }
+
   @Get()
   async findAll(): Promise<Response> {
     return await this.serviceService.findAll();

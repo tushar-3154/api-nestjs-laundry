@@ -25,6 +25,12 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @Get('mobile')
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.categoryService.getAll();
+  }
+
   @Get()
   async findAll(): Promise<Response> {
     return await this.categoryService.findAll();
