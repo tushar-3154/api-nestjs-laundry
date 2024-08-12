@@ -25,7 +25,7 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
 
-@Controller('services')
+@Controller()
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
@@ -33,17 +33,23 @@ import { ServicesService } from './services.service';
 export class ServicesController {
   constructor(private readonly serviceService: ServicesService) {}
 
-  @Get()
+  @Get('services')
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.serviceService.getAll();
+  }
+
+  @Get('admin/services')
   async findAll(): Promise<Response> {
     return await this.serviceService.findAll();
   }
 
-  @Get(':id')
+  @Get('admin/services/:id')
   async findOne(@Param('id') id: number): Promise<Response> {
     return await this.serviceService.findOne(id);
   }
 
-  @Post()
+  @Post('admin/services')
   @UseInterceptors(
     FileInterceptor('image', fileUpload(FilePath.SERVICE_IMAGES)),
   )
@@ -59,7 +65,7 @@ export class ServicesController {
     return this.serviceService.create(createserviceDto, imagepath);
   }
 
-  @Put(':id')
+  @Put('admin/services/:id')
   @UseInterceptors(
     FileInterceptor('image', fileUpload(FilePath.SERVICE_IMAGES)),
   )
@@ -72,7 +78,7 @@ export class ServicesController {
     return await this.serviceService.update(id, updateServiceDto, imagePath);
   }
 
-  @Delete(':id')
+  @Delete('admin/services/:id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return await this.serviceService.delete(id);
   }

@@ -18,31 +18,37 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
-@Controller('categories')
+@Controller()
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Get()
+  @Get('categories')
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.categoryService.getAll();
+  }
+
+  @Get('admin/categories')
   async findAll(): Promise<Response> {
     return await this.categoryService.findAll();
   }
 
-  @Get(':id')
+  @Get('admin/categories/:id')
   async findOne(@Param('id') id: number): Promise<Response> {
     return await this.categoryService.findOne(id);
   }
 
-  @Post()
+  @Post('admin/categories')
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<Response> {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Put(':id')
+  @Put('admin/categories/:id')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -50,7 +56,7 @@ export class CategoryController {
     return await this.categoryService.update(id, updateCategoryDto);
   }
 
-  @Delete(':id')
+  @Delete('admin/categories/:id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return await this.categoryService.delete(id);
   }

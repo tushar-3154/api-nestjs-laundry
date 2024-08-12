@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Product } from 'src/entities/product.entity';
+import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -13,14 +14,30 @@ export class ProductService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async findAll(): Promise<Response> {
-    const result = await this.productRepository.find({
+  async getAll(): Promise<Response> {
+    const product = await this.productRepository.find({
       where: { deleted_at: null },
     });
+
+    const products = appendBaseUrlToImages(product);
+    return {
+      statusCode: 200,
+      message: 'Product retrieved successfully',
+      data: { product: products },
+    };
+  }
+
+  async findAll(): Promise<Response> {
+    const product = await this.productRepository.find({
+      where: { deleted_at: null },
+    });
+
+    const products = appendBaseUrlToImages(product);
+
     return {
       statusCode: 200,
       message: 'product retrieved successfully',
-      data: { result },
+      data: { product: products },
     };
   }
 
@@ -31,12 +48,14 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    const products = appendBaseUrlToImages([product])[0];
     return {
       statusCode: 200,
       message: 'product retrieved successfully',
-      data: { product },
+      data: { product: products },
     };
   }
+
   async create(
     createProductDto: CreateProductDto,
     imagePath: string,
@@ -47,12 +66,12 @@ export class ProductService {
     });
 
     const result = await this.productRepository.save(product);
-    if (product?.image)
-      product.image = process.env.BASE_URL + '/' + product.image;
+    const Product = appendBaseUrlToImages([result])[0];
+
     return {
       statusCode: 201,
       message: 'product added successfully',
-      data: { result },
+      data: { result: Product },
     };
   }
 
@@ -79,13 +98,13 @@ export class ProductService {
     const update_product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },
     });
-    if (update_product?.image)
-      update_product.image = process.env.BASE_URL + '/' + update_product.image;
+
+    const products = appendBaseUrlToImages([update_product])[0];
 
     return {
       statusCode: 200,
       message: 'product updated successfully',
-      data: { update_product },
+      data: { update_product: products },
     };
   }
 
@@ -100,12 +119,15 @@ export class ProductService {
         data: null,
       };
     }
+
+    const products = appendBaseUrlToImages([product])[0];
+
     product.deleted_at = new Date();
     await this.productRepository.save(product);
     return {
       statusCode: 200,
       message: 'Product deleted successfully',
-      data: product,
+      data: { product: products },
     };
   }
 }

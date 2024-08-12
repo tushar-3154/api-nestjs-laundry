@@ -13,6 +13,18 @@ export class CategoryService {
     private categoryRepository: Repository<Category>,
   ) {}
 
+  async getAll(): Promise<Response> {
+    const category = await this.categoryRepository.find({
+      where: { deleted_at: null },
+    });
+
+    return {
+      statusCode: 200,
+      message: 'Category retrived successfully',
+      data: { category },
+    };
+  }
+
   async findAll(): Promise<Response> {
     const result = await this.categoryRepository.find({
       where: { deleted_at: null },
