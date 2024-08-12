@@ -119,12 +119,15 @@ export class ProductService {
         data: null,
       };
     }
+
+    const products = appendBaseUrlToImages([product])[0];
+
     product.deleted_at = new Date();
     await this.productRepository.save(product);
     return {
       statusCode: 200,
       message: 'Product deleted successfully',
-      data: product,
+      data: { product: products },
     };
   }
 }

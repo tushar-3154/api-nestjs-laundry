@@ -25,29 +25,29 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
 
-@Controller('products')
+@Controller()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Get('mobile')
+  @Get('products')
   @Roles(Role.CUSTOMER)
   async getAll(): Promise<Response> {
     return await this.productService.getAll();
   }
 
-  @Get()
+  @Get('admin/products')
   async findAll(): Promise<Response> {
     return await this.productService.findAll();
   }
 
-  @Get(':id')
+  @Get('admin/products/:id')
   async findOne(@Param('id') id: number): Promise<Response> {
     return await this.productService.findOne(id);
   }
 
-  @Post()
+  @Post('admin/products')
   @UseInterceptors(
     FileInterceptor('image', fileUpload(FilePath.PRODUCT_IMAGES)),
   )
@@ -62,7 +62,7 @@ export class ProductController {
     return this.productService.create(createProductDto, imagepath);
   }
 
-  @Put(':id')
+  @Put('admin/products/:id')
   @UseInterceptors(
     FileInterceptor('image', fileUpload(FilePath.PRODUCT_IMAGES)),
   )
@@ -75,7 +75,7 @@ export class ProductController {
     return await this.productService.update(id, updateProductDto, imagePath);
   }
 
-  @Delete(':id')
+  @Delete('admin/products/:id')
   async delete(@Param('id', ParseIntPipe) id: number): Promise<Response> {
     return await this.productService.delete(id);
   }

@@ -124,13 +124,15 @@ export class ServicesService {
       };
     }
 
+    const services = appendBaseUrlToImages([service])[0];
+
     service.deleted_at = new Date();
     await this.serviceRepository.save(service);
 
     return {
       statusCode: 200,
       message: 'Service deleted successfully',
-      data: service,
+      data: { service: services },
     };
   }
 }
