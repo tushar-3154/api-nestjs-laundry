@@ -8,6 +8,7 @@ const configService = new ConfigService();
 const entityPath = __dirname + '/../' + configService.get('ENTITIES') || '';
 const migrationPath =
   __dirname + '/../' + configService.get('MIGRATIONS') || '';
+
 export const dataSourceOptions: DataSourceOptions = {
   type: 'mysql',
   host: configService.get('DB_HOST'),

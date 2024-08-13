@@ -9,6 +9,7 @@ import { BaseEntity } from './base.entity';
 import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
+
 @Entity('prices')
 export class Price extends BaseEntity {
   @PrimaryGeneratedColumn()

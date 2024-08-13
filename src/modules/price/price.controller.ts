@@ -7,7 +7,7 @@ import { RolesGuard } from '../auth/guard/role.guard';
 import { CreatePriceDto } from './dto/create-price.dto';
 import { PriceService } from './price.service';
 
-@Controller('price')
+@Controller('prices')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)

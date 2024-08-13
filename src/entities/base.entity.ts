@@ -7,6 +7,6 @@ export class BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at: Date;
 }

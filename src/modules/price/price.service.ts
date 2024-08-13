@@ -35,7 +35,9 @@ export class PriceService {
   }
 
   async findAll(): Promise<Response> {
-    const price = await this.priceRepository.find();
+    const price = await this.priceRepository.find({
+      where: { deleted_at: null },
+    });
     return {
       statusCode: 200,
       message: 'prices retrieved successfully',
