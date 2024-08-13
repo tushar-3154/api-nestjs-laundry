@@ -1,4 +1,3 @@
-import { Gender } from 'src/enum/gender.enum';
 import {
   Column,
   Entity,
@@ -7,6 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Gender } from '../enum/gender.enum';
 
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
