@@ -8,7 +8,6 @@ const configService = new ConfigService();
 const entityPath = __dirname + '/../' + configService.get('ENTITIES') || '';
 const migrationPath =
   __dirname + '/../' + configService.get('MIGRATIONS') || '';
-// console.log('__dirname', __dirname);
 console.log('entityPath', entityPath);
 console.log('migrationPath', migrationPath);
 export const dataSourceOptions: DataSourceOptions = {
