@@ -4,8 +4,8 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { useContainer, ValidationError } from 'class-validator';
-import * as cors from 'cors';
-import * as dotenv from 'dotenv';
+import cors from 'cors';
+import dotenv from 'dotenv';
 import { join } from 'path';
 
 dotenv.config();

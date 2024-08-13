@@ -4,9 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { dataSourceOptions } from './database/data-source';
 import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { PriceModule } from './modules/price/price.module';
 import { ProductModule } from './modules/products/product.module';
 import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/user/user.module';
@@ -18,22 +20,14 @@ import { MorganMiddleware } from './morgan.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     AuthModule,
     UsersModule,
     AddressModule,
     CategoryModule,
     ProductModule,
     ServicesModule,
+    PriceModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
