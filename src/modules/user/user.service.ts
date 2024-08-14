@@ -2,6 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'src/dto/response.dto';
+import { DeviceUser } from 'src/entities/device-user.entity';
+import { LoginHistory } from 'src/entities/login-history.entity';
 import { User } from 'src/entities/user.entity';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
@@ -12,6 +14,10 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(DeviceUser)
+    private deviceUserRepository: Repository<DeviceUser>,
+    @InjectRepository(LoginHistory)
+    private loginHistoryRepository: Repository<LoginHistory>,
   ) {}
 
   async signup(signUpDto: SignupDto): Promise<User> {
@@ -28,7 +34,7 @@ export class UserService {
   }
 
   async login(loginDto: LoginDto): Promise<Response> {
-    const { username, password, role_id } = loginDto;
+    const { username, password, role_id, device_type, device_token } = loginDto;
     let mobileCondition = {};
     if (Number(username)) {
       mobileCondition = {
@@ -49,6 +55,7 @@ export class UserService {
       statusCode: 403,
       message: 'Your username and password do not match with our records',
     };
+
     if (!user) {
       return loginErrrorMessage;
     }
@@ -57,6 +64,9 @@ export class UserService {
     if (!pass) {
       return loginErrrorMessage;
     }
+
+    await this.storeLoginHistory(user, device_type);
+    await this.storeDeviceUser(user, device_type, device_token);
 
     return {
       statusCode: 200,
@@ -96,5 +106,24 @@ export class UserService {
       message: 'password change succssfully',
       data: { user },
     };
+  }
+
+  async storeLoginHistory(user: User, device_type: string): Promise<void> {
+    const loginHistory = new LoginHistory();
+    loginHistory.user_id = user.user_id;
+    loginHistory.type = device_type;
+    await this.loginHistoryRepository.save(loginHistory);
+  }
+
+  async storeDeviceUser(
+    user: User,
+    device_type: string,
+    device_token: string,
+  ): Promise<void> {
+    const deviceUser = new DeviceUser();
+    deviceUser.device_type = device_type;
+    deviceUser.device_token = device_token;
+    deviceUser.user_id = user.user_id;
+    await this.deviceUserRepository.save(deviceUser);
   }
 }
