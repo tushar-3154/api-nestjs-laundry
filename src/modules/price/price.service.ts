@@ -5,7 +5,7 @@ import { Category } from 'src/entities/category.entity';
 import { Price } from 'src/entities/price.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
-import { IsNull, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { CreatePriceDto } from './dto/create-price.dto';
 
 @Injectable()
@@ -19,19 +19,36 @@ export class PriceService {
     private productRepository: Repository<Product>,
     @InjectRepository(Service)
     private serviceRepository: Repository<Service>,
+
+    private dataSource: DataSource,
   ) {}
 
   async create(createPriceDto: CreatePriceDto): Promise<Response> {
-    await this.priceRepository.update(
-      { deleted_at: IsNull() },
-      { deleted_at: new Date() },
-    );
-    await this.priceRepository.insert(createPriceDto.prices);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return {
-      statusCode: 201,
-      message: 'price added successfully',
-    };
+    try {
+      await queryRunner.manager.update(
+        Price,
+        { deleted_at: IsNull() },
+        { deleted_at: new Date() },
+      );
+
+      await queryRunner.manager.insert(Price, createPriceDto.prices);
+
+      await queryRunner.commitTransaction();
+
+      return {
+        statusCode: 201,
+        message: 'Price added successfully',
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(): Promise<Response> {

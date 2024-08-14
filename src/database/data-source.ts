@@ -17,7 +17,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_DATABASE'),
   entities: [entityPath],
-  synchronize: false,
+  synchronize: true,
   migrations: [migrationPath],
   logging: false,
 };

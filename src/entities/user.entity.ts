@@ -7,9 +7,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Gender } from '../enum/gender.enum';
-
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
+import { DeviceUser } from './device-user.entity';
+import { LoginHistory } from './login-history.entity';
 import { Role } from './role.entity';
 
 @Entity({ name: 'users' })
@@ -50,4 +51,12 @@ export class User extends BaseEntity {
     onUpdate: 'NO ACTION',
   })
   addresses: UserAddress[];
+
+  @OneToMany(() => DeviceUser, (deviceUser) => deviceUser.user, {
+    cascade: true,
+  })
+  deviceUsers: DeviceUser[];
+
+  @OneToMany(() => LoginHistory, (loginHistory) => loginHistory.user)
+  loginHistories: LoginHistory[];
 }
