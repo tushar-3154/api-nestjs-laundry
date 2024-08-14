@@ -110,7 +110,7 @@ export class UserService {
 
   async storeLoginHistory(user: User, device_type: string): Promise<void> {
     const loginHistory = new LoginHistory();
-    loginHistory.user = user;
+    loginHistory.user_id = user.user_id;
     loginHistory.type = device_type;
     await this.loginHistoryRepository.save(loginHistory);
   }
@@ -123,7 +123,7 @@ export class UserService {
     const deviceUser = new DeviceUser();
     deviceUser.device_type = device_type;
     deviceUser.device_token = device_token;
-    deviceUser.user = user;
+    deviceUser.user_id = user.user_id;
     await this.deviceUserRepository.save(deviceUser);
   }
 }
