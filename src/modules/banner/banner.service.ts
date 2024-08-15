@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
-import { Banner } from 'src/entities/home-banner.entity';
+import { Banner } from 'src/entities/banner.entity';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
 import { CreateBannerDto } from './dto/create-banner.dto';

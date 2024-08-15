@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Banner } from 'src/entities/home-banner.entity';
+import { Banner } from 'src/entities/banner.entity';
 import { BannerController } from './banner.controller';
 import { BannerService } from './banner.service';
 
