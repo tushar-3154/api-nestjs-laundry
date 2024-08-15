@@ -19,7 +19,7 @@ export const dataSourceOptions: DataSourceOptions = {
   entities: [entityPath],
   synchronize: false,
   migrations: [migrationPath],
-  logging: true,
+  logging: false,
 };
 
 const dataSource = new DataSource(dataSourceOptions);
