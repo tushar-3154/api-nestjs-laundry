@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import {
   Column,
   Entity,
@@ -16,9 +17,11 @@ export class DeviceUser {
   user_id: number;
 
   @Column()
+  @IsOptional()
   device_type: string;
 
   @Column()
+  @IsOptional()
   device_token: string;
 
   @ManyToOne(() => User, (user) => user.deviceUsers)
