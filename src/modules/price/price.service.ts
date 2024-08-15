@@ -55,10 +55,22 @@ export class PriceService {
     const price = await this.priceRepository.find({
       where: { deleted_at: null },
     });
+    const result = {};
+    price.map((element) => {
+      result[
+        element.category_id +
+          '_' +
+          element.product_id +
+          '_' +
+          element.service_id
+      ] = element.price;
+    });
+
     return {
       statusCode: 200,
-      message: 'prices retrieved successfully',
-      data: { price },
+      message:
+        'prices retrieved successfully (category_id, product_id, service_id)',
+      data: result,
     };
   }
 }
