@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -20,7 +21,8 @@ export class LoginHistory {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  @IsOptional()
   type: string;
 
   @CreateDateColumn()

@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -10,7 +10,9 @@ export class LoginDto {
   @IsNotEmpty()
   role_id: number;
 
-  device_type: string;
+  @IsOptional()
+  device_type?: string;
 
-  device_token: string;
+  @IsOptional()
+  device_token?: string;
 }

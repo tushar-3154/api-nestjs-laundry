@@ -16,13 +16,13 @@ export class DeviceUser {
   @Column({ type: 'int' })
   user_id: number;
 
-  @Column()
+  @Column({ nullable: true })
   @IsOptional()
   device_type: string;
 
-  @Column()
+  @Column({ nullable: true })
   @IsOptional()
-  device_token: string;
+  device_token?: string;
 
   @ManyToOne(() => User, (user) => user.deviceUsers)
   @JoinColumn({ name: 'user_id' })
