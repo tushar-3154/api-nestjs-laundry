@@ -11,4 +11,5 @@ export class Setting extends BaseEntity {
 
   @Column()
   value: string;
+  setting: any;
 }

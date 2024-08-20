@@ -12,10 +12,7 @@ export class SettingService {
     private settingRepository: Repository<Setting>,
     private dataSource: DataSource,
   ) {}
-  async update(
-    id: number,
-    updateSettingDto: UpdateSettingDto,
-  ): Promise<Response> {
+  async update(updateSettingDto: UpdateSettingDto): Promise<Response> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -23,7 +20,7 @@ export class SettingService {
     try {
       await queryRunner.manager.update(
         Setting,
-        { deleted_at: IsNull() },
+        { key: updateSettingDto.key, deleted_at: IsNull() },
         { deleted_at: new Date() },
       );
 
@@ -41,5 +38,17 @@ export class SettingService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async findAll(): Promise<Response> {
+    const setting = await this.settingRepository.find({
+      where: { deleted_at: null },
+    });
+
+    return {
+      statusCode: 200,
+      message: 'settings retrieved successfully ',
+      data: { setting },
+    };
   }
 }
