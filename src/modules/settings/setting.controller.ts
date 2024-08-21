@@ -27,6 +27,6 @@ export class SettingController {
   @Get('settings')
   @Roles(Role.CUSTOMER)
   async getAll(): Promise<Response> {
-    return await this.settingService.getAll();
+    return await this.settingService.findAll();
   }
 }
