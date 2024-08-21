@@ -12,6 +12,7 @@ import { CategoryModule } from './modules/categories/category.module';
 import { PriceModule } from './modules/price/price.module';
 import { ProductModule } from './modules/products/product.module';
 import { ServicesModule } from './modules/services/services.module';
+import { SettingModule } from './modules/settings/setting.module';
 import { UsersModule } from './modules/user/user.module';
 import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
 import { MorganMiddleware } from './morgan.middleware';
@@ -30,6 +31,7 @@ import { MorganMiddleware } from './morgan.middleware';
     ServicesModule,
     PriceModule,
     BannerModule,
+    SettingModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
