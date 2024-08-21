@@ -7,20 +7,27 @@ import { RolesGuard } from '../auth/guard/role.guard';
 import { UpdateSettingDto } from './dto/update-settings.dto';
 import { SettingService } from './setting.service';
 
-@Controller('settings')
+@Controller()
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
-@Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN, Role.CUSTOMER)
+@Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 export class SettingController {
   constructor(private readonly settingService: SettingService) {}
 
-  @Put()
+  @Put('admin/settings')
   async update(@Body() updateSettingDto: UpdateSettingDto): Promise<Response> {
     return await this.settingService.update(updateSettingDto);
   }
 
-  @Get()
+  @Get('admin/settings')
   async findAll(): Promise<Response> {
     return await this.settingService.findAll();
+  }
+
+  @Get('settings')
+  
+  @Roles(Role.CUSTOMER)
+  async getAll(): Promise<Response> {
+    return await this.settingService.getAll();
   }
 }

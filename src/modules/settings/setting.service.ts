@@ -56,4 +56,21 @@ export class SettingService {
       data: result,
     };
   }
+
+  async getAll(): Promise<Response> {
+    const setting = await this.settingRepository.find({
+      where: { deleted_at: null },
+    });
+
+    const result = {};
+    setting.map((element) => {
+      result[element.key] = element.value;
+    });
+
+    return {
+      statusCode: 200,
+      message: 'settings retrieved successfully ',
+      data: result,
+    };
+  }
 }
