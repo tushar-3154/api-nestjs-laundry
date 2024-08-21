@@ -7,7 +7,7 @@ export class Setting extends BaseEntity {
   setting_id: number;
 
   @Column()
-  key: string;
+  setting_key: string;
 
   @Column()
   value: string;

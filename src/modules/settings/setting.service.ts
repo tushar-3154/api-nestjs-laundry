@@ -20,7 +20,7 @@ export class SettingService {
     try {
       await queryRunner.manager.update(
         Setting,
-        { key: updateSettingDto.key, deleted_at: IsNull() },
+        { key: updateSettingDto.setting_key, deleted_at: IsNull() },
         { deleted_at: new Date() },
       );
 
@@ -47,7 +47,7 @@ export class SettingService {
 
     const result = {};
     setting.map((element) => {
-      result[element.key] = element.value;
+      result[element.setting_key] = element.value;
     });
 
     return {
@@ -64,7 +64,7 @@ export class SettingService {
 
     const result = {};
     setting.map((element) => {
-      result[element.key] = element.value;
+      result[element.setting_key] = element.value;
     });
 
     return {
