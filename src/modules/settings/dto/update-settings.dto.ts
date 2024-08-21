@@ -7,5 +7,5 @@ export class UpdateSettingDto {
 
   @IsString()
   @IsNotEmpty()
-  value: string;
+  setting_value: string;
 }

@@ -47,7 +47,7 @@ export class SettingService {
 
     const result = {};
     setting.map((element) => {
-      result[element.setting_key] = element.value;
+      result[element.setting_key] = element.setting_value;
     });
 
     return {
@@ -64,7 +64,7 @@ export class SettingService {
 
     const result = {};
     setting.map((element) => {
-      result[element.setting_key] = element.value;
+      result[element.setting_key] = element.setting_value;
     });
 
     return {

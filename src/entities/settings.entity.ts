@@ -10,6 +10,6 @@ export class Setting extends BaseEntity {
   setting_key: string;
 
   @Column()
-  value: string;
+  setting_value: string;
   setting: any;
 }
