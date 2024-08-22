@@ -4,30 +4,17 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
-import { Category } from './category.entity';
-import { Product } from './product.entity';
-import { Service } from './service.entity';
+import { OrderItem } from './order-items.entity';
 
 @Entity({ name: 'orders' })
 export class OrderDetail extends BaseEntity {
   @PrimaryGeneratedColumn()
   order_id: number;
-
-  @Column()
-  category_id: number;
-
-  @Column()
-  product_id: number;
-
-  @Column()
-  service_id: number;
-
-  @Column()
-  price: number;
 
   @Column({ type: 'text', nullable: true })
   @IsOptional()
@@ -50,17 +37,11 @@ export class OrderDetail extends BaseEntity {
   @Column({ type: 'decimal' })
   total: number;
 
-  @ManyToOne(() => Category, { nullable: true })
-  @JoinColumn({ name: 'category_id' })
-  category: Category;
-
-  @ManyToOne(() => Product, { nullable: true })
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
-
-  @ManyToOne(() => Service, { nullable: true })
-  @JoinColumn({ name: 'service_id' })
-  service: Service;
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
+    cascade: true,
+    eager: true,
+  })
+  items: OrderItem[];
 
   @ManyToOne(() => UserAddress)
   @JoinColumn({ name: 'address_id' })
@@ -68,5 +49,7 @@ export class OrderDetail extends BaseEntity {
 
   @Column()
   address_id: number;
-  items: any;
+
+  @Column({ type: 'varchar', length: 255 })
+  address_details: string;
 }

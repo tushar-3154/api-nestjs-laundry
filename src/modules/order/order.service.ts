@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
-import { OrderDetail } from 'src/entities/order-detail.entity';
+import { OrderItem } from 'src/entities/order-items.entity';
+import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { Repository } from 'typeorm';
@@ -22,7 +23,27 @@ export class OrderService {
     private productRepository: Repository<Product>,
     @InjectRepository(Service)
     private serviceRepository: Repository<Service>,
+    @InjectRepository(OrderItem)
+    private orderItemRepository: Repository<OrderItem>,
   ) {}
+
+  private mapOrderToResponse(order: OrderDetail) {
+    return {
+      order_id: order.order_id,
+      description: order.description,
+      coupon_code: order.coupon_code,
+      express_delivery_charges: order.express_delivery_charges,
+      sub_total: order.sub_total,
+      shipping_charge: order.shipping_charge,
+      total: order.total,
+      address_details: order.address_details,
+
+      item_field: `product_id,  service_id,  category_id :price`,
+      items: order.items.map((item) => ({
+        item_details: `${item.product_id}_${item.service_id}_${item.category_id} : ${item.price}`,
+      })),
+    };
+  }
 
   async create(createOrderDto: CreateOrderDto): Promise<Response> {
     const {
@@ -35,33 +56,59 @@ export class OrderService {
     } = createOrderDto;
 
     const address = await this.addressRepository.findOne({
-      where: { address_id: address_id },
+      where: { address_id },
     });
-
     if (!address) {
       throw new NotFoundException(`Address with id ${address_id} not found`);
     }
 
+    const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
+
     const total = sub_total + shipping_charge + (express_delivery_charges || 0);
 
-    for (const item of items) {
-      const order = this.orderRepository.create({
-        category_id: item.category_id,
-        product_id: item.product_id,
-        service_id: item.service_id,
-        price: item.price,
-        description: item.description,
-        coupon_code,
-        express_delivery_charges,
-        sub_total,
-        shipping_charge,
-        total,
-        address,
-        address_id: address.address_id,
-      });
+    const orderDetail = this.orderRepository.create({
+      coupon_code,
+      express_delivery_charges,
+      sub_total,
+      shipping_charge,
+      total,
+      address,
+      address_id,
+      address_details: address_details,
+    });
+    const savedOrderDetail = await this.orderRepository.save(orderDetail);
 
-      await this.orderRepository.save(order);
-    }
+    const orderItems = await Promise.all(
+      items.map(async (item) => {
+        const [category, product, service] = await Promise.all([
+          this.categoryRepository.findOne({
+            where: { category_id: item.category_id },
+          }),
+          this.productRepository.findOne({
+            where: { product_id: item.product_id },
+          }),
+          this.serviceRepository.findOne({
+            where: { service_id: item.service_id },
+          }),
+        ]);
+
+        if (!category || !product || !service) {
+          throw new NotFoundException(
+            `Invalid category, product, or service ID`,
+          );
+        }
+
+        return this.orderItemRepository.create({
+          order: savedOrderDetail,
+          category,
+          product,
+          service,
+          price: item.price,
+        });
+      }),
+    );
+
+    await this.orderItemRepository.save(orderItems);
 
     return {
       statusCode: 201,
@@ -74,21 +121,7 @@ export class OrderService {
       where: { deleted_at: null },
     });
 
-    const result = orders.map((order) => ({
-      order_id: order.order_id,
-      item_details: `product_id , service_id , category_id  :  price`,
-
-      items: {
-        item_details: `${order.product_id}_${order.service_id}_${order.category_id} : ${order.price}`,
-      },
-      description: order.description,
-      coupon_code: order.coupon_code,
-      express_delivery_charges: order.express_delivery_charges,
-      sub_total: order.sub_total,
-      shipping_charge: order.shipping_charge,
-      total: order.total,
-      address_id: order.address_id,
-    }));
+    const result = orders.map(this.mapOrderToResponse.bind(this));
 
     return {
       statusCode: 200,
@@ -106,20 +139,7 @@ export class OrderService {
       throw new NotFoundException(`Order with id ${order_id} not found`);
     }
 
-    const result = {
-      order_id: order.order_id,
-      item_details: `product_id , service_id , category_id   :   price`,
-      items: {
-        item_details: `${order.product_id}_${order.service_id}_${order.category_id} : ${order.price}`,
-      },
-      description: order.description,
-      coupon_code: order.coupon_code,
-      express_delivery_charges: order.express_delivery_charges,
-      sub_total: order.sub_total,
-      shipping_charge: order.shipping_charge,
-      total: order.total,
-      address_id: order.address_id,
-    };
+    const result = this.mapOrderToResponse(order);
 
     return {
       statusCode: 200,
