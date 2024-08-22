@@ -1,8 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateServiceDto {
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
+  @IsOptional()
   image: string;
 }

@@ -81,7 +81,7 @@ export class ServicesService {
   async update(
     id: number,
     updateServicetDto: UpdateServiceDto,
-    imagePath: string,
+    imagePath?: string,
   ): Promise<Response> {
     const service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
@@ -93,10 +93,13 @@ export class ServicesService {
         data: null,
       };
     }
-    await this.serviceRepository.update(id, {
+    const updatedata = {
       ...updateServicetDto,
-      image: imagePath,
-    });
+    };
+    if (imagePath) {
+      updatedata.image = imagePath;
+    }
+    await this.serviceRepository.update(id, updatedata);
 
     const update_service = await this.serviceRepository.findOne({
       where: { service_id: id, deleted_at: null },
