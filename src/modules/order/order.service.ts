@@ -66,7 +66,7 @@ export class OrderService {
 
     const total = sub_total + shipping_charge + (express_delivery_charges || 0);
 
-    const orderDetail = this.orderRepository.create({
+    const order = this.orderRepository.create({
       coupon_code,
       express_delivery_charges,
       sub_total,
@@ -76,9 +76,9 @@ export class OrderService {
       address_id,
       address_details: address_details,
     });
-    const savedOrderDetail = await this.orderRepository.save(orderDetail);
+    const result = await this.orderRepository.save(order);
 
-    const orderItems = await Promise.all(
+    const order_items = await Promise.all(
       items.map(async (item) => {
         const [category, product, service] = await Promise.all([
           this.categoryRepository.findOne({
@@ -99,7 +99,7 @@ export class OrderService {
         }
 
         return this.orderItemRepository.create({
-          order: savedOrderDetail,
+          order: result,
           category,
           product,
           service,
@@ -108,7 +108,7 @@ export class OrderService {
       }),
     );
 
-    await this.orderItemRepository.save(orderItems);
+    await this.orderItemRepository.save(order_items);
 
     return {
       statusCode: 201,
