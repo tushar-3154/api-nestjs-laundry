@@ -78,7 +78,7 @@ export class ProductService {
   async update(
     id: number,
     updateProductDto: UpdateProductDto,
-    imagePath: string,
+    imagePath?: string,
   ): Promise<Response> {
     const product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },
@@ -90,15 +90,28 @@ export class ProductService {
         data: null,
       };
     }
-    await this.productRepository.update(id, {
+
+    const updateData = {
       ...updateProductDto,
-      image: imagePath,
-    });
+    };
+
+    if (imagePath) {
+      updateData.image = imagePath;
+    }
+
+    await this.productRepository.update(id, updateData);
 
     const update_product = await this.productRepository.findOne({
       where: { product_id: id, deleted_at: null },
     });
 
+    if (!update_product) {
+      return {
+        statusCode: 404,
+        message: 'Product not found',
+        data: null,
+      };
+    }
     const products = appendBaseUrlToImages([update_product])[0];
 
     return {
