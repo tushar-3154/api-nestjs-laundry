@@ -58,7 +58,9 @@ export class ProductController {
     if (!file) {
       throw new HttpException('File must be provide', HttpStatus.BAD_REQUEST);
     }
-    const imagepath = FilePath.PRODUCT_IMAGES + '/' + file.filename;
+    const imagepath = file
+      ? FilePath.PRODUCT_IMAGES + '/' + file.filename
+      : null;
     return this.productService.create(createProductDto, imagepath);
   }
 
@@ -71,8 +73,10 @@ export class ProductController {
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    const imagePath = FilePath.PRODUCT_IMAGES + '/' + file.filename;
-    return await this.productService.update(id, updateProductDto, imagePath);
+    const imagepath = file
+      ? FilePath.PRODUCT_IMAGES + '/' + file.filename
+      : null;
+    return await this.productService.update(id, updateProductDto, imagepath);
   }
 
   @Delete('admin/products/:id')
