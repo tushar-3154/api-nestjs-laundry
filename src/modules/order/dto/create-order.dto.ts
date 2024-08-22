@@ -1,28 +1,48 @@
-import { IsArray, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateOrderDto {
   @IsArray()
-  @IsNotEmpty()
-  items: {
-    category_id: number;
-    service_id: number;
-    product_id: number;
-    description: string;
-  }[];
-
-  @IsOptional()
-  @IsNumber()
-  extra_charges?: number;
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
 
   @IsOptional()
   coupon_code?: string;
 
+  @IsOptional()
   @IsNumber()
-  subTotal: number;
+  express_delivery_charges?: number;
 
   @IsNumber()
-  shippingCharge: number;
+  sub_total: number;
+
+  @IsNumber()
+  shipping_charge: number;
 
   @IsNumber()
   address_id: number;
+}
+
+export class OrderItemDto {
+  @IsNotEmpty()
+  category_id: number;
+
+  @IsNotEmpty()
+  service_id: number;
+
+  @IsNotEmpty()
+  product_id: number;
+
+  @IsOptional()
+  description?: string;
+
+  @IsNumber()
+  price: number;
 }

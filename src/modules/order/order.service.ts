@@ -25,36 +25,47 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Response> {
-    const { items, coupon_code, subTotal, shippingCharge, address_id } =
-      createOrderDto;
+    const {
+      items,
+      coupon_code,
+      express_delivery_charges,
+      sub_total,
+      shipping_charge,
+      address_id,
+    } = createOrderDto;
 
     const address = await this.addressRepository.findOne({
       where: { address_id: address_id },
     });
 
     if (!address) {
-      throw new Error(`Address with id ${address_id} not found`);
+      throw new NotFoundException(`Address with id ${address_id} not found`);
     }
 
-    const total = subTotal + shippingCharge;
+    const total = sub_total + shipping_charge + (express_delivery_charges || 0);
 
-    const order = this.orderRepository.create({
-      items,
-      coupon_code,
-      sub_total: subTotal,
-      shipping_charge: shippingCharge,
-      total,
-      address,
+    for (const item of items) {
+      const order = this.orderRepository.create({
+        category_id: item.category_id,
+        product_id: item.product_id,
+        service_id: item.service_id,
+        price: item.price,
+        description: item.description,
+        coupon_code,
+        express_delivery_charges,
+        sub_total,
+        shipping_charge,
+        total,
+        address,
+        address_id: address.address_id,
+      });
 
-      address_id: address.address_id,
-    });
-
-    const result = await this.orderRepository.save(order);
+      await this.orderRepository.save(order);
+    }
 
     return {
       statusCode: 201,
-      message: 'order detail added successfully',
-      data: result,
+      message: 'Order details added successfully',
     };
   }
 
@@ -63,26 +74,58 @@ export class OrderService {
       where: { deleted_at: null },
     });
 
+    const result = orders.map((order) => ({
+      order_id: order.order_id,
+      item_details: `product_id , service_id , category_id  :  price`,
+
+      items: {
+        item_details: `${order.product_id}_${order.service_id}_${order.category_id} : ${order.price}`,
+      },
+      description: order.description,
+      coupon_code: order.coupon_code,
+      express_delivery_charges: order.express_delivery_charges,
+      sub_total: order.sub_total,
+      shipping_charge: order.shipping_charge,
+      total: order.total,
+      address_id: order.address_id,
+    }));
+
     return {
       statusCode: 200,
       message: 'Orders retrieved successfully',
-      data: orders,
+      data: result,
     };
   }
 
-  async findOne(orderId: number): Promise<Response> {
+  async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
-      where: { order_id: orderId },
+      where: { order_id: order_id },
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with id ${orderId} not found`);
+      throw new NotFoundException(`Order with id ${order_id} not found`);
     }
+
+    const result = {
+      order_id: order.order_id,
+      item_details: `product_id , service_id , category_id   :   price`,
+      items: {
+        item_details: `${order.product_id}_${order.service_id}_${order.category_id} : ${order.price}`,
+      },
+      description: order.description,
+      coupon_code: order.coupon_code,
+      express_delivery_charges: order.express_delivery_charges,
+      sub_total: order.sub_total,
+      shipping_charge: order.shipping_charge,
+      total: order.total,
+      address_id: order.address_id,
+      address: `${order.address.building_number}, ${order.address.area}`,
+    };
 
     return {
       statusCode: 200,
       message: 'Order retrieved successfully',
-      data: order,
+      data: result,
     };
   }
 }

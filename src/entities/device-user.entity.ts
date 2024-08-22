@@ -18,7 +18,7 @@ export class DeviceUser {
 
   @Column({ nullable: true })
   @IsOptional()
-  device_type: string;
+  device_type?: string;
 
   @Column({ nullable: true })
   @IsOptional()

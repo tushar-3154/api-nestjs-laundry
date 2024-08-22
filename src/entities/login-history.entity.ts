@@ -23,7 +23,7 @@ export class LoginHistory {
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   @IsOptional()
-  type: string;
+  type?: string;
 
   @CreateDateColumn()
   created_at: Date;

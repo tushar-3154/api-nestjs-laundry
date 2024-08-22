@@ -12,19 +12,22 @@ import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
 
-@Entity({ name: 'order_details' })
+@Entity({ name: 'orders' })
 export class OrderDetail extends BaseEntity {
   @PrimaryGeneratedColumn()
   order_id: number;
 
-  @Column('json')
-  items: {
-    category_id: number;
-    product_id: number;
-    service_id: number;
-    price: number;
-    description: string;
-  }[];
+  @Column()
+  category_id: number;
+
+  @Column()
+  product_id: number;
+
+  @Column()
+  service_id: number;
+
+  @Column()
+  price: number;
 
   @Column({ type: 'text', nullable: true })
   @IsOptional()
@@ -36,7 +39,7 @@ export class OrderDetail extends BaseEntity {
 
   @Column({ nullable: true })
   @IsOptional()
-  extra_charges?: number;
+  express_delivery_charges?: number;
 
   @Column({ type: 'decimal' })
   sub_total: number;
@@ -65,4 +68,5 @@ export class OrderDetail extends BaseEntity {
 
   @Column()
   address_id: number;
+  items: any;
 }
