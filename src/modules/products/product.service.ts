@@ -105,13 +105,6 @@ export class ProductService {
       where: { product_id: id, deleted_at: null },
     });
 
-    if (!update_product) {
-      return {
-        statusCode: 404,
-        message: 'Product not found',
-        data: null,
-      };
-    }
     const products = appendBaseUrlToImages([update_product])[0];
 
     return {
