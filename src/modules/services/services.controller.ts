@@ -74,7 +74,9 @@ export class ServicesController {
     @Body() updateServiceDto: UpdateServiceDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    const imagePath = FilePath.SERVICE_IMAGES + '/' + file.filename;
+    const imagePath = file
+      ? FilePath.SERVICE_IMAGES + '/' + file.filename
+      : null;
     return await this.serviceService.update(id, updateServiceDto, imagePath);
   }
 
