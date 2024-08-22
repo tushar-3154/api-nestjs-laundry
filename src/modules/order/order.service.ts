@@ -119,7 +119,6 @@ export class OrderService {
       shipping_charge: order.shipping_charge,
       total: order.total,
       address_id: order.address_id,
-      address: `${order.address.building_number}, ${order.address.area}`,
     };
 
     return {
