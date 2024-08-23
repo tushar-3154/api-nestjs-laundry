@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Setting } from 'src/entities/settings.entity';
+import { Setting } from 'src/entities/setting.entity';
 import { SettingController } from './setting.controller';
 import { SettingService } from './setting.service';
 
