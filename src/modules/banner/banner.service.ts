@@ -78,7 +78,7 @@ export class BannerService {
   async update(
     id: number,
     updateBannerDto: UpdateBannerDto,
-    imagePath: string,
+    imagePath?: string,
   ): Promise<Response> {
     const banner = await this.BannerRepository.findOne({
       where: { banner_id: id, deleted_at: null },
@@ -90,10 +90,19 @@ export class BannerService {
         data: null,
       };
     }
-    await this.BannerRepository.update(id, {
+    // await this.BannerRepository.update(id, {
+    //   ...updateBannerDto,
+    //   image: imagePath,
+    // });
+    const updateData = {
       ...updateBannerDto,
-      image: imagePath,
-    });
+    };
+
+    if (imagePath) {
+      updateData.image = imagePath;
+    }
+
+    await this.BannerRepository.update(id, updateData);
 
     const update_banner = await this.BannerRepository.findOne({
       where: { banner_id: id, deleted_at: null },

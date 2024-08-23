@@ -1,10 +1,10 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateBannerDto {
-  @IsNotEmpty()
+  @IsOptional()
   title: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   image: string;
