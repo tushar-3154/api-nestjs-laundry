@@ -90,7 +90,6 @@ export class BannerService {
         data: null,
       };
     }
-
     const updateData = {
       ...updateBannerDto,
     };
