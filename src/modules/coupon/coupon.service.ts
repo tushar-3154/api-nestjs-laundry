@@ -10,12 +10,12 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 export class CouponService {
   constructor(
     @InjectRepository(Coupon)
-    private readonly CouponRepository: Repository<Coupon>,
+    private readonly couponRepository: Repository<Coupon>,
   ) {}
 
   async create(createCouponDto: CreateCouponDto): Promise<Response> {
-    const discountCoupon = this.CouponRepository.create(createCouponDto);
-    const result = await this.CouponRepository.save(discountCoupon);
+    const discountCoupon = this.couponRepository.create(createCouponDto);
+    const result = await this.couponRepository.save(discountCoupon);
 
     return {
       statusCode: 201,
@@ -25,7 +25,7 @@ export class CouponService {
   }
 
   async findAll(): Promise<Response> {
-    const result = await this.CouponRepository.find({
+    const result = await this.couponRepository.find({
       where: { deleted_at: null },
     });
     return {
@@ -39,7 +39,7 @@ export class CouponService {
     id: number,
     updateCouponDto: UpdateCouponDto,
   ): Promise<Response> {
-    const coupon = await this.CouponRepository.findOne({
+    const coupon = await this.couponRepository.findOne({
       where: { coupon_id: id },
     });
 
@@ -51,7 +51,7 @@ export class CouponService {
       };
     }
 
-    await this.CouponRepository.update(id, updateCouponDto);
+    await this.couponRepository.update(id, updateCouponDto);
 
     return {
       statusCode: 200,
@@ -61,7 +61,7 @@ export class CouponService {
   }
 
   async remove(id: number): Promise<Response> {
-    const coupon = await this.CouponRepository.findOne({
+    const coupon = await this.couponRepository.findOne({
       where: { coupon_id: id, deleted_at: null },
     });
     if (!coupon) {
@@ -72,7 +72,7 @@ export class CouponService {
       };
     }
     coupon.deleted_at = new Date();
-    await this.CouponRepository.save(coupon);
+    await this.couponRepository.save(coupon);
 
     return {
       statusCode: 200,
