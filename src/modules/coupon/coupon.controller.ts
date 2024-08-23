@@ -22,28 +22,28 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 export class CouponController {
-  constructor(private readonly discountCouponService: CouponService) {}
+  constructor(private readonly CouponService: CouponService) {}
 
-  @Post('admin/discount-coupon')
+  @Post('admin/coupon')
   async create(@Body() createCouponDto: CreateCouponDto): Promise<Response> {
-    return await this.discountCouponService.create(createCouponDto);
+    return await this.CouponService.create(createCouponDto);
   }
 
-  @Get('admin/discount-coupon')
+  @Get('admin/coupon')
   async findAll(): Promise<Response> {
-    return await this.discountCouponService.findAll();
+    return await this.CouponService.findAll();
   }
 
-  @Put('admin/discount-coupon/:id')
+  @Put('admin/coupon/:id')
   update(
     @Param('id') id: number,
     @Body() updateCouponDto: UpdateCouponDto,
   ): Promise<Response> {
-    return this.discountCouponService.update(id, updateCouponDto);
+    return this.CouponService.update(id, updateCouponDto);
   }
 
-  @Delete('admin/discount-coupon/:id')
+  @Delete('admin/coupon/:id')
   async remove(@Param('id') id: number): Promise<Response> {
-    return await this.discountCouponService.remove(id);
+    return await this.CouponService.remove(id);
   }
 }
