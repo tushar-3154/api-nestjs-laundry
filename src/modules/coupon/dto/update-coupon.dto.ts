@@ -2,48 +2,48 @@ import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { CouponType, DiscountType } from 'src/enum/coupon_type.enum';
-export class CreateDiscountCouponDto {
+
+export class UpdateCouponDto {
   @IsString()
-  @IsNotEmpty()
-  coupon_code: string;
+  @IsOptional()
+  code: string;
 
   @IsOptional()
   @IsString()
-  coupon_description?: string;
+  description?: string;
 
   @IsString()
-  @IsNotEmpty()
-  coupon_title: string;
+  @IsOptional()
+  title: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  @IsNotEmpty()
+  @IsOptional()
   start_time: Date;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  @IsNotEmpty()
+  @IsOptional()
   end_time: Date;
 
+  @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
-  total_usage_count: number;
+  total_usage_count?: number;
 
+  @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
-  maximum_usage_count_per_user: number;
+  maximum_usage_count_per_user?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(DiscountType)
   discount_type: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(CouponType)
   coupon_type: number;
 }

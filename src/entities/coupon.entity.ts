@@ -2,19 +2,19 @@ import { CouponType, DiscountType } from 'src/enum/coupon_type.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
-@Entity({ name: 'discount_coupons' })
-export class DiscountCoupon extends BaseEntity {
+@Entity({ name: 'coupons' })
+export class Coupon extends BaseEntity {
   @PrimaryGeneratedColumn()
   coupon_id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  coupon_code: string;
+  code: string;
 
   @Column({ type: 'text', nullable: true })
-  coupon_description: string;
+  description: string;
 
   @Column({ type: 'varchar', length: 255 })
-  coupon_title: string;
+  title: string;
 
   @Column({ type: 'timestamp' })
   start_time: Date;

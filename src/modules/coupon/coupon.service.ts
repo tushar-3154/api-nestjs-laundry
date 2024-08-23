@@ -1,25 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
-import { DiscountCoupon } from 'src/entities/discount-coupon.entity';
+import { Coupon } from 'src/entities/coupon.entity';
 import { Repository } from 'typeorm';
-import { CreateDiscountCouponDto } from './dto/create-discount-coupon.dto';
-import { UpdateDiscountCouponDto } from './dto/update-discount-coupon.dto';
+import { CreateCouponDto } from './dto/create-coupon.dto';
+import { UpdateCouponDto } from './dto/update-coupon.dto';
 
 @Injectable()
-export class DiscountCouponService {
+export class CouponService {
   constructor(
-    @InjectRepository(DiscountCoupon)
-    private readonly discountCouponRepository: Repository<DiscountCoupon>,
+    @InjectRepository(Coupon)
+    private readonly CouponRepository: Repository<Coupon>,
   ) {}
 
-  async create(
-    createDiscountCouponDto: CreateDiscountCouponDto,
-  ): Promise<Response> {
-    const discountCoupon = this.discountCouponRepository.create(
-      createDiscountCouponDto,
-    );
-    const result = await this.discountCouponRepository.save(discountCoupon);
+  async create(createCouponDto: CreateCouponDto): Promise<Response> {
+    const discountCoupon = this.CouponRepository.create(createCouponDto);
+    const result = await this.CouponRepository.save(discountCoupon);
 
     return {
       statusCode: 201,
@@ -29,7 +25,7 @@ export class DiscountCouponService {
   }
 
   async findAll(): Promise<Response> {
-    const result = await this.discountCouponRepository.find({
+    const result = await this.CouponRepository.find({
       where: { deleted_at: null },
     });
     return {
@@ -41,9 +37,9 @@ export class DiscountCouponService {
 
   async update(
     id: number,
-    updateDiscountCouponDto: UpdateDiscountCouponDto,
+    updateCouponDto: UpdateCouponDto,
   ): Promise<Response> {
-    const coupon = await this.discountCouponRepository.findOne({
+    const coupon = await this.CouponRepository.findOne({
       where: { coupon_id: id },
     });
 
@@ -55,7 +51,7 @@ export class DiscountCouponService {
       };
     }
 
-    await this.discountCouponRepository.update(id, updateDiscountCouponDto);
+    await this.CouponRepository.update(id, updateCouponDto);
 
     return {
       statusCode: 200,
@@ -65,7 +61,7 @@ export class DiscountCouponService {
   }
 
   async remove(id: number): Promise<Response> {
-    const coupon = await this.discountCouponRepository.findOne({
+    const coupon = await this.CouponRepository.findOne({
       where: { coupon_id: id, deleted_at: null },
     });
     if (!coupon) {
@@ -76,7 +72,7 @@ export class DiscountCouponService {
       };
     }
     coupon.deleted_at = new Date();
-    await this.discountCouponRepository.save(coupon);
+    await this.CouponRepository.save(coupon);
 
     return {
       statusCode: 200,

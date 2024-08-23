@@ -13,21 +13,20 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
-import { DiscountCouponService } from './discount-coupon.service';
-import { CreateDiscountCouponDto } from './dto/create-discount-coupon.dto';
+import { CouponService } from './coupon.service';
+import { CreateCouponDto } from './dto/create-coupon.dto';
+import { UpdateCouponDto } from './dto/update-coupon.dto';
 
 @Controller()
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-export class DiscountCouponController {
-  constructor(private readonly discountCouponService: DiscountCouponService) {}
+export class CouponController {
+  constructor(private readonly discountCouponService: CouponService) {}
 
   @Post('admin/discount-coupon')
-  async create(
-    @Body() createDiscountCouponDto: CreateDiscountCouponDto,
-  ): Promise<Response> {
-    return await this.discountCouponService.create(createDiscountCouponDto);
+  async create(@Body() createCouponDto: CreateCouponDto): Promise<Response> {
+    return await this.discountCouponService.create(createCouponDto);
   }
 
   @Get('admin/discount-coupon')
@@ -38,9 +37,9 @@ export class DiscountCouponController {
   @Put('admin/discount-coupon/:id')
   update(
     @Param('id') id: number,
-    @Body() updateDiscountCouponDto: CreateDiscountCouponDto,
+    @Body() updateCouponDto: UpdateCouponDto,
   ): Promise<Response> {
-    return this.discountCouponService.update(id, updateDiscountCouponDto);
+    return this.discountCouponService.update(id, updateCouponDto);
   }
 
   @Delete('admin/discount-coupon/:id')
