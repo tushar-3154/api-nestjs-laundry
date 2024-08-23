@@ -24,7 +24,7 @@ export class CreateOrderDto {
   sub_total: number;
 
   @IsNumber()
-  shipping_charge: number;
+  shipping_charges: number;
 
   @IsNumber()
   address_id: number;

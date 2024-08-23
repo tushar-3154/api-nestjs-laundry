@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
-import { Setting } from 'src/entities/settings.entity';
+import { Setting } from 'src/entities/setting.entity';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { UpdateSettingDto } from './dto/update-settings.dto';
 

@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
-import { OrderItem } from './order-items.entity';
+import { OrderItem } from './order-item.entity';
 
 @Entity({ name: 'orders' })
 export class OrderDetail extends BaseEntity {
@@ -32,7 +32,7 @@ export class OrderDetail extends BaseEntity {
   sub_total: number;
 
   @Column({ type: 'decimal' })
-  shipping_charge: number;
+  shipping_charges: number;
 
   @Column({ type: 'decimal' })
   total: number;

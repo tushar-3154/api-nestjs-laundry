@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
-import { OrderItem } from 'src/entities/order-items.entity';
+import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
@@ -34,7 +34,7 @@ export class OrderService {
       coupon_code: order.coupon_code,
       express_delivery_charges: order.express_delivery_charges,
       sub_total: order.sub_total,
-      shipping_charge: order.shipping_charge,
+      shipping_charge: order.shipping_charges,
       total: order.total,
       address_details: order.address_details,
 
@@ -46,76 +46,44 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderDto): Promise<Response> {
-    const {
-      items,
-      coupon_code,
-      express_delivery_charges,
-      sub_total,
-      shipping_charge,
-      address_id,
-    } = createOrderDto;
-
     const address = await this.addressRepository.findOne({
-      where: { address_id },
+      where: { address_id: createOrderDto.address_id },
     });
     if (!address) {
-      throw new NotFoundException(`Address with id ${address_id} not found`);
+      throw new NotFoundException(
+        `Address with id ${createOrderDto.address_id} not found`,
+      );
     }
 
     const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
 
-    const total = sub_total + shipping_charge + (express_delivery_charges || 0);
+    const total =
+      createOrderDto.sub_total +
+      createOrderDto.shipping_charges +
+      (createOrderDto.express_delivery_charges || 0);
 
     const order = this.orderRepository.create({
-      coupon_code,
-      express_delivery_charges,
-      sub_total,
-      shipping_charge,
+      ...createOrderDto,
       total,
-      address,
-      address_id,
-      address_details: address_details,
+      address_details,
     });
-    const result = await this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
 
-    const order_items = await Promise.all(
-      items.map(async (item) => {
-        const [category, product, service] = await Promise.all([
-          this.categoryRepository.findOne({
-            where: { category_id: item.category_id },
-          }),
-          this.productRepository.findOne({
-            where: { product_id: item.product_id },
-          }),
-          this.serviceRepository.findOne({
-            where: { service_id: item.service_id },
-          }),
-        ]);
+    const orderItems = createOrderDto.items.map((item) => ({
+      order: savedOrder,
+      category_id: item.category_id,
+      product_id: item.product_id,
+      service_id: item.service_id,
+      price: item.price,
+    }));
 
-        if (!category || !product || !service) {
-          throw new NotFoundException(
-            `Invalid category, product, or service ID`,
-          );
-        }
-
-        return this.orderItemRepository.create({
-          order: result,
-          category,
-          product,
-          service,
-          price: item.price,
-        });
-      }),
-    );
-
-    await this.orderItemRepository.save(order_items);
+    await this.orderItemRepository.insert(orderItems);
 
     return {
       statusCode: 201,
       message: 'Order details added successfully',
     };
   }
-
   async findAll(): Promise<Response> {
     const orders = await this.orderRepository.find({
       where: { deleted_at: null },
