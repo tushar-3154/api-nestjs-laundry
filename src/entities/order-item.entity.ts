@@ -24,7 +24,11 @@ export class OrderItem {
   @Column()
   service_id: number;
 
+  @Column()
+  order_id: number;
+
   @ManyToOne(() => OrderDetail, (orderDetail) => orderDetail.items)
+  @JoinColumn({ name: 'order_id' })
   order: OrderDetail;
 
   @ManyToOne(() => Category, { nullable: true })
