@@ -9,6 +9,7 @@ import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BannerModule } from './modules/banner/banner.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { DiscountCouponModule } from './modules/discount-coupon/discount-coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { PriceModule } from './modules/price/price.module';
 import { ProductModule } from './modules/products/product.module';
@@ -34,6 +35,7 @@ import { MorganMiddleware } from './morgan.middleware';
     BannerModule,
     SettingModule,
     OrderModule,
+    DiscountCouponModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
