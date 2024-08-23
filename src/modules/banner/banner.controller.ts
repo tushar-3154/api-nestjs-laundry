@@ -69,7 +69,9 @@ export class BannerController {
     @Body() updateBannerDto: UpdateBannerDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    const imagePath = FilePath.BANNER_IMAGES + '/' + file.filename;
+    const imagePath = file
+      ? FilePath.BANNER_IMAGES + '/' + file.filename
+      : null;
     return await this.bannerService.update(id, updateBannerDto, imagePath);
   }
 
