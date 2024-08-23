@@ -90,10 +90,7 @@ export class BannerService {
         data: null,
       };
     }
-    // await this.BannerRepository.update(id, {
-    //   ...updateBannerDto,
-    //   image: imagePath,
-    // });
+
     const updateData = {
       ...updateBannerDto,
     };
