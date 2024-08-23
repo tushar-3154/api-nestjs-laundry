@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { CouponType, DiscountType } from 'src/enum/coupon_type.enum';
 
-export class CreateDiscountCouponDto {
+export class UpdateDiscountCouponDto {
   @IsString()
   @IsOptional()
   coupon_code: string;
@@ -31,13 +31,13 @@ export class CreateDiscountCouponDto {
   @IsOptional()
   end_time: Date;
 
-  @IsNumber()
   @IsOptional()
-  total_usage_count: number;
+  @IsNumber()
+  total_usage_count?: number;
 
-  @IsNumber()
   @IsOptional()
-  maximum_usage_count_per_user: number;
+  @IsNumber()
+  maximum_usage_count_per_user?: number;
 
   @IsOptional()
   @IsEnum(DiscountType)

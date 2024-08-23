@@ -4,6 +4,7 @@ import { Response } from 'src/dto/response.dto';
 import { DiscountCoupon } from 'src/entities/discount-coupon.entity';
 import { Repository } from 'typeorm';
 import { CreateDiscountCouponDto } from './dto/create-discount-coupon.dto';
+import { UpdateDiscountCouponDto } from './dto/update-discount-coupon.dto';
 
 @Injectable()
 export class DiscountCouponService {
@@ -40,7 +41,7 @@ export class DiscountCouponService {
 
   async update(
     id: number,
-    updateDiscountCouponDto: CreateDiscountCouponDto,
+    updateDiscountCouponDto: UpdateDiscountCouponDto,
   ): Promise<Response> {
     const coupon = await this.discountCouponRepository.findOne({
       where: { coupon_id: id },
