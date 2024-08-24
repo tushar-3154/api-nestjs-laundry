@@ -43,6 +43,10 @@ export class UpdateCouponDto {
   @IsEnum(DiscountType)
   discount_type: number;
 
+  @IsNumber()
+  @IsOptional()
+  discount_value: number;
+
   @IsOptional()
   @IsEnum(CouponType)
   coupon_type: number;

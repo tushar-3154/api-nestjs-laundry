@@ -7,7 +7,7 @@ export class Coupon extends BaseEntity {
   @PrimaryGeneratedColumn()
   coupon_id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, unique: true })
   code: string;
 
   @Column({ type: 'text', nullable: true })
@@ -30,6 +30,9 @@ export class Coupon extends BaseEntity {
 
   @Column({ type: 'int', nullable: true })
   discount_type: DiscountType;
+
+  @Column({ type: 'decimal', nullable: false })
+  discount_value: number;
 
   @Column({ type: 'int', nullable: true })
   coupon_type: CouponType;

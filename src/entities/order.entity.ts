@@ -10,6 +10,7 @@ import {
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
 import { OrderItem } from './order-item.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'orders' })
 export class OrderDetail extends BaseEntity {
@@ -52,4 +53,11 @@ export class OrderDetail extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255 })
   address_details: string;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column()
+  user_id: number;
 }
