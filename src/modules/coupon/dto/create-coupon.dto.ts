@@ -43,6 +43,10 @@ export class CreateCouponDto {
   @IsEnum(DiscountType)
   discount_type: number;
 
+  @IsNumber()
+  @IsNotEmpty()
+  discount_value: number;
+
   @IsNotEmpty()
   @IsEnum(CouponType)
   coupon_type: number;

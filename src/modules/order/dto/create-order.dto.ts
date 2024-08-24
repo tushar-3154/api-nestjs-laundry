@@ -28,6 +28,9 @@ export class CreateOrderDto {
 
   @IsNumber()
   address_id: number;
+
+  @IsNumber()
+  user_id: number;
 }
 
 export class OrderItemDto {

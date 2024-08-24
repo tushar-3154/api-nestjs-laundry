@@ -15,6 +15,7 @@ import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
+import { ApplyCouponDto } from './dto/create.verify-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 
 @Controller()
@@ -32,6 +33,15 @@ export class CouponController {
   @Get('admin/coupon')
   async findAll(): Promise<Response> {
     return await this.couponService.findAll();
+  }
+
+  @Post('coupon/apply')
+  @Roles(Role.CUSTOMER)
+  async applyCoupon(
+    @Body() applyCouponDto: ApplyCouponDto,
+    @Param('userId') userId: number,
+  ): Promise<Response> {
+    return this.couponService.applyCoupon(applyCouponDto, userId);
   }
 
   @Put('admin/coupon/:id')
