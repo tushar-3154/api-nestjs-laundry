@@ -9,5 +9,6 @@ import { CouponService } from './coupon.service';
   imports: [TypeOrmModule.forFeature([Coupon, OrderDetail, User])],
   providers: [CouponService],
   controllers: [CouponController],
+  exports: [CouponService],
 })
 export class CouponModule {}

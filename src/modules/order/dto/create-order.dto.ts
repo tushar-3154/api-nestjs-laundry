@@ -17,6 +17,9 @@ export class CreateOrderDto {
   coupon_code?: string;
 
   @IsOptional()
+  coupon_discount?: string;
+
+  @IsOptional()
   @IsNumber()
   express_delivery_charges?: number;
 
