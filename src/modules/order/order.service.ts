@@ -8,6 +8,7 @@ import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { Repository } from 'typeorm';
+import { CouponService } from '../coupon/coupon.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class OrderService {
     private serviceRepository: Repository<Service>,
     @InjectRepository(OrderItem)
     private orderItemRepository: Repository<OrderItem>,
+    private readonly couponService: CouponService,
   ) {}
 
   private mapOrderToResponse(order: OrderDetail) {
@@ -57,14 +59,31 @@ export class OrderService {
 
     const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
 
+    let sub_total = createOrderDto.sub_total;
+    let coupon_discount = 0;
+    const coupon_code = createOrderDto.coupon_code;
+
+    if (coupon_code) {
+      const couponValidation = await this.couponService.applyCoupon(
+        { coupon_Code: coupon_code, order_Total: sub_total },
+        createOrderDto.user_id,
+      );
+
+      coupon_discount = couponValidation.data.discountAmount;
+      sub_total -= coupon_discount;
+    }
+
     const total =
-      createOrderDto.sub_total +
+      sub_total +
       createOrderDto.shipping_charges +
       (createOrderDto.express_delivery_charges || 0);
 
     const order = this.orderRepository.create({
       ...createOrderDto,
+      sub_total,
       total,
+      coupon_code,
+      coupon_discount,
       address_details,
     });
     const savedOrder = await this.orderRepository.save(order);

@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -15,6 +16,10 @@ export class CreateOrderDto {
 
   @IsOptional()
   coupon_code?: string;
+
+  @IsOptional()
+  @IsInt()
+  coupon_discount?: number;
 
   @IsOptional()
   @IsNumber()

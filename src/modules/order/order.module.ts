@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
+import { Coupon } from 'src/entities/coupon.entity';
 import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { CouponModule } from '../coupon/coupon.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 
@@ -18,7 +20,9 @@ import { OrderService } from './order.service';
       Category,
       Product,
       Service,
+      Coupon,
     ]),
+    CouponModule,
   ],
   providers: [OrderService],
   controllers: [OrderController],

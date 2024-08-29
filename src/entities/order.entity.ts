@@ -32,6 +32,9 @@ export class OrderDetail extends BaseEntity {
   @Column({ type: 'decimal' })
   sub_total: number;
 
+  @Column({ type: 'decimal', nullable: true })
+  coupon_discount?: number;
+
   @Column({ type: 'decimal' })
   shipping_charges: number;
 

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'src/dto/response.dto';
@@ -9,6 +13,7 @@ import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
 import { Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -125,5 +130,102 @@ export class UserService {
     deviceUser.device_token = device_token;
     deviceUser.user_id = user.user_id;
     await this.deviceUserRepository.save(deviceUser);
+  }
+
+  async createUser(signUpDto: SignupDto): Promise<Response> {
+    const salt = await bcrypt.genSalt(10);
+    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
+
+    const user = this.userRepository.create({
+      ...signUpDto,
+      password: hashedpassword,
+    });
+
+    const result = await this.userRepository.save(user);
+
+    return {
+      statusCode: 201,
+      message: 'user added successfully',
+      data: { result },
+    };
+  }
+
+  async updateUser(
+    user_id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: { user_id, deleted_at: null },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
+
+    return {
+      statusCode: 200,
+      message: 'User updated successfully',
+      data: { updatedUser },
+    };
+  }
+
+  async getUserById(user_id: number): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: { user_id, deleted_at: null },
+    });
+
+    if (!user) {
+      return {
+        statusCode: 404,
+        message: 'user not found',
+        data: null,
+      };
+    }
+
+    return {
+      statusCode: 201,
+      message: 'user found ',
+      data: { user },
+    };
+  }
+
+  async getAllUsers(): Promise<Response> {
+    const users = await this.userRepository.find({
+      where: { deleted_at: null },
+    });
+    return {
+      statusCode: 200,
+      message: 'users retrived successfully,',
+      data: { users },
+    };
+  }
+
+  async deleteUser(user_id: number): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: { user_id, deleted_at: null },
+    });
+
+    if (!user) {
+      return {
+        statusCode: 404,
+        message: 'user not found',
+        data: null,
+      };
+    }
+
+    user.deleted_at = new Date();
+
+    await this.userRepository.save(user);
+
+    return {
+      statusCode: 200,
+      message: 'User deleted successfully',
+      data: user,
+    };
   }
 }
