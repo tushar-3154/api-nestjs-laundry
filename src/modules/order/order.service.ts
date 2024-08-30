@@ -39,6 +39,10 @@ export class OrderService {
       shipping_charge: order.shipping_charges,
       total: order.total,
       address_details: order.address_details,
+      ordre_status: order.order_status,
+      payment_status: order.payment_status,
+      payment_type: order.payment_type,
+      transaction_id: order.transaction_id,
 
       item_field: `product_id,  service_id,  category_id :price`,
       items: order.items.map((item) => ({
@@ -103,6 +107,7 @@ export class OrderService {
       message: 'Order details added successfully',
     };
   }
+
   async findAll(): Promise<Response> {
     const orders = await this.orderRepository.find({
       where: { deleted_at: null },
