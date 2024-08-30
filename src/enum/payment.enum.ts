@@ -1,10 +1,10 @@
 export enum PaymentStatus {
-  Payment_Pending = 1,
-  Full_Payment_Received = 2,
-  Partial_Payment_Received = 3,
+  PAYMENT_PENDING = 1,
+  FULL_PAYMENT_RECEIVED = 2,
+  PARTIAL_PAYMENT_RECEIVED = 3,
 }
 
 export enum PaymentType {
-  Cash_On_Delivery = 1,
-  Online_Payment = 2,
+  CASH_ON_DELIVERY = 1,
+  ONLINE_PAYMENT = 2,
 }

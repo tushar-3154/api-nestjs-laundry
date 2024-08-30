@@ -70,15 +70,15 @@ export class OrderDetail extends BaseEntity {
   @IsOptional()
   transaction_id?: string;
 
-  @Column({ type: 'int', default: PaymentType.Online_Payment })
+  @Column({ type: 'int', default: PaymentType.ONLINE_PAYMENT })
   payment_type: PaymentType;
 
-  @Column({ type: 'int', default: OrderStatus.Pending })
+  @Column({ type: 'int', default: OrderStatus.PENDING })
   order_status: OrderStatus;
 
   @Column({
     type: 'int',
-    default: PaymentStatus.Payment_Pending,
+    default: PaymentStatus.PAYMENT_PENDING,
   })
   payment_status: PaymentStatus;
 }

@@ -2,22 +2,22 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class CreateBranchDto {
   @IsString()
-  branch_Name: string;
+  branch_name: string;
 
   @IsString()
-  branch_Address: string;
+  branch_address: string;
 
   @IsString()
-  branch_Manager: string;
+  branch_manager: string;
 
   @IsString()
-  branch_Phone_Number: string;
+  branch_phone_number: string;
 
   @IsString()
-  branch_Email: string;
+  branch_email: string;
 
   @IsString()
-  branch_Registration_Number: string;
+  branch_registration_number: string;
 
   @IsNumber()
   company_id: number;

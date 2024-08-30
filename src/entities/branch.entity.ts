@@ -1,9 +1,9 @@
 import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Company } from './company.entity';
@@ -14,22 +14,22 @@ export class Branch extends BaseEntity {
   branch_id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  branch_Name: string;
+  branch_name: string;
 
   @Column({ type: 'varchar', length: 255 })
-  branch_Address: string;
+  branch_address: string;
 
   @Column({ type: 'varchar', length: 100 })
-  branch_Manager: string;
+  branch_manager: string;
 
   @Column({ type: 'varchar', length: 20 })
-  branch_Phone_Number: string;
+  branch_phone_number: string;
 
   @Column({ type: 'varchar', length: 255 })
-  branch_Email: string;
+  branch_email: string;
 
   @Column({ type: 'varchar', length: 100 })
-  branch_Registration_Number: string;
+  branch_registration_number: string;
 
   @ManyToOne(() => Company, (company) => company.branches)
   @JoinColumn({ name: 'company_id' })

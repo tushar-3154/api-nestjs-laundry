@@ -9,7 +9,7 @@ export class Company extends BaseEntity {
   company_id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  company_Name: string;
+  company_name: string;
 
   @Column({ type: 'varchar', length: 255 })
   address: string;
@@ -24,13 +24,13 @@ export class Company extends BaseEntity {
   zip_code: string;
 
   @Column({ type: 'varchar', length: 255 })
-  company_Owner_Name: string;
+  company_owner_name: string;
 
   @Column({ type: 'varchar', length: 20 })
-  phone_Number: string;
+  phone_number: string;
 
   @Column({ type: 'varchar', length: 20 })
-  mobile_Number: string;
+  mobile_number: string;
 
   @Column({ type: 'varchar', length: 255 })
   email: string;
@@ -42,19 +42,19 @@ export class Company extends BaseEntity {
   logo: string;
 
   @Column({ type: 'varchar', length: 100 })
-  registration_Number: string;
+  registration_number: string;
 
   @Column({ type: 'date' })
-  registration_Date: Date;
+  registration_date: Date;
 
   @Column({ type: 'varchar', length: 20 })
   gstin: string;
 
   @Column({ type: 'int', nullable: true })
-  company_OwnedBy: CompanyOwed;
+  company_ownedby: CompanyOwed;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  contract_Document: string;
+  contract_document: string;
 
   @OneToMany(() => Branch, (branch) => branch.company)
   branches: Branch[];

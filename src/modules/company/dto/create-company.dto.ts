@@ -10,7 +10,7 @@ import { CompanyOwed } from 'src/enum/company_owed.enum';
 
 export class CreateCompanyDto {
   @IsString()
-  company_Name: string;
+  company_name: string;
 
   @IsString()
   address: string;
@@ -25,13 +25,13 @@ export class CreateCompanyDto {
   zip_code: string;
 
   @IsString()
-  company_Owner_Name: string;
+  company_owner_name: string;
 
   @IsString()
-  phone_Number: string;
+  phone_number: string;
 
   @IsString()
-  mobile_Number: string;
+  mobile_number: string;
 
   @IsString()
   email: string;
@@ -42,11 +42,11 @@ export class CreateCompanyDto {
   logo: string;
 
   @IsString()
-  registration_Number: string;
+  registration_number: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  registration_Date: Date;
+  registration_date: Date;
 
   @IsString()
   gstin: string;
@@ -54,9 +54,9 @@ export class CreateCompanyDto {
   @IsNumber()
   @Transform(({ value }) => parseInt(value))
   @IsEnum(CompanyOwed)
-  company_OwnedBy: number;
+  company_ownedby: number;
 
   @IsOptional()
   @IsString()
-  contract_Document?: string;
+  contract_document?: string;
 }
