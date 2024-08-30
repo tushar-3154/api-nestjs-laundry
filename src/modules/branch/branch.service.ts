@@ -99,7 +99,7 @@ export class BranchService {
     }
 
     branch.deleted_at = new Date();
-    await this.branchRepository.delete(id);
+    await this.branchRepository.save(branch);
     return {
       statusCode: 200,
       message: 'Branch deleted successfully',
