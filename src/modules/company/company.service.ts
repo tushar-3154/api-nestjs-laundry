@@ -33,9 +33,15 @@ export class CompanyService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const result = await this.companyRepository.find({
+  async findAll(
+    per_page: number = 10,
+    page_number: number = 1,
+  ): Promise<Response> {
+    const skip = (page_number - 1) * per_page;
+    const [result, total] = await this.companyRepository.findAndCount({
       where: { deleted_at: null },
+      take: per_page,
+      skip: skip,
     });
 
     const Company = appendBaseUrlToLogo(result);
@@ -43,7 +49,12 @@ export class CompanyService {
     return {
       statusCode: 200,
       message: 'company retrieved successfully',
-      data: { result: Company },
+      data: {
+        result: Company,
+        limit: per_page,
+        page_number: page_number,
+        count: total,
+      },
     };
   }
 

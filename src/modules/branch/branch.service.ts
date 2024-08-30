@@ -24,18 +24,26 @@ export class BranchService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const result = await this.branchRepository.find();
+  async findAll(
+    per_page: number = 10,
+    page_number: number = 1,
+  ): Promise<Response> {
+    const skip = (page_number - 1) * per_page;
+    const [result, total] = await this.branchRepository.findAndCount({
+      where: { deleted_at: null },
+      take: per_page,
+      skip: skip,
+    });
     return {
       statusCode: 200,
       message: 'Branches retrieved successfully',
-      data: { result },
+      data: { result, limit: per_page, page_number: page_number, count: total },
     };
   }
 
   async findOne(id: number): Promise<Response> {
     const result = await this.branchRepository.findOne({
-      where: { branch_id: id },
+      where: { branch_id: id, deleted_at: null },
     });
     if (!result) {
       return {
@@ -56,7 +64,7 @@ export class BranchService {
     updateBranchDto: UpdateBranchDto,
   ): Promise<Response> {
     const branch = await this.branchRepository.findOne({
-      where: { branch_id: id },
+      where: { branch_id: id, deleted_at: null },
     });
     if (!branch) {
       return {
@@ -80,7 +88,7 @@ export class BranchService {
 
   async delete(id: number): Promise<Response> {
     const branch = await this.branchRepository.findOne({
-      where: { branch_id: id },
+      where: { branch_id: id, deleted_at: null },
     });
     if (!branch) {
       return {
@@ -90,6 +98,7 @@ export class BranchService {
       };
     }
 
+    branch.deleted_at = new Date();
     await this.branchRepository.delete(id);
     return {
       statusCode: 200,
