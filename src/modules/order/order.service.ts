@@ -7,6 +7,8 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { OrderStatus } from 'src/enum/order-status.eum';
+import { PaymentStatus } from 'src/enum/payment-status.enum';
 import { Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -39,6 +41,8 @@ export class OrderService {
       shipping_charge: order.shipping_charges,
       total: order.total,
       address_details: order.address_details,
+      status: order.order_status,
+      payment_status: order.payment_status,
 
       item_field: `product_id,  service_id,  category_id :price`,
       items: order.items.map((item) => ({
@@ -85,6 +89,8 @@ export class OrderService {
       coupon_code,
       coupon_discount,
       address_details,
+      order_status: OrderStatus.Pending,
+      payment_status: PaymentStatus.Payment_Pending,
     });
     const savedOrder = await this.orderRepository.save(order);
 
@@ -103,6 +109,7 @@ export class OrderService {
       message: 'Order details added successfully',
     };
   }
+
   async findAll(): Promise<Response> {
     const orders = await this.orderRepository.find({
       where: { deleted_at: null },

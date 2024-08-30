@@ -7,7 +7,9 @@ import { dataSourceOptions } from './database/data-source';
 import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BannerModule } from './modules/banner/banner.module';
+import { BranchModule } from './modules/branch/branch.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { CompanyModule } from './modules/company/company.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { PriceModule } from './modules/price/price.module';
@@ -35,6 +37,8 @@ import { MorganMiddleware } from './morgan.middleware';
     SettingModule,
     OrderModule,
     CouponModule,
+    CompanyModule,
+    BranchModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],

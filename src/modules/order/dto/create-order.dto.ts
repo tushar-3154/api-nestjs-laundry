@@ -1,12 +1,15 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
+import { OrderStatus } from 'src/enum/order-status.eum';
+import { PaymentStatus } from 'src/enum/payment-status.enum';
 
 export class CreateOrderDto {
   @IsArray()
@@ -36,6 +39,14 @@ export class CreateOrderDto {
 
   @IsNumber()
   user_id: number;
+
+  @IsNumber()
+  @IsEnum(OrderStatus)
+  order_status: OrderStatus;
+
+  @IsNumber()
+  @IsEnum(PaymentStatus)
+  payment_status: PaymentStatus;
 }
 
 export class OrderItemDto {
