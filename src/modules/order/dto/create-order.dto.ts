@@ -6,10 +6,11 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsString,
   ValidateNested,
 } from 'class-validator';
 import { OrderStatus } from 'src/enum/order-status.eum';
-import { PaymentStatus } from 'src/enum/payment-status.enum';
+import { PaymentStatus, PaymentType } from 'src/enum/payment.enum';
 
 export class CreateOrderDto {
   @IsArray()
@@ -34,16 +35,26 @@ export class CreateOrderDto {
   @IsNumber()
   shipping_charges: number;
 
+  @IsOptional()
+  @IsString()
+  transaction_id?: string;
+
+  @IsOptional()
+  @IsEnum(PaymentType)
+  payment_type?: PaymentType;
+
   @IsNumber()
   address_id: number;
 
   @IsNumber()
   user_id: number;
 
+  @IsOptional()
   @IsNumber()
   @IsEnum(OrderStatus)
   order_status: OrderStatus;
 
+  @IsOptional()
   @IsNumber()
   @IsEnum(PaymentStatus)
   payment_status: PaymentStatus;

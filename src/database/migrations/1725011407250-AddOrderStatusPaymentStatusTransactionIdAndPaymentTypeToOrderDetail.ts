@@ -1,9 +1,10 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddOrderAndPaymentStatusToOrdersTable1724996596774
+export class AddOrderStatusPaymentStatusTransactionIdAndPaymentTypeToOrderDetail1725011407250
   implements MigrationInterface
 {
-  name = 'AddOrderAndPaymentStatusToOrdersTable1724996596774';
+  name =
+    'AddOrderStatusPaymentStatusTransactionIdAndPaymentTypeToOrderDetail1725011407250';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -23,6 +24,12 @@ export class AddOrderAndPaymentStatusToOrdersTable1724996596774
     );
     await queryRunner.query(
       `ALTER TABLE \`orders\` ADD \`user_id\` int NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`orders\` ADD \`transaction_id\` varchar(255) NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`orders\` ADD \`payment_type\` int NOT NULL DEFAULT '2'`,
     );
     await queryRunner.query(
       `ALTER TABLE \`orders\` ADD \`order_status\` int NOT NULL DEFAULT '1'`,
@@ -56,6 +63,12 @@ export class AddOrderAndPaymentStatusToOrdersTable1724996596774
     );
     await queryRunner.query(
       `ALTER TABLE \`orders\` DROP COLUMN \`order_status\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`orders\` DROP COLUMN \`payment_type\``,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`orders\` DROP COLUMN \`transaction_id\``,
     );
     await queryRunner.query(`ALTER TABLE \`orders\` DROP COLUMN \`user_id\``);
     await queryRunner.query(

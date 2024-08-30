@@ -1,6 +1,6 @@
 import { IsOptional } from 'class-validator';
 import { OrderStatus } from 'src/enum/order-status.eum';
-import { PaymentStatus } from 'src/enum/payment-status.enum';
+import { PaymentStatus, PaymentType } from 'src/enum/payment.enum';
 import {
   Column,
   Entity,
@@ -65,6 +65,13 @@ export class OrderDetail extends BaseEntity {
 
   @Column()
   user_id: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  @IsOptional()
+  transaction_id?: string;
+
+  @Column({ type: 'int', default: PaymentType.Online_Payment })
+  payment_type: PaymentType;
 
   @Column({ type: 'int', default: OrderStatus.Pending })
   order_status: OrderStatus;
