@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
+import { Note } from './note.entity';
 import { OrderItem } from './order-item.entity';
 import { User } from './user.entity';
 
@@ -81,4 +82,7 @@ export class OrderDetail extends BaseEntity {
     default: PaymentStatus.PAYMENT_PENDING,
   })
   payment_status: PaymentStatus;
+
+  @OneToMany(() => Note, (note) => note.order)
+  notes: Note[];
 }

@@ -3,4 +3,5 @@ export const FilePath = {
   SERVICE_IMAGES: 'images/service',
   BANNER_IMAGES: 'images/banner',
   COMPANY_LOGO: 'images/logo',
+  NOTE_IMAGES: 'images/note',
 };
