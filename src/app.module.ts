@@ -11,6 +11,7 @@ import { BranchModule } from './modules/branch/branch.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { CouponModule } from './modules/coupon/coupon.module';
+import { NotesModule } from './modules/notes/note.module';
 import { OrderModule } from './modules/order/order.module';
 import { PriceModule } from './modules/price/price.module';
 import { ProductModule } from './modules/products/product.module';
@@ -39,6 +40,7 @@ import { MorganMiddleware } from './morgan.middleware';
     CouponModule,
     CompanyModule,
     BranchModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],

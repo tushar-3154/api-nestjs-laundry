@@ -11,6 +11,7 @@ import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
 import { DeviceUser } from './device-user.entity';
 import { LoginHistory } from './login-history.entity';
+import { Note } from './note.entity';
 import { OrderDetail } from './order.entity';
 import { Role } from './role.entity';
 
@@ -63,4 +64,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.user)
   orders: OrderDetail[];
+
+  @OneToMany(() => Note, (note) => note.user)
+  notes: Note[];
 }
