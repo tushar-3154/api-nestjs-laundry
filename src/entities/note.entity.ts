@@ -17,7 +17,6 @@ export class Note extends BaseEntity {
   @ManyToOne(() => OrderDetail)
   @JoinColumn({ name: 'order_id' })
   order: OrderDetail;
-
   @Column()
   order_id: number;
 
