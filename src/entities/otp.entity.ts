@@ -4,6 +4,7 @@ import { BaseEntity } from './base.entity';
 
 @Entity({ name: 'otps' })
 export class Otp extends BaseEntity {
+  
   @PrimaryGeneratedColumn()
   otp_id: number;
 
