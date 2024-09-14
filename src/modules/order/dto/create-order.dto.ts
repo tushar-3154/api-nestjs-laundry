@@ -58,6 +58,14 @@ export class CreateOrderDto {
   @IsNumber()
   @IsEnum(PaymentStatus)
   payment_status: PaymentStatus;
+
+  @IsNumber()
+  @IsOptional()
+  paid_amount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  kasar_amount?: number;
 }
 
 export class OrderItemDto {

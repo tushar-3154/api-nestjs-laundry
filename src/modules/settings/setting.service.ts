@@ -20,7 +20,10 @@ export class SettingService {
     try {
       await queryRunner.manager.update(
         Setting,
-        { setting_key: updateSettingDto.setting_key, deleted_at: IsNull() },
+        {
+          setting_key: updateSettingDto.setting_key,
+          deleted_at: IsNull(),
+        },
         { deleted_at: new Date() },
       );
 
