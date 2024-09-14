@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -47,27 +48,27 @@ export class OrderController {
     return this.orderService.updateOrder(id, updateOrderDto);
   }
 
-  @Post('/update-status/:id')
+  @Patch('/:order_id/update-status/')
   async updateOrderStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('order_id', ParseIntPipe) order_id: number,
     @Body('status') status: number,
   ): Promise<Response> {
-    return this.orderService.updateOrderStatus(id, status);
+    return this.orderService.updateOrderStatus(order_id, status);
   }
 
-  @Post('/update-payment-status/:id')
+  @Patch('/:order_id/update-payment-status')
   async updatePaymentStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('order_id', ParseIntPipe) order_id: number,
     @Body('status') status: number,
   ): Promise<Response> {
-    return this.orderService.updatePaymentStatus(id, status);
+    return this.orderService.updatePaymentStatus(order_id, status);
   }
 
-  @Post('/assign-delivery/:id')
+  @Patch('/:order_id/assign-delivery')
   async assignDeliveryBoy(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('order_id', ParseIntPipe) order_id: number,
     @Body('delivery_boy_id') delivery_boy_id: number,
   ): Promise<Response> {
-    return this.orderService.assignDeliveryBoy(id, delivery_boy_id);
+    return this.orderService.assignDeliveryBoy(order_id, delivery_boy_id);
   }
 }
