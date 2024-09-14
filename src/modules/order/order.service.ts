@@ -7,10 +7,10 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
-import { User } from 'src/entities/user.entity';
 import { Role } from 'src/enum/role.enum';
 import { Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
+import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
@@ -30,8 +30,7 @@ export class OrderService {
     @InjectRepository(OrderItem)
     private orderItemRepository: Repository<OrderItem>,
     private readonly couponService: CouponService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
   ) {}
 
   private mapOrderToResponse(order: OrderDetail) {
@@ -247,9 +246,10 @@ export class OrderService {
       throw new NotFoundException(`Order with id ${order_id} not found`);
     }
 
-    const deliveryBoy = await this.userRepository.findOne({
-      where: { user_id: delivery_boy_id, role_id: Role.DELIVERY_BOY },
-    });
+    const deliveryBoy = await this.userService.findOneByRole(
+      delivery_boy_id,
+      Role.DELIVERY_BOY,
+    );
 
     if (!deliveryBoy) {
       throw new NotFoundException(

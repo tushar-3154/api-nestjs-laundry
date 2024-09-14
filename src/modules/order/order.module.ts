@@ -9,6 +9,7 @@ import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { User } from 'src/entities/user.entity';
 import { CouponModule } from '../coupon/coupon.module';
+import { UsersModule } from '../user/user.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 
@@ -25,6 +26,7 @@ import { OrderService } from './order.service';
       User,
     ]),
     CouponModule,
+    UsersModule,
   ],
   providers: [OrderService],
   controllers: [OrderController],

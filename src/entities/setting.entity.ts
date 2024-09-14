@@ -11,7 +11,4 @@ export class Setting extends BaseEntity {
 
   @Column()
   setting_value: string;
-
-  @Column({ type: 'float', nullable: true })
-  gst?: number;
 }

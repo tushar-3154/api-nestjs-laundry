@@ -69,10 +69,6 @@ export class CreateOrderDto {
 }
 
 export class OrderItemDto {
-  @IsNumber()
-  @IsOptional()
-  order_id?: number;
-
   @IsNotEmpty()
   category_id: number;
 

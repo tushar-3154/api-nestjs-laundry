@@ -284,18 +284,22 @@ export class UserService {
       },
     });
 
-    if (deliveryBoys.length === 0) {
-      return {
-        statusCode: 404,
-        message: 'No delivery boys found',
-        data: null,
-      };
-    }
-
     return {
       statusCode: 200,
       message: 'Delivery boys retrieved successfully',
       data: { deliveryBoys },
     };
+  }
+
+  async findOneByRole(user_id: number, role_id: Role): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { user_id: user_id, role_id: role_id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${user_id} not found`);
+    }
+
+    return user;
   }
 }
