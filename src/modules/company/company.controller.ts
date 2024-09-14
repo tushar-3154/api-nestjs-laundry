@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -45,8 +46,11 @@ export class CompanyController {
   }
 
   @Get()
-  async findAll(): Promise<Response> {
-    return await this.companyService.findAll();
+  async findAll(
+    @Query('per_page') per_page?: number,
+    @Query('page_number') page_number?: number,
+  ): Promise<Response> {
+    return await this.companyService.findAll(per_page, page_number);
   }
 
   @Get(':id')

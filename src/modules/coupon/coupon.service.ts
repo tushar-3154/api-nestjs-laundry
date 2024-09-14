@@ -41,20 +41,19 @@ export class CouponService {
     }
   }
 
-  async findAll(
-    per_page: number = 10,
-    page_number: number = 1,
-  ): Promise<Response> {
-    const skip = (page_number - 1) * per_page;
+  async findAll(per_page?: number, page_number?: number): Promise<Response> {
+    const pagenumber = page_number ?? 1;
+    const perpage = per_page ?? 10;
+    const skip = (pagenumber - 1) * perpage;
     const [result, total] = await this.couponRepository.findAndCount({
       where: { deleted_at: null },
-      take: per_page,
+      take: perpage,
       skip: skip,
     });
     return {
       statusCode: 200,
       message: 'discount coupon retrieved successfully',
-      data: { result, limit: per_page, page_number: page_number, count: total },
+      data: { result, limit: perpage, page_number: page_number, count: total },
     };
   }
 

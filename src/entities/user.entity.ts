@@ -70,4 +70,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.delivery_boy)
   ordersAsDeliveryBoy: OrderDetail[];
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  reset_token: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  reset_token_expires: Date;
 }
