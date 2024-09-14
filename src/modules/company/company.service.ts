@@ -33,26 +33,26 @@ export class CompanyService {
     };
   }
 
-  async findAll(
-    per_page: number = 10,
-    page_number: number = 1,
-  ): Promise<Response> {
-    const skip = (page_number - 1) * per_page;
+  async findAll(per_page?: number, page_number?: number): Promise<Response> {
+    const pagenumber = page_number ?? 1;
+    const perpage = per_page ?? 10;
+    const skip = (pagenumber - 1) * perpage;
+
     const [result, total] = await this.companyRepository.findAndCount({
       where: { deleted_at: null },
-      take: per_page,
+      take: perpage,
       skip: skip,
     });
 
-    const Company = appendBaseUrlToLogo(result);
+    const companiesWithBaseUrl = appendBaseUrlToLogo(result);
 
     return {
       statusCode: 200,
-      message: 'company retrieved successfully',
+      message: 'Companies retrieved successfully',
       data: {
-        result: Company,
-        limit: per_page,
-        page_number: page_number,
+        result: companiesWithBaseUrl,
+        limit: perpage,
+        page_number: pagenumber,
         count: total,
       },
     };

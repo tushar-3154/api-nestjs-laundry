@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,8 +31,11 @@ export class BranchController {
   }
 
   @Get()
-  async findAll(): Promise<Response> {
-    return await this.branchService.findAll();
+  async findAll(
+    @Query('per_page') per_page?: number,
+    @Query('page_number') page_number?: number,
+  ): Promise<Response> {
+    return await this.branchService.findAll(per_page, page_number);
   }
 
   @Get(':id')

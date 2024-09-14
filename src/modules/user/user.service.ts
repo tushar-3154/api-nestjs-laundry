@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { Response } from 'src/dto/response.dto';
 import { DeviceUser } from 'src/entities/device-user.entity';
 import { LoginHistory } from 'src/entities/login-history.entity';
@@ -14,9 +15,16 @@ import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
+import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
+);
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 
 @Injectable()
 export class UserService {
@@ -296,6 +304,69 @@ export class UserService {
       statusCode: 200,
       message: 'Delivery boys retrieved successfully',
       data: { deliveryBoys },
+    };
+  }
+
+  async sendPasswordResetLink(mobile_number: number): Promise<Response> {
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    const user = await this.userRepository.findOne({
+      where: { mobile_number },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.reset_token = resetToken;
+    user.reset_token_expires = new Date(Date.now() + 3600000);
+    await this.userRepository.save(user);
+
+    const baseurl = process.env.BASE_URL;
+    const resetLink = `${baseurl}/reset-password?token=${resetToken}`;
+
+    const countryCode = '+91';
+    const formattedMobileNumber = `${countryCode}${String(user.mobile_number).replace(/^0/, '')}`;
+
+    try {
+      await twilioClient.messages.create({
+        body: `Password reset link: ${resetLink}`,
+        from: TWILIO_PHONE_NUMBER,
+        to: formattedMobileNumber,
+      });
+      return {
+        statusCode: 200,
+        message: 'Password reset link sent successfully',
+        data: null,
+      };
+    } catch (error) {
+      console.error('Twilio Error:', error.response?.data || error.message);
+      throw new BadRequestException('Failed to send SMS');
+    }
+  }
+
+  async resetPassword(token: string, new_password: string): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: {
+        reset_token: token,
+        reset_token_expires: MoreThan(new Date()),
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(new_password, salt);
+    user.reset_token = null;
+    user.reset_token_expires = null;
+    await this.userRepository.save(user);
+
+    return {
+      statusCode: 200,
+      message: 'Password reset successfully',
+      data: null,
     };
   }
 }

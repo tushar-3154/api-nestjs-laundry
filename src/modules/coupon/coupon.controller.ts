@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,8 +32,11 @@ export class CouponController {
   }
 
   @Get('admin/coupon')
-  async findAll(): Promise<Response> {
-    return await this.couponService.findAll();
+  async findAll(
+    @Query('per_page') per_page?: number,
+    @Query('page_number') page_number?: number,
+  ): Promise<Response> {
+    return await this.couponService.findAll(per_page, page_number);
   }
 
   @Post('coupon/apply')
