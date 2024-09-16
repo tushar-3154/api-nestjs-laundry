@@ -25,20 +25,20 @@ export class BranchService {
   }
 
   async findAll(per_page?: number, page_number?: number): Promise<Response> {
-    const pagenumber = page_number ?? 1;
-    const perpage = per_page ?? 10;
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
     const skip = (page_number - 1) * per_page;
 
     const [result, total] = await this.branchRepository.findAndCount({
       where: { deleted_at: null },
-      take: perpage,
+      take: perPage,
       skip: skip,
     });
 
     return {
       statusCode: 200,
       message: 'Branches retrieved successfully',
-      data: { result, limit: per_page, page_number: pagenumber, count: total },
+      data: { result, limit: per_page, page_number: pageNumber, count: total },
     };
   }
 

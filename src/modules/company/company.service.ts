@@ -34,13 +34,13 @@ export class CompanyService {
   }
 
   async findAll(per_page?: number, page_number?: number): Promise<Response> {
-    const pagenumber = page_number ?? 1;
-    const perpage = per_page ?? 10;
-    const skip = (pagenumber - 1) * perpage;
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * per_page;
 
     const [result, total] = await this.companyRepository.findAndCount({
       where: { deleted_at: null },
-      take: perpage,
+      take: perPage,
       skip: skip,
     });
 
@@ -51,8 +51,8 @@ export class CompanyService {
       message: 'Companies retrieved successfully',
       data: {
         result: companiesWithBaseUrl,
-        limit: perpage,
-        page_number: pagenumber,
+        limit: perPage,
+        page_number: pageNumber,
         count: total,
       },
     };
