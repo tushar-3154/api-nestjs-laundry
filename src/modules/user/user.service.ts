@@ -14,9 +14,16 @@ import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
+import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
+);
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
 
 @Injectable()
 export class UserService {
@@ -246,36 +253,6 @@ export class UserService {
     };
   }
 
-  async generateOtp(mobile_number: number, type: OtpType): Promise<number> {
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const otpEntry = this.otpRepository.create({
-      mobile_number,
-      otp,
-      type,
-      created_at: new Date(),
-    });
-    await this.otpRepository.save(otpEntry);
-    return otp;
-  }
-
-  async validateOtp(mobile_number: number, otp: number): Promise<boolean> {
-    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
-    const otpEntry = await this.otpRepository.findOne({
-      where: {
-        mobile_number,
-        otp,
-        deleted_at: null,
-        created_at: MoreThan(tenMinutesAgo),
-      },
-    });
-    if (otpEntry) {
-      otpEntry.deleted_at = new Date();
-      await this.otpRepository.save(otpEntry);
-      return true;
-    }
-    return false;
-  }
-
   async getAllDeliveryBoys(): Promise<Response> {
     const deliveryBoys = await this.userRepository.find({
       where: {
@@ -301,5 +278,113 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async generateOtp(mobile_number: number, type: OtpType): Promise<number> {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otpEntry = this.otpRepository.create({
+      mobile_number,
+      otp,
+      type,
+      created_at: new Date(),
+    });
+    await this.otpRepository.save(otpEntry);
+
+    const countryCode = '+91';
+    const formattedMobileNumber = `${countryCode}${String(mobile_number).replace(/^0/, '')}`;
+
+    try {
+      await twilioClient.messages.create({
+        body: `Your OTP for ${type} is: ${otp}`,
+        from: TWILIO_PHONE_NUMBER,
+        to: formattedMobileNumber,
+      });
+    } catch (error) {
+      console.error('Twilio Error:', error.response?.data || error.message);
+      throw new BadRequestException('Failed to send OTP via SMS');
+    }
+
+    return otp;
+  }
+
+  async validateOtp(mobile_number: number, otp: number): Promise<boolean> {
+    const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000);
+    const otpEntry = await this.otpRepository.findOne({
+      where: {
+        mobile_number,
+        otp,
+        deleted_at: null,
+        created_at: MoreThan(tenMinutesAgo),
+      },
+    });
+    if (otpEntry) {
+      otpEntry.deleted_at = new Date();
+      await this.otpRepository.save(otpEntry);
+      return true;
+    }
+    return false;
+  }
+
+  async sendOtpForgotPassword(mobile_number: number): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: { mobile_number },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.generateOtp(mobile_number, OtpType.FORGOT_PASSWORD);
+
+    return {
+      statusCode: 200,
+      message: 'OTP Sent Successfully',
+      data: null,
+    };
+  }
+
+  async resetPassword(
+    mobile_number: number,
+    otp: number,
+    new_password: string,
+  ): Promise<Response> {
+    const user = await this.userRepository.findOne({
+      where: {
+        mobile_number,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const otpEntry = await this.otpRepository.findOne({
+      where: {
+        mobile_number,
+        otp,
+        type: OtpType.FORGOT_PASSWORD,
+        created_at: MoreThan(new Date(new Date().getTime() - 10 * 60 * 1000)),
+      },
+    });
+
+    if (!otpEntry) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(new_password, salt);
+
+    await this.userRepository.save(user);
+
+    await this.otpRepository.delete({
+      mobile_number,
+      otp,
+    });
+
+    return {
+      statusCode: 200,
+      message: 'Password reset successfully',
+      data: null,
+    };
   }
 }
