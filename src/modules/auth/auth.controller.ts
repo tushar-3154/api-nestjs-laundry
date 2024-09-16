@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
@@ -7,7 +7,7 @@ import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { SendResetLinkDto } from './dto/send-reset-link.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
 import { SignupDto } from './dto/signup.dto';
 import { RolesGuard } from './guard/role.guard';
 
@@ -29,20 +29,16 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async sendResetLink(
-    @Body() sendResetLinkDto: SendResetLinkDto,
-  ): Promise<Response> {
-    return this.userService.sendPasswordResetLink(
-      sendResetLinkDto.mobile_number,
-    );
+  async sendOtp(@Body() sendOtpDto: SendOtpDto): Promise<Response> {
+    return this.userService.sendOtpForgotPassword(sendOtpDto.mobile_number);
   }
 
   @Post('reset-password')
   async resetPassword(
-    @Query('token') token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<Response> {
-    return this.userService.resetPassword(token, resetPasswordDto.new_password);
+    const { mobile_number, otp, new_password } = resetPasswordDto;
+    return this.userService.resetPassword(mobile_number, otp, new_password);
   }
 
   @UseGuards(RolesGuard)
