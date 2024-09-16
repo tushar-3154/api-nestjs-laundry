@@ -26,21 +26,25 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @Roles(Role.CUSTOMER)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Response> {
     return this.orderService.create(createOrderDto);
   }
 
   @Get()
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async findAll(): Promise<Response> {
     return this.orderService.findAll();
   }
 
   @Get(':id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Response> {
     return this.orderService.findOne(id);
   }
 
   @Put(':id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderDto: UpdateOrderDto,
