@@ -73,16 +73,13 @@ export class PriceService {
       data: result,
     };
   }
-
-  async getPricesByCategoryAndService(
-    category_id: number,
-    service_id: number,
-  ): Promise<any> {
-    return await this.priceRepository.find({
+  async getPricesByCategoryAndService(category_id: number, service_id: number) {
+    return this.priceRepository.find({
       where: {
         category: { category_id: category_id },
         service: { service_id: service_id },
       },
+      relations: ['product'],
     });
   }
 }

@@ -7,6 +7,7 @@ import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { BannerService } from '../banner/banner.service';
 import { PriceService } from '../price/price.service';
+import { ProductService } from '../products/product.service';
 import { ServicesService } from '../services/services.service';
 import { MobileApiController } from './mobileapi.controller';
 import { MobileApiService } from './mobileapi.service';
@@ -23,6 +24,12 @@ import { MobileApiService } from './mobileapi.service';
     ]),
   ],
   controllers: [MobileApiController],
-  providers: [MobileApiService, BannerService, ServicesService, PriceService],
+  providers: [
+    MobileApiService,
+    BannerService,
+    ServicesService,
+    PriceService,
+    ProductService,
+  ],
 })
 export class MobileApiModule {}

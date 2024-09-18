@@ -18,12 +18,12 @@ export class MobileApiController {
     return await this.mobileApiService.findAll();
   }
 
-  @Get('prices')
-  async getPricesByCategoryAndService(
+  @Get('products')
+  async getProductsByCategoryAndService(
     @Query('category_id') category_id: number,
     @Query('service_id') service_id: number,
   ): Promise<Response> {
-    return await this.mobileApiService.getPricesByCategoryAndService(
+    return await this.mobileApiService.getProductsByCategoryAndService(
       category_id,
       service_id,
     );
