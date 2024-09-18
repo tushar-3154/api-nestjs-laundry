@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'src/dto/response.dto';
 import { BannerService } from '../banner/banner.service';
+import { PriceService } from '../price/price.service';
 import { ServicesService } from '../services/services.service';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class MobileApiService {
   constructor(
     private readonly serviceService: ServicesService,
     private readonly bannerService: BannerService,
+    private readonly priceService: PriceService,
   ) {}
 
   async findAll(): Promise<Response> {
@@ -23,6 +25,22 @@ export class MobileApiService {
         services: services,
         banners: banners,
       },
+    };
+  }
+
+  async getPricesByCategoryAndService(
+    category_id: number,
+    service_id: number,
+  ): Promise<Response> {
+    const prices = await this.priceService.getPricesByCategoryAndService(
+      category_id,
+      service_id,
+    );
+
+    return {
+      statusCode: 200,
+      message: 'Prices retrieved successfully',
+      data: prices,
     };
   }
 }
