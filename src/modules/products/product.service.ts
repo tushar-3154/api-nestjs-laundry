@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Product } from 'src/entities/product.entity';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -39,19 +39,6 @@ export class ProductService {
       message: 'product retrieved successfully',
       data: { product: products },
     };
-  }
-
-  async getProductsByIds(ids: number[]): Promise<Product[]> {
-    if (ids.length === 0) {
-      return [];
-    }
-    const products = await this.productRepository.find({
-      where: {
-        product_id: In(ids),
-        deleted_at: null,
-      },
-    });
-    return appendBaseUrlToImages(products);
   }
 
   async findOne(id: number): Promise<Response> {

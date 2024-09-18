@@ -39,14 +39,10 @@ export class MobileApiService {
       service_id,
     );
 
-    const productIds = prices.map((price) => price.product.product_id);
-
-    const products = await this.productService.getProductsByIds(productIds);
-
     return {
       statusCode: 200,
       message: 'Products retrieved successfully',
-      data: products,
+      data: prices,
     };
   }
 }

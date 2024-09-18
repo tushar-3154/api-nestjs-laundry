@@ -5,6 +5,7 @@ import { Category } from 'src/entities/category.entity';
 import { Price } from 'src/entities/price.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { CreatePriceDto } from './dto/create-price.dto';
 
@@ -74,12 +75,20 @@ export class PriceService {
     };
   }
   async getPricesByCategoryAndService(category_id: number, service_id: number) {
-    return this.priceRepository.find({
+    const prices = await this.priceRepository.find({
       where: {
         category: { category_id: category_id },
         service: { service_id: service_id },
       },
       relations: ['product'],
     });
+
+    return prices.map((price) => ({
+      ...price,
+      product: {
+        ...price.product,
+        image: appendBaseUrlToImages([{ image: price.product.image }])[0].image,
+      },
+    }));
   }
 }
