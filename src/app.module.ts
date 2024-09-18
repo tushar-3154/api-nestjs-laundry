@@ -11,7 +11,7 @@ import { BranchModule } from './modules/branch/branch.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { CouponModule } from './modules/coupon/coupon.module';
-import { HomeModule } from './modules/mobileapi/mobileapi.module';
+import { MobileApiModule } from './modules/mobileapi/mobileapi.module';
 import { NotesModule } from './modules/notes/note.module';
 import { OrderModule } from './modules/order/order.module';
 import { PriceModule } from './modules/price/price.module';
@@ -42,7 +42,7 @@ import { MorganMiddleware } from './morgan.middleware';
     CompanyModule,
     BranchModule,
     NotesModule,
-    HomeModule,
+    MobileApiModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],

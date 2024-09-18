@@ -4,7 +4,7 @@ import { BannerService } from '../banner/banner.service';
 import { ServicesService } from '../services/services.service';
 
 @Injectable()
-export class HomeService {
+export class MobileApiService {
   constructor(
     private readonly serviceService: ServicesService,
     private readonly bannerService: BannerService,

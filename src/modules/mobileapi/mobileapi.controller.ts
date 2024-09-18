@@ -4,17 +4,17 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
-import { HomeService } from './mobileapi.service';
+import { MobileApiService } from './mobileapi.service';
 
-@Controller('mobileapi')
+@Controller('mobile')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.CUSTOMER)
-export class HomeController {
-  constructor(private readonly homeService: HomeService) {}
+export class MobileApiController {
+  constructor(private readonly mobileApiService: MobileApiService) {}
 
   @Get('/home')
   async findAll(): Promise<Response> {
-    return await this.homeService.findAll();
+    return await this.mobileApiService.findAll();
   }
 }
