@@ -276,7 +276,7 @@ export class OrderService {
       order_no: order.order_id,
       status: order.order_status === 2 ? 'Picked Up' : 'Order Confirmed',
       total_items: order.items.length,
-      date: new Date(order.created_at).toLocaleDateString('en-GB'),
+      date: new Date(order.created_at).toLocaleDateString('en-IN'),
       total_amount: order.total,
     }));
 
