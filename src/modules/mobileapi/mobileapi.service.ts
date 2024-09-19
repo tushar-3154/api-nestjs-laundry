@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Response } from 'src/dto/response.dto';
 import { BannerService } from '../banner/banner.service';
 import { PriceService } from '../price/price.service';
-import { ProductService } from '../products/product.service';
 import { ServicesService } from '../services/services.service';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class MobileApiService {
     private readonly serviceService: ServicesService,
     private readonly bannerService: BannerService,
     private readonly priceService: PriceService,
-    private readonly productService: ProductService,
   ) {}
 
   async findAll(): Promise<Response> {
