@@ -266,4 +266,24 @@ export class OrderService {
       message: 'Delivery boy assigned successfully',
     };
   }
+
+  async getOrder(): Promise<Response> {
+    const orders = await this.orderRepository.find({
+      where: { deleted_at: null },
+    });
+
+    const formattedOrder = orders.map((order) => ({
+      order_no: order.order_id,
+      status: order.order_status === 2 ? 'Picked Up' : 'Order Confirmed',
+      total_items: order.items.length,
+      date: new Date(order.created_at).toLocaleDateString('en-GB'),
+      total_amount: order.total,
+    }));
+
+    return {
+      statusCode: 200,
+      message: 'Order retrived successfully',
+      data: formattedOrder,
+    };
+  }
 }

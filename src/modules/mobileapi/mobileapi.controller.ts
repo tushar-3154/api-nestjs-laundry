@@ -28,4 +28,11 @@ export class MobileApiController {
       service_id,
     );
   }
+
+  @Get('categories')
+  async getCategoriesByService(
+    @Query('service_id') service_id: number,
+  ): Promise<Response> {
+    return await this.mobileApiService.getCategoriesByService(service_id);
+  }
 }
