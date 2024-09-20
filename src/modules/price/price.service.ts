@@ -91,4 +91,17 @@ export class PriceService {
       },
     }));
   }
+
+  async getCategoriesByService(service_id: number) {
+    const price = await this.priceRepository.find({
+      where: {
+        service: { service_id: service_id },
+      },
+      relations: ['category'],
+    });
+
+    return price.map((price) => ({
+      ...price.category,
+    }));
+  }
 }

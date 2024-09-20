@@ -43,4 +43,15 @@ export class MobileApiService {
       data: prices,
     };
   }
+
+  async getCategoriesByService(service_id: number): Promise<Response> {
+    const categories =
+      await this.priceService.getCategoriesByService(service_id);
+
+    return {
+      statusCode: 200,
+      message: 'Categories retrived successfully',
+      data: categories,
+    };
+  }
 }

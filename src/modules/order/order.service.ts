@@ -266,4 +266,64 @@ export class OrderService {
       message: 'Delivery boy assigned successfully',
     };
   }
+
+  async getOrderDetail(order_id: number): Promise<Response> {
+    const order = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('items.category', 'category')
+      .leftJoinAndSelect('items.product', 'product')
+      .leftJoinAndSelect('items.service', 'service')
+      .where('order.order_id = :orderId', { orderId: order_id })
+      .andWhere('order.deleted_at IS NULL')
+      .select([
+        'order.order_id',
+        'items.item_id',
+        'items.order_id',
+        'category.category_id',
+        'category.name',
+        'product.product_id',
+        'product.name',
+        'service.service_id',
+        'service.name',
+        'items.price ',
+        'order.sub_total ',
+        'order.shipping_charges',
+        'order.total',
+        'order.address_details',
+        'order.transaction_id',
+      ])
+      .getOne();
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return {
+      statusCode: 200,
+      message: 'Order retrived successfully',
+      data: order,
+    };
+  }
+
+  async getAll(user_id: number): Promise<Response> {
+    const orders = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .where('order.user_id = :userId', { userId: user_id })
+      .select([
+        'order.order_id As order_id',
+        'order.total As total',
+        'order.created_at As created_at',
+        'COUNT(items.item_id) As total_item',
+      ])
+      .groupBy('order.order_id')
+      .getRawMany();
+
+    return {
+      statusCode: 200,
+      message: 'order retrived',
+      data: orders,
+    };
+  }
 }
