@@ -274,7 +274,6 @@ export class OrderService {
       .leftJoinAndSelect('items.category', 'category')
       .leftJoinAndSelect('items.product', 'product')
       .leftJoinAndSelect('items.service', 'service')
-      .leftJoinAndSelect('order.address', 'address')
       .where('order.order_id = :orderId', { orderId: order_id })
       .andWhere('order.deleted_at IS NULL')
       .select([
@@ -291,15 +290,7 @@ export class OrderService {
         'order.sub_total ',
         'order.shipping_charges',
         'order.total',
-        'address.full_name',
-        'address.phone_number ',
-        'address.building_number ',
-        'address.area',
-        'address.landmark',
-        'address.pincode',
-        'address.city',
-        'address.state',
-        'address.country',
+        'order.address_details',
         'order.transaction_id',
       ])
       .getOne();
@@ -318,13 +309,13 @@ export class OrderService {
   async getAll(user_id: number): Promise<Response> {
     const orders = await this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'item')
+      .leftJoinAndSelect('order.items', 'items')
       .where('order.user_id = :userId', { userId: user_id })
       .select([
         'order.order_id As order_id',
         'order.total As total',
         'order.created_at As created_at',
-        'COUNT(item.item_id) As total_item',
+        'COUNT(items.item_id) As total_item',
       ])
       .groupBy('order.order_id')
       .getRawMany();
