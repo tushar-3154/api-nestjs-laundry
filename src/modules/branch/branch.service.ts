@@ -67,7 +67,6 @@ export class BranchService {
     const branch = await this.branchRepository.findOne({
       where: { branch_id: id, deleted_at: null },
     });
-
     if (!branch) {
       return {
         statusCode: 404,
