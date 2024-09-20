@@ -268,41 +268,71 @@ export class OrderService {
   }
 
   async getOrderDetail(order_id: number): Promise<Response> {
-    const order = await this.orderRepository.findOne({
-      where: { order_id: order_id, deleted_at: null },
-    });
+    const order = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('items.category', 'category')
+      .leftJoinAndSelect('items.product', 'product')
+      .leftJoinAndSelect('items.service', 'service')
+      .leftJoinAndSelect('order.address', 'address')
+      .where('order.order_id = :orderId', { orderId: order_id })
+      .andWhere('order.deleted_at IS NULL')
+      .select([
+        'order.order_id',
+        'items.item_id',
+        'items.order_id',
+        'category.category_id',
+        'category.name',
+        'product.product_id',
+        'product.name',
+        'service.service_id',
+        'service.name',
+        'items.price ',
+        'order.sub_total ',
+        'order.shipping_charges',
+        'order.total',
+        'address.full_name',
+        'address.phone_number ',
+        'address.building_number ',
+        'address.area',
+        'address.landmark',
+        'address.pincode',
+        'address.city',
+        'address.state',
+        'address.country',
+        'order.transaction_id',
+      ])
+      .getOne();
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    const result = this.mapOrderToResponse(order);
-
     return {
       statusCode: 200,
       message: 'Order retrived successfully',
-      data: result,
+      data: order,
     };
   }
 
   async getAll(user_id: number): Promise<Response> {
-    const orders = await this.orderRepository.find({
-      where: {
-        user_id: user_id,
-      },
-    });
+    const orders = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'item')
+      .where('order.user_id = :userId', { userId: user_id })
+      .select([
+        'order.order_id As order_id',
+        'order.total As total',
+        'order.created_at As created_at',
+        'COUNT(item.item_id) As total_item',
+      ])
+      .groupBy('order.order_id')
+      .getRawMany();
 
-    const formattedOrders = orders.map((order) => ({
-      order_no: order.order_id,
-      status: order.order_status === 2 ? 'Picked Up' : 'Order Confirmed',
-      total_items: order.items?.length || 0,
-      date: new Date(order.created_at).toLocaleDateString('en-IN'),
-      total_amount: order.total,
-    }));
     return {
       statusCode: 200,
       message: 'order retrived',
-      data: formattedOrders,
+      data: orders,
     };
   }
 }

@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Branch } from 'src/entities/branch.entity';
 import { Repository } from 'typeorm';
-import { CompanyService } from '../company/company.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-brach.dto';
 
@@ -12,7 +11,6 @@ export class BranchService {
   constructor(
     @InjectRepository(Branch)
     private branchRepository: Repository<Branch>,
-    private companyService: CompanyService,
   ) {}
 
   async create(createBranchDto: CreateBranchDto): Promise<Response> {
