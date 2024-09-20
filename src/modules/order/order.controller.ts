@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -30,16 +31,17 @@ export class OrderController {
     return this.orderService.create(createOrderDto);
   }
 
-  @Get('orders/summary')
+  @Get('orders/:order_id')
   @Roles(Role.CUSTOMER)
-  async getOrder(): Promise<Response> {
-    return this.orderService.getOrder();
+  async getOrderDetail(@Param('order_id') order_id: number): Promise<Response> {
+    return this.orderService.getOrderDetail(order_id);
   }
 
-  @Get('order/all')
+  @Get('orders')
   @Roles(Role.CUSTOMER)
-  async getAll(): Promise<Response> {
-    return this.orderService.findAll();
+  async getCustomerOrders(@Request() req): Promise<Response> {
+    const user = req.user;
+    return this.orderService.getAll(user.user_id);
   }
 
   @Get('admin/orders')

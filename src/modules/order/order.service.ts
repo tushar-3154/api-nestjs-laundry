@@ -267,23 +267,42 @@ export class OrderService {
     };
   }
 
-  async getOrder(): Promise<Response> {
-    const orders = await this.orderRepository.find({
-      where: { deleted_at: null },
+  async getOrderDetail(order_id: number): Promise<Response> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: order_id, deleted_at: null },
     });
 
-    const formattedOrder = orders.map((order) => ({
-      order_no: order.order_id,
-      status: order.order_status === 2 ? 'Picked Up' : 'Order Confirmed',
-      total_items: order.items.length,
-      date: new Date(order.created_at).toLocaleDateString('en-IN'),
-      total_amount: order.total,
-    }));
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const result = this.mapOrderToResponse(order);
 
     return {
       statusCode: 200,
       message: 'Order retrived successfully',
-      data: formattedOrder,
+      data: result,
+    };
+  }
+
+  async getAll(user_id: number): Promise<Response> {
+    const orders = await this.orderRepository.find({
+      where: {
+        user_id: user_id,
+      },
+    });
+
+    const formattedOrders = orders.map((order) => ({
+      order_no: order.order_id,
+      status: order.order_status === 2 ? 'Picked Up' : 'Order Confirmed',
+      total_items: order.items?.length || 0,
+      date: new Date(order.created_at).toLocaleDateString('en-IN'),
+      total_amount: order.total,
+    }));
+    return {
+      statusCode: 200,
+      message: 'order retrived',
+      data: formattedOrders,
     };
   }
 }

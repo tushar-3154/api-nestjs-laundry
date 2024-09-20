@@ -70,19 +70,6 @@ export class BranchService {
       where: { branch_id: id, deleted_at: null },
     });
 
-    if (updateBranchDto.company_id) {
-      const companyExists = await this.companyService.findOne(
-        updateBranchDto.company_id,
-      );
-      if (!companyExists) {
-        return {
-          statusCode: 400,
-          message: 'Invalid company_id',
-          data: null,
-        };
-      }
-    }
-
     if (!branch) {
       return {
         statusCode: 404,
