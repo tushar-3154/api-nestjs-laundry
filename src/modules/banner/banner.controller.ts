@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -21,6 +22,7 @@ import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { fileUpload } from 'src/multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
@@ -53,8 +55,8 @@ export class BannerController {
   }
 
   @Get('admin/banners')
-  async findAll(): Promise<Response> {
-    return await this.bannerService.findAll();
+  async findAll(@Query() paginationQueryDto: PaginationQueryDto) {
+    return this.bannerService.findAll(paginationQueryDto);
   }
 
   @Get('admin/banners/:id')

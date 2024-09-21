@@ -4,6 +4,7 @@ import { Response } from 'src/dto/response.dto';
 import { Banner } from 'src/entities/banner.entity';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 
@@ -46,17 +47,51 @@ export class BannerService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const banner = await this.BannerRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
 
-    const Banner = appendBaseUrlToImages(banner);
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.BannerRepository.createQueryBuilder('banner')
+      .where('banner.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(banner.title LIKE :search OR banner.description LIKE :search OR banner.image LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    let sortColumn = 'banner.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+    const Banner = appendBaseUrlToImages(result);
 
     return {
       statusCode: 200,
-      message: 'banner retrieved successfully',
-      data: { banner: Banner },
+      message: 'Banners retrieved successfully',
+      data: {
+        banner: Banner,
+        limit: perPage,
+        page_number: pageNumber,
+        count: total,
+      },
     };
   }
 

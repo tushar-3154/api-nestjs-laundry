@@ -14,6 +14,7 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { BranchService } from './branch.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-brach.dto';
@@ -31,11 +32,8 @@ export class BranchController {
   }
 
   @Get()
-  async findAll(
-    @Query('per_page') per_page?: number,
-    @Query('page_number') page_number?: number,
-  ): Promise<Response> {
-    return await this.branchService.findAll(per_page, page_number);
+  async findAll(@Query() paginationQueryDto: PaginationQueryDto) {
+    return this.branchService.findAll(paginationQueryDto);
   }
 
   @Get(':id')

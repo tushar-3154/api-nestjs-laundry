@@ -9,6 +9,7 @@ import {
 import { Gender } from '../enum/gender.enum';
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
+import { Branch } from './branch.entity';
 import { DeviceUser } from './device-user.entity';
 import { LoginHistory } from './login-history.entity';
 import { Note } from './note.entity';
@@ -70,4 +71,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.delivery_boy)
   ordersAsDeliveryBoy: OrderDetail[];
+
+  @OneToMany(() => Branch, (branch) => branch.branch_manager)
+  branches: Branch[];
 }

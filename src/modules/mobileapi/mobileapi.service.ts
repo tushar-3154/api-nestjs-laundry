@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'src/dto/response.dto';
 import { BannerService } from '../banner/banner.service';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { PriceService } from '../price/price.service';
 import { ServicesService } from '../services/services.service';
 
@@ -12,10 +13,10 @@ export class MobileApiService {
     private readonly priceService: PriceService,
   ) {}
 
-  async findAll(): Promise<Response> {
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
     const [services, banners] = await Promise.all([
       this.serviceService.findAll(),
-      this.bannerService.findAll(),
+      this.bannerService.findAll(paginationQueryDto),
     ]);
 
     return {
