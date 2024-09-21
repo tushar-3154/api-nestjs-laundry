@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Repository } from 'typeorm';
 import { Category } from '../../entities/category.entity';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -25,15 +26,44 @@ export class CategoryService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const result = await this.categoryRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
+
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.categoryRepository
+      .createQueryBuilder('category')
+      .where('category.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere('category.name LIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    let sortColumn = 'category.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'ASC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
 
     return {
       statusCode: 200,
-      message: 'Category retrieved successfully',
-      data: { result },
+      message: 'Categories retrieved successfully',
+      data: { result, limit: perPage, page_number: pageNumber, count: total },
     };
   }
 

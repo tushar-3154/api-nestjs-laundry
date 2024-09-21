@@ -4,6 +4,7 @@ import { Response } from 'src/dto/response.dto';
 import { Service } from 'src/entities/service.entity';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 
@@ -27,17 +28,46 @@ export class ServicesService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const services = await this.serviceRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
 
-    const service = appendBaseUrlToImages(services);
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.serviceRepository
+      .createQueryBuilder('service')
+      .where('service.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere('(service.name LIKE :search)', {
+        search: `%${search}%`,
+      });
+    }
+
+    let sortColumn = 'service.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+
+    const services = appendBaseUrlToImages(result);
 
     return {
       statusCode: 200,
-      message: 'Service retrieved successfully',
-      data: { service },
+      message: 'Services retrieved successfully',
+      data: { services, limit: perPage, page_number: pageNumber, count: total },
     };
   }
 

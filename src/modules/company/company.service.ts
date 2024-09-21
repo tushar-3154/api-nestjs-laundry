@@ -4,6 +4,7 @@ import { Response } from 'src/dto/response.dto';
 import { Company } from 'src/entities/company.entity';
 import { appendBaseUrlToLogo } from 'src/utils/image-path.helper';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
@@ -33,16 +34,39 @@ export class CompanyService {
     };
   }
 
-  async findAll(per_page?: number, page_number?: number): Promise<Response> {
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
+
     const pageNumber = page_number ?? 1;
     const perPage = per_page ?? 10;
-    const skip = (pageNumber - 1) * per_page;
+    const skip = (pageNumber - 1) * perPage;
 
-    const [result, total] = await this.companyRepository.findAndCount({
-      where: { deleted_at: null },
-      take: perPage,
-      skip: skip,
-    });
+    const queryBuilder = this.companyRepository
+      .createQueryBuilder('company')
+      .where('company.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(company.company_name LIKE :search OR company.registration_number LIKE :search OR company.address LIKE :search OR company.city LIKE :search OR company.state LIKE :search OR company.phone_number LIKE :search OR company.mobile_number LIKE :search OR company.email LIKE :search OR company.website LIKE :search OR company.company_owner_name LIKE:search)',
+        { search: `%${search}%` },
+      );
+    }
+    let sortColumn = 'company.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
 
     const companiesWithBaseUrl = appendBaseUrlToLogo(result);
 

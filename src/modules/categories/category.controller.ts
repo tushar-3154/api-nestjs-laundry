@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -14,6 +15,7 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from 'src/modules/auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -32,8 +34,10 @@ export class CategoryController {
   }
 
   @Get('admin/categories')
-  async findAll(): Promise<Response> {
-    return await this.categoryService.findAll();
+  async findAll(
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<Response> {
+    return await this.categoryService.findAll(paginationQueryDto);
   }
 
   @Get('admin/categories/:id')

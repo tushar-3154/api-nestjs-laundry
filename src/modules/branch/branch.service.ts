@@ -41,7 +41,7 @@ export class BranchService {
 
     if (search) {
       queryBuilder.andWhere(
-        '(branch.branch_name LIKE :search OR branch.branch_address LIKE :search OR branch.branch_manager LIKE :search OR branch.branch_email LIKE :search OR branch.branch_registration_number LIKE :search)',
+        '(branch.branch_name LIKE :search OR branch.branch_address LIKE :search OR branch.branch_manager_id LIKE :search OR branch.branch_email LIKE :search OR branch.branch_registration_number LIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -54,7 +54,7 @@ export class BranchService {
     if (order) {
       sortOrder = order;
     }
-
+    console.log(sort_by, sortOrder);
     queryBuilder.orderBy(sortColumn, sortOrder);
 
     const [result, total] = await queryBuilder.getManyAndCount();
