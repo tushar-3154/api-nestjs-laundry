@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -21,6 +22,7 @@ import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { fileUpload } from '../../multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
@@ -40,8 +42,10 @@ export class ServicesController {
   }
 
   @Get('admin/services')
-  async findAll(): Promise<Response> {
-    return await this.serviceService.findAll();
+  async findAll(
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<Response> {
+    return await this.serviceService.findAll(paginationQueryDto);
   }
 
   @Get('admin/services/:id')

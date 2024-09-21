@@ -21,6 +21,7 @@ import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { fileUpload } from 'src/multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -47,10 +48,9 @@ export class CompanyController {
 
   @Get()
   async findAll(
-    @Query('per_page') per_page?: number,
-    @Query('page_number') page_number?: number,
+    @Query() paginationQueryDto: PaginationQueryDto,
   ): Promise<Response> {
-    return await this.companyService.findAll(per_page, page_number);
+    return await this.companyService.findAll(paginationQueryDto);
   }
 
   @Get(':id')

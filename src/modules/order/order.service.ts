@@ -10,6 +10,7 @@ import { Service } from 'src/entities/service.entity';
 import { Role } from 'src/enum/role.enum';
 import { Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -116,20 +117,60 @@ export class OrderService {
     };
   }
 
-  async findAll(): Promise<Response> {
-    const orders = await this.orderRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(paginationQuery: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } = paginationQuery;
 
-    const result = orders.map(this.mapOrderToResponse.bind(this));
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.user', 'user')
+      .where('order.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search OR user.first_name LIKE :search OR user.last_name LIKE :search OR user.email LIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+
+    let sortColumn = 'order.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn =
+        sort_by === 'first_name' ||
+        sort_by === 'last_name' ||
+        sort_by === 'email'
+          ? `user.${sort_by}`
+          : `order.${sort_by}`;
+    }
+
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [orders, total] = await queryBuilder.getManyAndCount();
+    const result = orders.map((order) => this.mapOrderToResponse(order));
 
     return {
       statusCode: 200,
       message: 'Orders retrieved successfully',
-      data: result,
+      data: {
+        result,
+        limit: perPage,
+        page_number: pageNumber,
+        count: total,
+      },
     };
   }
-
   async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
       where: { order_id: order_id },

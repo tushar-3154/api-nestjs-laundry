@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
@@ -46,8 +48,10 @@ export class OrderController {
 
   @Get('admin/orders')
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async findAll(): Promise<Response> {
-    return this.orderService.findAll();
+  async findAll(
+    @Query() paginationQuery: PaginationQueryDto,
+  ): Promise<Response> {
+    return this.orderService.findAll(paginationQuery);
   }
 
   @Get('admin/orders/:id')
