@@ -127,16 +127,15 @@ export class OrderService {
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.user', 'user')
       .where('order.deleted_at IS NULL')
       .take(perPage)
       .skip(skip);
 
     if (search) {
       queryBuilder.andWhere(
-        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search OR order.sub_total LIKE : search OR order.shipping_charges LIKE : search OR order.total LIKE : : search OR order.express_delivery_charges LIKE ',
-        {
-          search: `%${search}%`,
-        },
+        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search OR user.first_name LIKE :search OR user.last_name LIKE :search OR user.email LIKE :search',
+        { search: `%${search}%` },
       );
     }
 
@@ -144,13 +143,20 @@ export class OrderService {
     let sortOrder: 'ASC' | 'DESC' = 'DESC';
 
     if (sort_by) {
-      sortColumn = `order.${sort_by}`;
+      sortColumn =
+        sort_by === 'first_name' ||
+        sort_by === 'last_name' ||
+        sort_by === 'email'
+          ? `user.${sort_by}`
+          : `order.${sort_by}`;
     }
+
     if (order) {
       sortOrder = order;
     }
 
     queryBuilder.orderBy(sortColumn, sortOrder);
+
     const [orders, total] = await queryBuilder.getManyAndCount();
     const result = orders.map((order) => this.mapOrderToResponse(order));
 
@@ -165,7 +171,6 @@ export class OrderService {
       },
     };
   }
-
   async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
       where: { order_id: order_id },
