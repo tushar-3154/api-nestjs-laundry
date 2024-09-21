@@ -54,7 +54,6 @@ export class BranchService {
     if (order) {
       sortOrder = order;
     }
-    console.log(sort_by, sortOrder);
     queryBuilder.orderBy(sortColumn, sortOrder);
 
     const [result, total] = await queryBuilder.getManyAndCount();

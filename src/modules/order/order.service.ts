@@ -133,7 +133,7 @@ export class OrderService {
 
     if (search) {
       queryBuilder.andWhere(
-        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search',
+        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search OR order.sub_total LIKE : search OR order.shipping_charges LIKE : search OR order.total LIKE : : search OR order.express_delivery_charges LIKE ',
         {
           search: `%${search}%`,
         },
