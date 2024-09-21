@@ -41,5 +41,5 @@ export class Branch extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.branches)
   @JoinColumn({ name: 'branch_manager_id' })
-  branch_manager: User;
+  branchManager: User;
 }

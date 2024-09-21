@@ -1,11 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddBranchManagerIdBranchTable1726896063541
+export class AddBranchManagerIdBranchTable1726899442207
   implements MigrationInterface
 {
-  name = 'AddBranchManagerIdBranchTable1726896063541';
+  name = 'AddBranchManagerIdBranchTable1726899442207';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE \`branches\` CHANGE \`branch_manager\` \`branch_manager_id\` varchar(100) NOT NULL`,
+    );
     await queryRunner.query(
       `ALTER TABLE \`branches\` DROP COLUMN \`branch_manager_id\``,
     );
@@ -26,6 +29,9 @@ export class AddBranchManagerIdBranchTable1726896063541
     );
     await queryRunner.query(
       `ALTER TABLE \`branches\` ADD \`branch_manager_id\` varchar(100) NOT NULL`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE \`branches\` CHANGE \`branch_manager_id\` \`branch_manager\` varchar(100) NOT NULL`,
     );
   }
 }
