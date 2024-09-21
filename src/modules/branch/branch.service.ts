@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Branch } from 'src/entities/branch.entity';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-brach.dto';
 
@@ -24,16 +25,39 @@ export class BranchService {
     };
   }
 
-  async findAll(per_page?: number, page_number?: number): Promise<Response> {
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
+
     const pageNumber = page_number ?? 1;
     const perPage = per_page ?? 10;
-    const skip = (page_number - 1) * per_page;
+    const skip = (pageNumber - 1) * perPage;
 
-    const [result, total] = await this.branchRepository.findAndCount({
-      where: { deleted_at: null },
-      take: perPage,
-      skip: skip,
-    });
+    const queryBuilder = this.branchRepository
+      .createQueryBuilder('branch')
+      .where('branch.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(branch.branch_name LIKE :search OR branch.branch_address LIKE :search OR branch.branch_manager LIKE :search OR branch.branch_email LIKE :search OR branch.branch_registration_number LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+    let sortColumn = 'branch.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+    if (order) {
+      sortOrder = order;
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
 
     return {
       statusCode: 200,

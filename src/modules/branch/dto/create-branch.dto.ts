@@ -7,8 +7,8 @@ export class CreateBranchDto {
   @IsString()
   branch_address: string;
 
-  @IsString()
-  branch_manager: string;
+  @IsNumber()
+  branch_manager_id: number;
 
   @IsString()
   branch_phone_number: string;
