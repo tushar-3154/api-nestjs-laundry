@@ -13,6 +13,6 @@ export class Product extends BaseEntity {
   @Column()
   image: string;
 
-  @OneToMany(() => Carts, (cartItem) => cartItem.product)
+  @OneToMany(() => Carts, (cart) => cart.product)
   carts: Carts[];
 }

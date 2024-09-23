@@ -13,7 +13,4 @@ export class AddCartDto {
   @IsInt()
   @Min(1)
   quantity: number;
-
-  // @IsNotEmpty()
-  // price: number;
 }
