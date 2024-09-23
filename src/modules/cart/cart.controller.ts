@@ -35,13 +35,13 @@ export class CartController {
   }
 
   @Get()
-  async getAllCartItems(@Request() req): Promise<Response> {
+  async getAllCart(@Request() req): Promise<Response> {
     const user = req.user;
     return this.cartService.getAllCarts(user.user_id);
   }
 
   @Put(':cart_id')
-  async updateCartItem(
+  async updateCart(
     @Param('cart_id') cart_id: number,
     @Body('quantity') quantity: number,
   ): Promise<Response> {
@@ -49,7 +49,7 @@ export class CartController {
   }
 
   @Delete(':cart_id')
-  async removeCartItem(
+  async removeCart(
     @Param('cart_id', ParseIntPipe) cart_id: number,
   ): Promise<Response> {
     return this.cartService.removeCart(cart_id);

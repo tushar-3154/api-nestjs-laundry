@@ -76,6 +76,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Branch, (branch) => branch.branchManager)
   branches: Branch[];
 
-  @OneToMany(() => Carts, (cartItem) => cartItem.user)
+  @OneToMany(() => Carts, (cart) => cart.user)
   carts: Carts[];
 }

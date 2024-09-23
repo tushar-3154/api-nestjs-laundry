@@ -68,12 +68,12 @@ export class CartService {
 
     cart.quantity = quantity;
 
-    const updatedItem = await this.cartRepository.save(cart);
+    const updated = await this.cartRepository.save(cart);
 
     return {
       statusCode: 200,
       message: 'Cart updated successfully',
-      data: updatedItem,
+      data: updated,
     };
   }
 
