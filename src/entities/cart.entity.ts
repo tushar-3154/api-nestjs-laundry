@@ -48,7 +48,4 @@ export class Carts extends BaseEntity {
 
   @Column({ type: 'int' })
   quantity: number;
-
-  @Column({ type: 'decimal' })
-  price: number;
 }

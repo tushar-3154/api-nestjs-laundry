@@ -16,13 +16,13 @@ export class CartService {
   async addToCart(addCartDto: AddCartDto, user_id: number): Promise<Response> {
     const { category_id, product_id, service_id, quantity } = addCartDto;
 
-    const priceEntry = await this.cartRepository.manager.findOne(Price, {
-      where: {
-        category_id,
-        product_id,
-        service_id,
-      },
-    });
+    const priceEntry = await this.cartRepository.manager
+      .createQueryBuilder(Price, 'price')
+      .where('price.category_id = :category_id', { category_id })
+      .andWhere('price.product_id = :product_id', { product_id })
+      .andWhere('price.service_id = :service_id', { service_id })
+      .andWhere('price.deleted_at IS NULL')
+      .getOne();
 
     if (!priceEntry) {
       return {
@@ -31,11 +31,11 @@ export class CartService {
           'Price not found for the specified category, product, and service',
       };
     }
+
     const cart = this.cartRepository.create({
       ...addCartDto,
       user_id,
       quantity,
-      price: priceEntry.price,
     });
 
     const result = await this.cartRepository.save(cart);
@@ -43,7 +43,7 @@ export class CartService {
     return {
       statusCode: 201,
       message: 'Cart added successfully',
-      data: { result },
+      data: { result, price: priceEntry.price },
     };
   }
 
@@ -51,10 +51,33 @@ export class CartService {
     const carts = await this.cartRepository.find({
       where: { user_id: user_id },
     });
+
+    const cartsWithPrices = await Promise.all(
+      carts.map(async (cart) => {
+        const priceEntry = await this.cartRepository.manager
+          .createQueryBuilder(Price, 'price')
+          .where('price.category_id = :category_id', {
+            category_id: cart.category_id,
+          })
+          .andWhere('price.product_id = :product_id', {
+            product_id: cart.product_id,
+          })
+          .andWhere('price.service_id = :service_id', {
+            service_id: cart.service_id,
+          })
+          .getOne();
+
+        return {
+          ...cart,
+          Price: priceEntry.price,
+        };
+      }),
+    );
+
     return {
       statusCode: 200,
       message: 'Cart retrieved successfully',
-      data: carts,
+      data: cartsWithPrices,
     };
   }
 
