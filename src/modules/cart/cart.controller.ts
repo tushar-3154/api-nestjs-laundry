@@ -16,7 +16,7 @@ import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { CartService } from './cart.service';
-import { AddCartItemDto } from './dto/cart-item.dto';
+import { AddCartDto } from './dto/cart.dto';
 
 @Controller('cart')
 @UseGuards(RolesGuard)
@@ -28,7 +28,7 @@ export class CartController {
   @Post()
   async addToCart(
     @Request() req,
-    @Body() addCartDto: AddCartItemDto,
+    @Body() addCartDto: AddCartDto,
   ): Promise<Response> {
     const user = req.user;
     return this.cartService.addToCart(addCartDto, user.user_id);

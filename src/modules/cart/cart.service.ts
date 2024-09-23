@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Carts } from 'src/entities/cart.entity';
+import { Price } from 'src/entities/price.entity';
 import { Repository } from 'typeorm';
-import { AddCartItemDto } from './dto/cart-item.dto';
+import { AddCartDto } from './dto/cart.dto';
 
 @Injectable()
 export class CartService {
@@ -12,28 +13,36 @@ export class CartService {
     private cartRepository: Repository<Carts>,
   ) {}
 
-  async addToCart(
-    addCartDto: AddCartItemDto,
-    user_id: number,
-  ): Promise<Response> {
-    const { category_id, product_id, service_id, quantity, price } = addCartDto;
+  async addToCart(addCartDto: AddCartDto, user_id: number): Promise<Response> {
+    const { category_id, product_id, service_id, quantity } = addCartDto;
 
-    const totalprice = quantity * price;
+    const priceEntry = await this.cartRepository.manager.findOne(Price, {
+      where: {
+        category_id,
+        product_id,
+        service_id,
+      },
+    });
 
+    if (!priceEntry) {
+      return {
+        statusCode: 404,
+        message:
+          'Price not found for the specified category, product, and service',
+      };
+    }
     const cart = this.cartRepository.create({
-      category_id: category_id,
-      product_id: product_id,
-      service_id: service_id,
-      user_id: user_id,
+      ...addCartDto,
+      user_id,
       quantity,
-      price: totalprice,
+      price: priceEntry.price,
     });
 
     const result = await this.cartRepository.save(cart);
 
     return {
       statusCode: 201,
-      message: 'cart item added succssfully',
+      message: 'Cart added successfully',
       data: { result },
     };
   }
@@ -44,7 +53,7 @@ export class CartService {
     });
     return {
       statusCode: 200,
-      message: 'Cart items retrieved successfully',
+      message: 'Cart retrieved successfully',
       data: carts,
     };
   }
@@ -54,19 +63,16 @@ export class CartService {
       where: { cart_id: cart_id },
     });
     if (!cart) {
-      throw new NotFoundException('Cart item not found');
+      throw new NotFoundException('Cart not found');
     }
 
-    const Price = cart.price / cart.quantity;
     cart.quantity = quantity;
-    cart.price = Price * quantity;
-    console.log(cart.price);
 
     const updatedItem = await this.cartRepository.save(cart);
 
     return {
       statusCode: 200,
-      message: 'Cart item updated successfully',
+      message: 'Cart updated successfully',
       data: updatedItem,
     };
   }
@@ -77,14 +83,14 @@ export class CartService {
     });
 
     if (!cart) {
-      throw new NotFoundException('Cart item not found');
+      throw new NotFoundException('Cart not found');
     }
 
     await this.cartRepository.delete(cart_id);
 
     return {
       statusCode: 200,
-      message: 'Cart item removed successfully',
+      message: 'Cart removed successfully',
       data: null,
     };
   }

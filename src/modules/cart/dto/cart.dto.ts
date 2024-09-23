@@ -1,6 +1,6 @@
-import { IsInt, IsNotEmpty, Min } from 'class-validator';
+import { IsInt, Min } from 'class-validator';
 
-export class AddCartItemDto {
+export class AddCartDto {
   @IsInt()
   category_id: number;
 
@@ -14,6 +14,6 @@ export class AddCartItemDto {
   @Min(1)
   quantity: number;
 
-  @IsNotEmpty()
-  price: number;
+  // @IsNotEmpty()
+  // price: number;
 }
