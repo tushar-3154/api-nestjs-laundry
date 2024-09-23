@@ -1,18 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
-import { CartItem } from 'src/entities/cart-items.entity';
+import { Carts } from 'src/entities/cart.entity';
 import { Repository } from 'typeorm';
 import { AddCartItemDto } from './dto/cart-item.dto';
 
 @Injectable()
 export class CartService {
   constructor(
-    @InjectRepository(CartItem)
-    private cartItemRepository: Repository<CartItem>,
+    @InjectRepository(Carts)
+    private cartRepository: Repository<Carts>,
   ) {}
 
-  async addItemToCart(
+  async addToCart(
     addCartDto: AddCartItemDto,
     user_id: number,
   ): Promise<Response> {
@@ -20,7 +20,7 @@ export class CartService {
 
     const totalprice = quantity * price;
 
-    const cartItem = this.cartItemRepository.create({
+    const cart = this.cartRepository.create({
       category_id: category_id,
       product_id: product_id,
       service_id: service_id,
@@ -29,7 +29,7 @@ export class CartService {
       price: totalprice,
     });
 
-    const result = await this.cartItemRepository.save(cartItem);
+    const result = await this.cartRepository.save(cart);
 
     return {
       statusCode: 201,
@@ -38,31 +38,31 @@ export class CartService {
     };
   }
 
-  async getAllCartItems(user_id: number): Promise<Response> {
-    const cartItems = await this.cartItemRepository.find({
+  async getAllCarts(user_id: number): Promise<Response> {
+    const carts = await this.cartRepository.find({
       where: { user_id: user_id },
     });
     return {
       statusCode: 200,
       message: 'Cart items retrieved successfully',
-      data: cartItems,
+      data: carts,
     };
   }
 
-  async updateCartItem(cart_id: number, quantity: number): Promise<Response> {
-    const cartItem = await this.cartItemRepository.findOne({
+  async updateCart(cart_id: number, quantity: number): Promise<Response> {
+    const cart = await this.cartRepository.findOne({
       where: { cart_id: cart_id },
     });
-    if (!cartItem) {
+    if (!cart) {
       throw new NotFoundException('Cart item not found');
     }
 
-    const Price = cartItem.price / cartItem.quantity;
-    cartItem.quantity = quantity;
-    cartItem.price = Price * quantity;
-    console.log(cartItem.price);
+    const Price = cart.price / cart.quantity;
+    cart.quantity = quantity;
+    cart.price = Price * quantity;
+    console.log(cart.price);
 
-    const updatedItem = await this.cartItemRepository.save(cartItem);
+    const updatedItem = await this.cartRepository.save(cart);
 
     return {
       statusCode: 200,
@@ -71,16 +71,16 @@ export class CartService {
     };
   }
 
-  async removeCartItem(cart_id: number): Promise<Response> {
-    const cartItem = await this.cartItemRepository.findOne({
+  async removeCart(cart_id: number): Promise<Response> {
+    const cart = await this.cartRepository.findOne({
       where: { cart_id: cart_id },
     });
 
-    if (!cartItem) {
+    if (!cart) {
       throw new NotFoundException('Cart item not found');
     }
 
-    await this.cartItemRepository.delete(cart_id);
+    await this.cartRepository.delete(cart_id);
 
     return {
       statusCode: 200,

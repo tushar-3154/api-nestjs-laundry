@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { CartItem } from './cart-items.entity';
+import { Carts } from './cart.entity';
 
 @Entity({ name: 'products' })
 export class Product extends BaseEntity {
@@ -13,6 +13,6 @@ export class Product extends BaseEntity {
   @Column()
   image: string;
 
-  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
-  cartItems: CartItem[];
+  @OneToMany(() => Carts, (cartItem) => cartItem.product)
+  carts: Carts[];
 }

@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { CartItem } from './cart-items.entity';
+import { Carts } from './cart.entity';
 
 @Entity({ name: 'categories' })
 export class Category extends BaseEntity {
@@ -10,6 +10,6 @@ export class Category extends BaseEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => CartItem, (cartItem) => cartItem.category)
-  cartItems: CartItem[];
+  @OneToMany(() => Carts, (carts) => carts.category)
+  carts: Carts[];
 }

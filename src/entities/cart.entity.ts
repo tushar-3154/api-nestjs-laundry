@@ -5,13 +5,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
 import { User } from './user.entity';
 
 @Entity('cart_items')
-export class CartItem {
+export class Carts extends BaseEntity {
   @PrimaryGeneratedColumn()
   cart_id: number;
 
@@ -27,19 +28,19 @@ export class CartItem {
   @Column()
   user_id: number;
 
-  @ManyToOne(() => User, (user) => user.cartItems, { nullable: false })
+  @ManyToOne(() => User, (user) => user.carts, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.cartItems, { nullable: false })
+  @ManyToOne(() => Product, (product) => product.carts, { nullable: false })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @ManyToOne(() => Service, (service) => service.cartItems, { nullable: false })
+  @ManyToOne(() => Service, (service) => service.carts, { nullable: false })
   @JoinColumn({ name: 'service_id' })
   service: Service;
 
-  @ManyToOne(() => Category, (category) => category.cartItems, {
+  @ManyToOne(() => Category, (category) => category.carts, {
     nullable: false,
   })
   @JoinColumn({ name: 'category_id' })
