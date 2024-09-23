@@ -8,6 +8,7 @@ import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BannerModule } from './modules/banner/banner.module';
 import { BranchModule } from './modules/branch/branch.module';
+import { CartModule } from './modules/cart/cart.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { CouponModule } from './modules/coupon/coupon.module';
@@ -43,6 +44,7 @@ import { MorganMiddleware } from './morgan.middleware';
     BranchModule,
     NotesModule,
     MobileApiModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],

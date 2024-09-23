@@ -38,12 +38,18 @@ export class BranchService {
       .leftJoinAndSelect('branch.branchManager', 'user')
       .leftJoinAndSelect('branch.company', 'company')
       .where('branch.deleted_at IS NULL')
+      .select([
+        'branch',
+        'company.company_name',
+        'user.first_name',
+        'user.last_name',
+      ])
       .take(perPage)
       .skip(skip);
 
     if (search) {
       queryBuilder.andWhere(
-        '(branch.branch_name LIKE :search OR branch.branch_address LIKE search OR user.first_name LIKE :search OR user.last_name LIKE  :search OR branch.branch_email LIKE :search OR branch.branch_registration_number LIKE :search OR company.company_name LIKE :search)',
+        '(branch.branch_name LIKE :search OR branch.branch_address LIKE :search OR user.first_name LIKE :search OR user.last_name LIKE  :search OR branch.branch_email LIKE :search OR branch.branch_registration_number LIKE :search OR company.company_name LIKE :search)',
         { search: `%${search}%` },
       );
     }
