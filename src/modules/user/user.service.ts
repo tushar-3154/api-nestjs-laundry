@@ -389,18 +389,10 @@ export class UserService {
   }
 
   async logout(user_id: number, device_id: number): Promise<Response> {
-    const device_user = await this.deviceUserRepository.findOne({
-      where: {
-        user_id: user_id,
-        device_id,
-      },
+    await this.deviceUserRepository.delete({
+      user_id: user_id,
+      device_id: device_id,
     });
-
-    if (!device_user) {
-      throw new NotFoundException('Device not found for this user');
-    }
-
-    await this.deviceUserRepository.remove(device_user);
     return {
       statusCode: 200,
       message: 'logout successfully',
