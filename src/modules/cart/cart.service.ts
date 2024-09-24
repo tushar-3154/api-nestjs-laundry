@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Carts } from 'src/entities/cart.entity';
-import { Price } from 'src/entities/price.entity';
 import { Repository } from 'typeorm';
 import { AddCartDto } from './dto/cart.dto';
 
@@ -14,28 +13,9 @@ export class CartService {
   ) {}
 
   async addToCart(addCartDto: AddCartDto, user_id: number): Promise<Response> {
-    const { category_id, product_id, service_id, quantity } = addCartDto;
-
-    const priceEntry = await this.cartRepository.manager
-      .createQueryBuilder(Price, 'price')
-      .where('price.category_id = :category_id', { category_id })
-      .andWhere('price.product_id = :product_id', { product_id })
-      .andWhere('price.service_id = :service_id', { service_id })
-      .andWhere('price.deleted_at IS NULL')
-      .getOne();
-
-    if (!priceEntry) {
-      return {
-        statusCode: 404,
-        message:
-          'Price not found for the specified category, product, and service',
-      };
-    }
-
     const cart = this.cartRepository.create({
       ...addCartDto,
       user_id,
-      quantity,
     });
 
     const result = await this.cartRepository.save(cart);
@@ -43,41 +23,40 @@ export class CartService {
     return {
       statusCode: 201,
       message: 'Cart added successfully',
-      data: { result, price: priceEntry.price },
+      data: result,
     };
   }
 
   async getAllCarts(user_id: number): Promise<Response> {
-    const carts = await this.cartRepository.find({
-      where: { user_id: user_id },
-    });
-
-    const cartsWithPrices = await Promise.all(
-      carts.map(async (cart) => {
-        const priceEntry = await this.cartRepository.manager
-          .createQueryBuilder(Price, 'price')
-          .where('price.category_id = :category_id', {
-            category_id: cart.category_id,
-          })
-          .andWhere('price.product_id = :product_id', {
-            product_id: cart.product_id,
-          })
-          .andWhere('price.service_id = :service_id', {
-            service_id: cart.service_id,
-          })
-          .getOne();
-
-        return {
-          ...cart,
-          Price: priceEntry.price,
-        };
-      }),
-    );
+    const BASE_URL = process.env.BASE_URL;
+    const carts = await this.cartRepository
+      .createQueryBuilder('cart')
+      .leftJoin('cart.category', 'category')
+      .leftJoin('cart.product', 'product')
+      .leftJoin('cart.service', 'service')
+      .innerJoin('cart.price', 'price')
+      .where('user_id = :user_id', {
+        user_id,
+      })
+      .andWhere('cart.deleted_at IS NULL')
+      .select([
+        'cart.cart_id as cart_id',
+        'cart.product_id as product_id',
+        'product.name as product_name',
+        `CONCAT('${BASE_URL}/', product.image) as product_image`,
+        'cart.category_id as category_id',
+        'category.name as category_name',
+        'cart.service_id as service_id',
+        'service.name as service_name',
+        'price.price_id as price_id',
+        'price.price as price',
+      ])
+      .getRawMany();
 
     return {
       statusCode: 200,
       message: 'Cart retrieved successfully',
-      data: cartsWithPrices,
+      data: carts,
     };
   }
 

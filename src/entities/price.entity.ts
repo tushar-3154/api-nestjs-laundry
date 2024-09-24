@@ -3,9 +3,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Carts } from './cart.entity';
 import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
@@ -13,7 +15,7 @@ import { Service } from './service.entity';
 @Entity('prices')
 export class Price extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  price_id: number;
 
   @Column()
   category_id: number;
@@ -38,4 +40,7 @@ export class Price extends BaseEntity {
 
   @Column({ nullable: true })
   price: number;
+
+  @OneToMany(() => Carts, (cart) => cart.price)
+  carts: Carts[];
 }
