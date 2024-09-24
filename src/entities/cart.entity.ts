@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Category } from './category.entity';
-import { Price } from './price.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
 import { User } from './user.entity';
@@ -49,12 +48,4 @@ export class Cart extends BaseEntity {
 
   @Column({ type: 'int' })
   quantity: number;
-
-  @ManyToOne(() => Price, (price) => price.carts, { nullable: false })
-  @JoinColumn([
-    { name: 'category_id', referencedColumnName: 'category_id' },
-    { name: 'product_id', referencedColumnName: 'product_id' },
-    { name: 'service_id', referencedColumnName: 'service_id' },
-  ])
-  price: Price;
 }

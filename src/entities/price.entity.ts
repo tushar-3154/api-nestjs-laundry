@@ -3,11 +3,9 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Cart } from './cart.entity';
 import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
@@ -40,7 +38,4 @@ export class Price extends BaseEntity {
 
   @Column({ nullable: true })
   price: number;
-
-  @OneToMany(() => Cart, (cart) => cart.price)
-  carts: Cart[];
 }

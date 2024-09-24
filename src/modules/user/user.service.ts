@@ -140,7 +140,7 @@ export class UserService {
   async storeLoginHistory(user: User, device_type: string): Promise<void> {
     const loginHistory = new LoginHistory();
     loginHistory.user_id = user.user_id;
-    loginHistory.type = device_type;
+    loginHistory.type = device_type || '';
     await this.loginHistoryRepository.save(loginHistory);
   }
 
@@ -150,8 +150,8 @@ export class UserService {
     device_token: string,
   ): Promise<void> {
     const deviceUser = new DeviceUser();
-    deviceUser.device_type = device_type;
-    deviceUser.device_token = device_token;
+    deviceUser.device_type = device_type || '';
+    deviceUser.device_token = device_token || '';
     deviceUser.user_id = user.user_id;
     await this.deviceUserRepository.save(deviceUser);
   }
@@ -385,6 +385,25 @@ export class UserService {
       statusCode: 200,
       message: 'Password reset successfully',
       data: null,
+    };
+  }
+
+  async logout(user_id: number, device_id: number): Promise<Response> {
+    const device_user = await this.deviceUserRepository.findOne({
+      where: {
+        user_id: user_id,
+        device_id,
+      },
+    });
+
+    if (!device_user) {
+      throw new NotFoundException('Device not found for this user');
+    }
+
+    await this.deviceUserRepository.remove(device_user);
+    return {
+      statusCode: 200,
+      message: 'logout successfully',
     };
   }
 }

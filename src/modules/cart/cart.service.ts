@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
 import { Cart } from 'src/entities/cart.entity';
+import { Price } from 'src/entities/price.entity';
 import { Repository } from 'typeorm';
 import { AddCartDto } from './dto/cart.dto';
 
@@ -31,14 +32,17 @@ export class CartService {
     const BASE_URL = process.env.BASE_URL;
     const carts = await this.cartRepository
       .createQueryBuilder('cart')
-      .leftJoin('cart.category', 'category')
-      .leftJoin('cart.product', 'product')
-      .leftJoin('cart.service', 'service')
-      .innerJoin('cart.price', 'price')
+      .innerJoin('cart.category', 'category')
+      .innerJoin('cart.product', 'product')
+      .innerJoin('cart.service', 'service')
+      .innerJoinAndSelect(
+        Price,
+        'price',
+        'cart.category_id = price.category_id AND cart.product_id = price.product_id AND cart.service_id = price.service_id and price.deleted_at is NULL',
+      )
       .where('user_id = :user_id', {
         user_id,
       })
-      .andWhere('cart.deleted_at IS NULL')
       .select([
         'cart.cart_id as cart_id',
         'cart.product_id as product_id',
