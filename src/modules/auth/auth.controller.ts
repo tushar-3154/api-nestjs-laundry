@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
@@ -39,6 +48,17 @@ export class AuthController {
   ): Promise<Response> {
     const { mobile_number, otp, new_password } = resetPasswordDto;
     return this.userService.resetPassword(mobile_number, otp, new_password);
+  }
+
+  @Delete('logout/:device_id')
+  @Roles(Role.CUSTOMER)
+  @UseGuards(AuthGuard('jwt'))
+  async logout(
+    @Request() req,
+    @Param('device_id') device_id: number,
+  ): Promise<Response> {
+    const user = req.user;
+    return this.userService.logout(user.user_id, device_id);
   }
 
   @UseGuards(RolesGuard)
