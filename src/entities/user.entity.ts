@@ -10,7 +10,7 @@ import { Gender } from '../enum/gender.enum';
 import { UserAddress } from './address.entity';
 import { BaseEntity } from './base.entity';
 import { Branch } from './branch.entity';
-import { Carts } from './cart.entity';
+import { Cart } from './cart.entity';
 import { DeviceUser } from './device-user.entity';
 import { LoginHistory } from './login-history.entity';
 import { Note } from './note.entity';
@@ -76,6 +76,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Branch, (branch) => branch.branchManager)
   branches: Branch[];
 
-  @OneToMany(() => Carts, (cart) => cart.user)
-  carts: Carts[];
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
 }

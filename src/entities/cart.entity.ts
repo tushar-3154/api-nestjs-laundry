@@ -13,7 +13,7 @@ import { Service } from './service.entity';
 import { User } from './user.entity';
 
 @Entity('carts')
-export class Carts extends BaseEntity {
+export class Cart extends BaseEntity {
   @PrimaryGeneratedColumn()
   cart_id: number;
 

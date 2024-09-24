@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
-import { Carts } from './cart.entity';
+import { Cart } from './cart.entity';
 import { Category } from './category.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
@@ -41,6 +41,6 @@ export class Price extends BaseEntity {
   @Column({ nullable: true })
   price: number;
 
-  @OneToMany(() => Carts, (cart) => cart.price)
-  carts: Carts[];
+  @OneToMany(() => Cart, (cart) => cart.price)
+  carts: Cart[];
 }

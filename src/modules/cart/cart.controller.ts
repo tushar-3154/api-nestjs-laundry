@@ -18,7 +18,7 @@ import { RolesGuard } from '../auth/guard/role.guard';
 import { CartService } from './cart.service';
 import { AddCartDto } from './dto/cart.dto';
 
-@Controller('cart')
+@Controller('carts')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.CUSTOMER)
