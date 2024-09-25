@@ -8,9 +8,10 @@ import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { Role } from 'src/enum/role.enum';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
+import { NotificationService } from '../notification/notification.service';
 import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -32,6 +33,8 @@ export class OrderService {
     private orderItemRepository: Repository<OrderItem>,
     private readonly couponService: CouponService,
     private readonly userService: UserService,
+    private readonly notificationService: NotificationService,
+    private dataSource: DataSource,
   ) {}
 
   private mapOrderToResponse(order: OrderDetail) {
@@ -57,64 +60,82 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderDto): Promise<Response> {
-    const address = await this.addressRepository.findOne({
-      where: { address_id: createOrderDto.address_id },
-    });
-    if (!address) {
-      throw new NotFoundException(
-        `Address with id ${createOrderDto.address_id} not found`,
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const address = await queryRunner.manager.findOne(UserAddress, {
+        where: { address_id: createOrderDto.address_id },
+      });
+      if (!address) {
+        throw new NotFoundException(
+          `Address with id ${createOrderDto.address_id} not found`,
+        );
+      }
+
+      const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
+
+      let sub_total = createOrderDto.sub_total;
+      let coupon_discount = 0;
+      const coupon_code = createOrderDto.coupon_code;
+
+      if (coupon_code) {
+        const couponValidation = await this.couponService.applyCoupon(
+          { coupon_Code: coupon_code, order_Total: sub_total },
+          createOrderDto.user_id,
+        );
+
+        coupon_discount = couponValidation.data.discountAmount;
+        sub_total -= coupon_discount;
+      }
+
+      const total =
+        sub_total +
+        createOrderDto.shipping_charges +
+        (createOrderDto.express_delivery_charges || 0);
+
+      const paid_amount = createOrderDto.paid_amount || 0;
+      const kasar_amount = paid_amount < total ? total - paid_amount : 0;
+
+      const order = this.orderRepository.create({
+        ...createOrderDto,
+        sub_total,
+        total,
+        coupon_code,
+        coupon_discount,
+        address_details,
+        kasar_amount,
+      });
+
+      const savedOrder = await queryRunner.manager.save(order);
+
+      const orderItems = createOrderDto.items.map((item) => ({
+        order: savedOrder,
+        category_id: item.category_id,
+        product_id: item.product_id,
+        service_id: item.service_id,
+        price: item.price,
+      }));
+
+      await queryRunner.manager.insert(OrderItem, orderItems);
+
+      await queryRunner.commitTransaction();
+
+      await this.notificationService.sendWhatsAppNotification(
+        savedOrder.order_id,
       );
+
+      return {
+        statusCode: 201,
+        message: 'Order details added successfully',
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
-
-    let sub_total = createOrderDto.sub_total;
-    let coupon_discount = 0;
-    const coupon_code = createOrderDto.coupon_code;
-
-    if (coupon_code) {
-      const couponValidation = await this.couponService.applyCoupon(
-        { coupon_Code: coupon_code, order_Total: sub_total },
-        createOrderDto.user_id,
-      );
-
-      coupon_discount = couponValidation.data.discountAmount;
-      sub_total -= coupon_discount;
-    }
-
-    const total =
-      sub_total +
-      createOrderDto.shipping_charges +
-      (createOrderDto.express_delivery_charges || 0);
-
-    const paid_amount = createOrderDto.paid_amount || 0;
-    const kasar_amount = paid_amount < total ? total - paid_amount : 0;
-
-    const order = this.orderRepository.create({
-      ...createOrderDto,
-      sub_total,
-      total,
-      coupon_code,
-      coupon_discount,
-      address_details,
-      kasar_amount,
-    });
-    const savedOrder = await this.orderRepository.save(order);
-
-    const orderItems = createOrderDto.items.map((item) => ({
-      order: savedOrder,
-      category_id: item.category_id,
-      product_id: item.product_id,
-      service_id: item.service_id,
-      price: item.price,
-    }));
-
-    await this.orderItemRepository.insert(orderItems);
-
-    return {
-      statusCode: 201,
-      message: 'Order details added successfully',
-    };
   }
 
   async findAll(paginationQuery: PaginationQueryDto): Promise<Response> {

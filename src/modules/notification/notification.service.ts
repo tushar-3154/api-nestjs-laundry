@@ -1,16 +1,21 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { OrderDetail } from 'src/entities/order.entity';
 import { OrderService } from '../order/order.service';
 
 @Injectable()
 export class NotificationService {
-  private readonly apiUrl =
-    'https://wts.vision360solutions.co.in/api/sendText?token=61041f957f26a4cb491e6dcf';
+  private readonly apiUrl = 'https://wts.vision360solutions.co.in/api/sendText';
 
   constructor(
     private readonly httpService: HttpService,
+    @Inject(forwardRef(() => OrderService))
     private readonly orderService: OrderService,
   ) {}
   async sendWhatsAppNotification(order_id: number): Promise<void> {
@@ -23,7 +28,7 @@ export class NotificationService {
 
     const encodedMessage = encodeURIComponent(message);
 
-    const finalUrl = `${this.apiUrl}&phone=91${order.user.mobile_number}&message=${encodedMessage}`;
+    const finalUrl = `${this.apiUrl}?token=${process.env.TOKEN}&phone=91${order.user.mobile_number}&message=${encodedMessage}`;
 
     const response = await firstValueFrom(this.httpService.post(finalUrl, {}));
 
