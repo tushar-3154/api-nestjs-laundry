@@ -367,4 +367,13 @@ export class OrderService {
       data: orders,
     };
   }
+
+  async findOrderById(order_id: number): Promise<OrderDetail | null> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: order_id },
+      relations: ['user', 'items'],
+    });
+
+    return order || null;
+  }
 }
