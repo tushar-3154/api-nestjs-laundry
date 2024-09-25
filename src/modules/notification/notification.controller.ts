@@ -12,12 +12,12 @@ import { NotificationService } from './notification.service';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Post('whatsapp/:orderId')
+  @Post('whatsapp/:order_id')
   async sendWhatsAppNotification(
-    @Param('orderId', ParseIntPipe) orderId: number,
+    @Param('order_id', ParseIntPipe) order_id: number,
   ) {
     try {
-      await this.notificationService.sendWhatsAppNotification(orderId);
+      await this.notificationService.sendWhatsAppNotification(order_id);
       return { message: 'WhatsApp notification sent successfully.' };
     } catch (error) {
       throw new HttpException(
