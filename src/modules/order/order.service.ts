@@ -7,7 +7,6 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
-import { User } from 'src/entities/user.entity';
 import { Role } from 'src/enum/role.enum';
 import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
@@ -74,10 +73,8 @@ export class OrderService {
           `Address with id ${createOrderDto.address_id} not found`,
         );
       }
-      const user = await queryRunner.manager.findOne(User, {
-        where: { user_id: createOrderDto.user_id },
-        select: ['first_name', 'last_name', 'mobile_number'],
-      });
+
+      const user = await this.userService.findUserById(createOrderDto.user_id);
 
       const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
 
