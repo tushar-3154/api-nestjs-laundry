@@ -46,6 +46,15 @@ export class OrderController {
     return this.orderService.getAll(user.user_id);
   }
 
+  @Post('admin/orders')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async createorder(
+    @Request() req,
+    @Body() createOrderDto: CreateOrderDto,
+  ): Promise<Response> {
+    return this.orderService.create(createOrderDto);
+  }
+
   @Get('admin/orders')
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async findAll(

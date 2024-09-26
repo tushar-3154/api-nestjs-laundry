@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -40,6 +41,17 @@ export class UserController {
       user.user_id,
       changePasswordDto,
     );
+  }
+
+  @Post('customers')
+  async createCustomer(@Body() signupDto: SignupDto) {
+    return await this.userService.createUser(signupDto);
+  }
+
+  @Get('customers')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async getAllCustomers(@Query('search') search?: string): Promise<Response> {
+    return this.userService.getAllCustomers(search);
   }
 
   @Post()

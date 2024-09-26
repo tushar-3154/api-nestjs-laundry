@@ -405,4 +405,32 @@ export class UserService {
       select: ['first_name', 'last_name', 'mobile_number'],
     });
   }
+
+  async getAllCustomers(search?: string): Promise<Response> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role_id = :role_id', { role_id: Role.CUSTOMER })
+      .select([
+        'user.user_id',
+        'user.first_name',
+        'user.last_name',
+        'user.mobile_number',
+        'user.email',
+      ]);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.first_name LIKE :search OR user.last_name LIKE :search OR user.email LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    const customers = await queryBuilder.take(20).getMany();
+
+    return {
+      statusCode: 200,
+      message: 'Customers fetched successfully',
+      data: customers,
+    };
+  }
 }
