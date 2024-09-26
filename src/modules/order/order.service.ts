@@ -402,28 +402,4 @@ export class OrderService {
       data: orders,
     };
   }
-
-  async findOrderById(order_id: number): Promise<OrderDetail> {
-    const order = await this.orderRepository
-      .createQueryBuilder('order')
-      .leftJoinAndSelect('order.user', 'user')
-      .leftJoinAndSelect('order.items', 'items')
-      .where('order.order_id = :order_id', { order_id })
-      .select([
-        'order.order_id',
-        'order.created_at',
-        'order.total',
-        'user.first_name',
-        'user.last_name',
-        'user.mobile_number',
-        'items',
-      ])
-      .getOne();
-
-    if (!order) {
-      throw new NotFoundException(`Order with ID ${order_id} not found.`);
-    }
-
-    return order;
-  }
 }
