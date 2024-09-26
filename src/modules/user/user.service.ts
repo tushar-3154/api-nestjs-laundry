@@ -399,7 +399,7 @@ export class UserService {
     };
   }
 
-  async findUserById(userId: number): Promise<User | null> {
+  async findUserById(userId: number): Promise<User> {
     return this.userRepository.findOne({
       where: { user_id: userId },
       select: ['first_name', 'last_name', 'mobile_number'],
