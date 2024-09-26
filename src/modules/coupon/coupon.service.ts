@@ -62,10 +62,10 @@ export class CouponService {
           'coupon.description LIKE :search OR ' +
           'coupon.title LIKE :search OR ' +
           'coupon.discount_value LIKE :search OR ' +
-          'coupon.total_usage_count::text LIKE :search OR ' +
-          'coupon.maximum_usage_count_per_user::text LIKE :search)' +
-          'coupon.start_time::text LIKE :search OR ' +
-          'coupon.end_time::text LIKE :search)',
+          'CAST(coupon.total_usage_count AS CHAR) LIKE :search OR ' +
+          'CAST(coupon.maximum_usage_count_per_user AS CHAR) LIKE :search OR ' +
+          'coupon.start_time LIKE :search OR ' +
+          'coupon.end_time LIKE :search)',
         { search: `%${search}%` },
       );
     }
