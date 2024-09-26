@@ -7,6 +7,7 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { User } from 'src/entities/user.entity';
 import { Role } from 'src/enum/role.enum';
 import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
@@ -73,6 +74,10 @@ export class OrderService {
           `Address with id ${createOrderDto.address_id} not found`,
         );
       }
+      const user = await queryRunner.manager.findOne(User, {
+        where: { user_id: createOrderDto.user_id },
+        select: ['first_name', 'last_name', 'mobile_number'],
+      });
 
       const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
 
@@ -121,10 +126,19 @@ export class OrderService {
       await queryRunner.manager.insert(OrderItem, orderItems);
 
       await queryRunner.commitTransaction();
+      const orderDetail = {
+        order_id: savedOrder.order_id,
+        total: savedOrder.total,
+        created_at: savedOrder.created_at,
+        items: orderItems.length,
+        user: {
+          first_name: user.first_name,
+          last_name: user.last_name,
+          mobile_number: user.mobile_number,
+        },
+      };
 
-      await this.notificationService.sendWhatsAppNotification(
-        savedOrder.order_id,
-      );
+      await this.notificationService.sendOrderNotification(orderDetail);
 
       return {
         statusCode: 201,
@@ -132,7 +146,7 @@ export class OrderService {
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw error;
+      throw new Error(`Transaction failed: ${error.message}`);
     } finally {
       await queryRunner.release();
     }
