@@ -398,4 +398,11 @@ export class UserService {
       message: 'logout successfully',
     };
   }
+
+  async findUserById(userId: number): Promise<User> {
+    return this.userRepository.findOne({
+      where: { user_id: userId },
+      select: ['first_name', 'last_name', 'mobile_number'],
+    });
+  }
 }

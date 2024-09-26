@@ -9,6 +9,7 @@ import { Coupon } from 'src/entities/coupon.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { DiscountType } from 'src/enum/coupon_type.enum';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { ApplyCouponDto } from './dto/create.verify-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
@@ -41,18 +42,52 @@ export class CouponService {
     }
   }
 
-  async findAll(per_page?: number, page_number?: number): Promise<Response> {
+  async findAll(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
+
     const pageNumber = page_number ?? 1;
     const perPage = per_page ?? 10;
-    const skip = (pageNumber - 1) * per_page;
-    const [result, total] = await this.couponRepository.findAndCount({
-      where: { deleted_at: null },
-      take: perPage,
-      skip: skip,
-    });
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.couponRepository
+      .createQueryBuilder('coupon')
+      .where('coupon.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(coupon.code LIKE :search OR ' +
+          'coupon.description LIKE :search OR ' +
+          'coupon.title LIKE :search OR ' +
+          'coupon.discount_value LIKE :search OR ' +
+          'coupon.total_usage_count::text LIKE :search OR ' +
+          'coupon.maximum_usage_count_per_user::text LIKE :search)' +
+          'coupon.start_time::text LIKE :search OR ' +
+          'coupon.end_time::text LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    let sortColumn = 'coupon.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+
+    if (order) {
+      sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+
     return {
       statusCode: 200,
-      message: 'discount coupon retrieved successfully',
+      message: 'Discount coupons retrieved successfully',
       data: { result, limit: perPage, page_number: pageNumber, count: total },
     };
   }

@@ -14,6 +14,7 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { ApplyCouponDto } from './dto/create.verify-coupon.dto';
@@ -33,10 +34,9 @@ export class CouponController {
 
   @Get('admin/coupon')
   async findAll(
-    @Query('per_page') per_page?: number,
-    @Query('page_number') page_number?: number,
+    @Query() paginationQueryDto: PaginationQueryDto,
   ): Promise<Response> {
-    return await this.couponService.findAll(per_page, page_number);
+    return this.couponService.findAll(paginationQueryDto);
   }
 
   @Post('coupon/apply')

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
@@ -9,6 +9,7 @@ import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { User } from 'src/entities/user.entity';
 import { CouponModule } from '../coupon/coupon.module';
+import { NotificationModule } from '../notification/notification.module';
 import { UsersModule } from '../user/user.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
@@ -27,8 +28,10 @@ import { OrderService } from './order.service';
     ]),
     CouponModule,
     UsersModule,
+    forwardRef(() => NotificationModule),
   ],
   providers: [OrderService],
   controllers: [OrderController],
+  exports: [OrderService],
 })
 export class OrderModule {}
