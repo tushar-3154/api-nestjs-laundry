@@ -156,7 +156,7 @@ export class UserService {
     await this.deviceUserRepository.save(deviceUser);
   }
 
-  async createUser(signUpDto: SignupDto): Promise<Response> {
+  async createUser(admin_id: number, signUpDto: SignupDto): Promise<Response> {
     const salt = await bcrypt.genSalt(10);
     const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
 
@@ -170,7 +170,7 @@ export class UserService {
     return {
       statusCode: 201,
       message: 'user added successfully',
-      data: { result },
+      data: { result, admin_id },
     };
   }
 

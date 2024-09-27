@@ -149,6 +149,24 @@ export class OrderService {
     }
   }
 
+  async createAdminOrder(
+    createOrderDto: CreateOrderDto,
+    admin_id: number,
+  ): Promise<Response> {
+    await this.userService.findOneByRole(createOrderDto.user_id, Role.CUSTOMER);
+    createOrderDto.created_by_customer_order = admin_id;
+
+    const result = await this.create(createOrderDto);
+    return {
+      statusCode: 201,
+      message: 'Order created successfully',
+      data: {
+        result,
+        admin_id,
+      },
+    };
+  }
+
   async findAll(paginationQuery: PaginationQueryDto): Promise<Response> {
     const { per_page, page_number, search, sort_by, order } = paginationQuery;
 

@@ -52,7 +52,9 @@ export class OrderController {
     @Request() req,
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<Response> {
-    return this.orderService.create(createOrderDto);
+    const admin_id = req.user;
+
+    return this.orderService.createAdminOrder(createOrderDto, admin_id.user_id);
   }
 
   @Get('admin/orders')

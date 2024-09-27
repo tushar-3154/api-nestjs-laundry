@@ -44,8 +44,9 @@ export class UserController {
   }
 
   @Post('customers')
-  async createCustomer(@Body() signupDto: SignupDto) {
-    return await this.userService.createUser(signupDto);
+  async createCustomer(@Request() req, @Body() signupDto: SignupDto) {
+    const user = req.user;
+    return await this.userService.createUser(user.user_id, signupDto);
   }
 
   @Get('customers')
@@ -56,8 +57,12 @@ export class UserController {
 
   @Post()
   @Roles(Role.SUPER_ADMIN)
-  async createUser(@Body() signUpDto: SignupDto): Promise<Response> {
-    return await this.userService.createUser(signUpDto);
+  async createUser(
+    @Request() req,
+    @Body() signUpDto: SignupDto,
+  ): Promise<Response> {
+    const user = req.user;
+    return await this.userService.createUser(user.user_id, signUpDto);
   }
 
   @Put(':id')
