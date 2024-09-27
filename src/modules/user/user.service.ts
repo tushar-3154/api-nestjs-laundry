@@ -156,10 +156,11 @@ export class UserService {
     await this.deviceUserRepository.save(deviceUser);
   }
 
-  async createUser(signUpDto: SignupDto): Promise<Response> {
+  async createUser(admin_id: number, signUpDto: SignupDto): Promise<Response> {
     const salt = await bcrypt.genSalt(10);
     const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
 
+    signUpDto.created_by_user_id = admin_id;
     const user = this.userRepository.create({
       ...signUpDto,
       password: hashedpassword,
@@ -404,5 +405,33 @@ export class UserService {
       where: { user_id: userId },
       select: ['first_name', 'last_name', 'mobile_number'],
     });
+  }
+
+  async getAllCustomers(search?: string): Promise<Response> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role_id = :role_id', { role_id: Role.CUSTOMER })
+      .select([
+        'user.user_id',
+        'user.first_name',
+        'user.last_name',
+        'user.mobile_number',
+        'user.email',
+      ]);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.first_name LIKE :search OR user.last_name LIKE :search OR user.email LIKE :search OR user.mobile_number LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    const customers = await queryBuilder.take(20).getMany();
+
+    return {
+      statusCode: 200,
+      message: 'Customers fetched successfully',
+      data: customers,
+    };
   }
 }

@@ -47,7 +47,12 @@ export class CreateOrderDto {
   address_id: number;
 
   @IsNumber()
+  @IsOptional()
   user_id: number;
+
+  @IsNumber()
+  @IsOptional()
+  created_by_user_id?: number;
 
   @IsOptional()
   @IsNumber()
