@@ -160,6 +160,7 @@ export class UserService {
     const salt = await bcrypt.genSalt(10);
     const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
 
+    signUpDto.created_by_user_id = admin_id;
     const user = this.userRepository.create({
       ...signUpDto,
       password: hashedpassword,
@@ -170,7 +171,7 @@ export class UserService {
     return {
       statusCode: 201,
       message: 'user added successfully',
-      data: { result, admin_id },
+      data: { result },
     };
   }
 

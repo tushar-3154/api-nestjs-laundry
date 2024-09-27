@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   MinLength,
@@ -44,4 +45,8 @@ export class SignupDto {
 
   @IsNotEmpty()
   role_id: number;
+
+  @IsNumber()
+  @IsOptional()
+  created_by_user_id?: number;
 }

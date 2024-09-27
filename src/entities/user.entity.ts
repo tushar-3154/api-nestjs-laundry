@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import {
   Column,
   Entity,
@@ -42,6 +43,10 @@ export class User extends BaseEntity {
 
   @Column()
   role_id: number;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  created_by_user_id?: number;
 
   @ManyToOne(() => Role, (role) => role.users, {
     onDelete: 'NO ACTION',

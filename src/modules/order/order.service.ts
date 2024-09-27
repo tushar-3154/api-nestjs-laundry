@@ -154,7 +154,7 @@ export class OrderService {
     admin_id: number,
   ): Promise<Response> {
     await this.userService.findOneByRole(createOrderDto.user_id, Role.CUSTOMER);
-    createOrderDto.created_by_customer_order = admin_id;
+    createOrderDto.created_by_user_id = admin_id;
 
     const result = await this.create(createOrderDto);
     return {
@@ -162,7 +162,6 @@ export class OrderService {
       message: 'Order created successfully',
       data: {
         result,
-        admin_id,
       },
     };
   }

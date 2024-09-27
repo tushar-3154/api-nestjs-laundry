@@ -52,7 +52,7 @@ export class CreateOrderDto {
 
   @IsNumber()
   @IsOptional()
-  created_by_customer_order?: number;
+  created_by_user_id?: number;
 
   @IsOptional()
   @IsNumber()

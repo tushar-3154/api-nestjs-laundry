@@ -98,5 +98,5 @@ export class OrderDetail extends BaseEntity {
 
   @Column({ nullable: true })
   @IsOptional()
-  created_by_customer_order?: number;
+  created_by_user_id?: number;
 }
