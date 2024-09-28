@@ -26,7 +26,6 @@ import { UserService } from './user.service';
 
 @Controller('user')
 @UseGuards(RolesGuard)
-@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -56,6 +55,7 @@ export class UserController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async createUser(
     @Request() req,
@@ -66,6 +66,7 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async updateUser(
     @Param('id') id: number,
@@ -75,24 +76,28 @@ export class UserController {
   }
 
   @Get('delivery-boys')
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getDeliveryBoys(): Promise<Response> {
     return await this.userService.getAllDeliveryBoys();
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getUserById(@Param('id') id: number): Promise<Response> {
     return await this.userService.getUserById(id);
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getAllUsers(): Promise<Response> {
     return await this.userService.getAllUsers();
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async deleteUser(@Param('id') id: number): Promise<Response> {
     return await this.userService.deleteUser(id);
@@ -110,7 +115,6 @@ export class UserController {
   }
 
   @Post('validate')
-  @Roles(Role.SUPER_ADMIN)
   async validateOtp(@Body() body: { mobile_number: number; otp: number }) {
     const { mobile_number, otp } = body;
     const isValid = await this.userService.validateOtp(mobile_number, otp);
