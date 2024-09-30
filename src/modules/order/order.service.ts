@@ -12,6 +12,7 @@ import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { NotificationService } from '../notification/notification.service';
+import { SettingService } from '../settings/setting.service';
 import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -34,6 +35,7 @@ export class OrderService {
     private readonly couponService: CouponService,
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
+    private readonly settingService: SettingService,
     private dataSource: DataSource,
   ) {}
 
@@ -47,11 +49,19 @@ export class OrderService {
       shipping_charge: order.shipping_charges,
       total: order.total,
       address_details: order.address_details,
-      ordre_status: order.order_status,
+      order_status: order.order_status,
       payment_status: order.payment_status,
       payment_type: order.payment_type,
       transaction_id: order.transaction_id,
+      create_at: order.created_at,
+      estimated_pickup_time: order.estimated_pickup_time,
 
+      user_details: {
+        first_name: order.user.first_name,
+        last_name: order.user.last_name,
+        email: order.user.email,
+        mobile_number: order.user.mobile_number,
+      },
       item_field: `product_id,  service_id,  category_id :price`,
       items: order.items.map((item) => ({
         item_details: `${item.product_id}_${item.service_id}_${item.category_id} : ${item.price}`,
@@ -100,6 +110,11 @@ export class OrderService {
       const paid_amount = createOrderDto.paid_amount || 0;
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
+      const isExpress = !!createOrderDto.express_delivery_charges;
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      const estimated_pickup_time =
+        await this.settingService.getEstimatedPickupTime(isExpress);
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
@@ -108,6 +123,8 @@ export class OrderService {
         coupon_discount,
         address_details,
         kasar_amount,
+        estimated_pickup_time,
+        delivery_date: deliveryDate,
       });
 
       const savedOrder = await queryRunner.manager.save(order);
@@ -177,7 +194,27 @@ export class OrderService {
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.items', 'items')
       .leftJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('items.category', 'category')
+      .leftJoinAndSelect('items.product', 'product')
+      .leftJoinAndSelect('items.service', 'service')
       .where('order.deleted_at IS NULL')
+      .select([
+        'order',
+        'user.first_name',
+        'user.last_name',
+        'user.mobile_number',
+        'user.email',
+        'items.item_id',
+        'items.order_id',
+        'category.category_id',
+        'category.name',
+        'product.product_id',
+        'product.name',
+        'product.image',
+        'service.service_id',
+        'service.name',
+        'service.image',
+      ])
       .take(perPage)
       .skip(skip);
 
@@ -207,19 +244,18 @@ export class OrderService {
     queryBuilder.orderBy(sortColumn, sortOrder);
 
     const [orders, total] = await queryBuilder.getManyAndCount();
-    const result = orders.map((order) => this.mapOrderToResponse(order));
-
     return {
       statusCode: 200,
       message: 'Orders retrieved successfully',
       data: {
-        result,
+        orders,
         limit: perPage,
         page_number: pageNumber,
         count: total,
       },
     };
   }
+
   async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
       where: { order_id: order_id },
@@ -414,6 +450,34 @@ export class OrderService {
       statusCode: 200,
       message: 'order retrived',
       data: orders,
+    };
+  }
+
+  async getOrdersWithAssignedDeliveryBoys(
+    delivery_boy_id: number,
+  ): Promise<Response> {
+    const ordersWithAssignedDeliveryBoys = await this.orderRepository
+      .createQueryBuilder('order')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.user', 'user')
+      .where('order.delivery_boy_id = :delivery_boy_id', { delivery_boy_id })
+      .select([
+        'order.order_id As order_id',
+        'user.user_id As delivery_boy_id',
+        'user.first_name As first_name',
+        'user.last_name As last_name',
+        'user.mobile_number As mobile_number',
+        'order.address_details As address',
+        'COUNT(items.item_id) As total_item',
+        'order.estimated_pickup_time As estimated_pickup_time_hour',
+      ])
+      .groupBy('order.order_id')
+      .getRawMany();
+
+    return {
+      statusCode: 201,
+      message: 'Orders with assigned delivery boys retrieved successfully',
+      data: ordersWithAssignedDeliveryBoys,
     };
   }
 }

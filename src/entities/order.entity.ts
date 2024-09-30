@@ -96,7 +96,14 @@ export class OrderDetail extends BaseEntity {
   @Column({ nullable: true })
   delivery_boy_id: number;
 
+  @Column({ type: 'date', nullable: true })
+  delivery_date: Date;
+
   @Column({ nullable: true })
   @IsOptional()
   created_by_user_id?: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  @IsOptional()
+  estimated_pickup_time?: string;
 }

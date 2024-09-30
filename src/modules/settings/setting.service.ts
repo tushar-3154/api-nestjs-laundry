@@ -59,4 +59,16 @@ export class SettingService {
       data: result,
     };
   }
+
+  async getEstimatedPickupTime(isExpress: boolean): Promise<string> {
+    const settingKey = isExpress
+      ? 'estimate_pickup_express_hour'
+      : 'estimate_pickup_normal_hour';
+
+    const setting = await this.settingRepository.findOne({
+      where: { setting_key: settingKey },
+    });
+
+    return setting ? setting.setting_value : 'N/A';
+  }
 }

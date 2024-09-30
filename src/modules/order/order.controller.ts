@@ -106,4 +106,14 @@ export class OrderController {
   ): Promise<Response> {
     return this.orderService.assignDeliveryBoy(order_id, delivery_boy_id);
   }
+
+  @Get('admin/orders/assigned-delivery-boys/:delivery_boy_id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async getAssignedDeliveryBoys(
+    @Param('delivery_boy_id') delivery_boy_id: number,
+  ): Promise<Response> {
+    return await this.orderService.getOrdersWithAssignedDeliveryBoys(
+      delivery_boy_id,
+    );
+  }
 }
