@@ -53,7 +53,6 @@ export class OrderService {
       payment_status: order.payment_status,
       payment_type: order.payment_type,
       transaction_id: order.transaction_id,
-      create_at: order.created_at,
       estimated_pickup_time: order.estimated_pickup_time,
 
       user_details: {
@@ -111,8 +110,10 @@ export class OrderService {
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
       const isExpress = !!createOrderDto.express_delivery_charges;
+
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 3);
+
       const estimated_pickup_time =
         await this.settingService.getEstimatedPickupTime(isExpress);
       const order = this.orderRepository.create({
