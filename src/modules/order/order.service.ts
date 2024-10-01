@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { addDays, format } from 'date-fns';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
@@ -114,7 +115,15 @@ export class OrderService {
         ? settings['estimate_pickup_express_hour']
         : settings['estimate_pickup_normal_hour'];
 
-      const estimated_delivery_date = settings['estimated_delivery_date'];
+      const estimated_delivery_date = new Date(
+        settings['estimated_delivery_date'],
+      );
+      const deliveryDaysToAdd = 3;
+      const updated_delivery_date = addDays(
+        estimated_delivery_date,
+        deliveryDaysToAdd,
+      );
+
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
@@ -124,7 +133,7 @@ export class OrderService {
         address_details,
         kasar_amount,
         estimated_pickup_time,
-        estimated_delivery_date,
+        estimated_delivery_date: format(updated_delivery_date, 'yyyy-MM-dd'),
       });
 
       const savedOrder = await queryRunner.manager.save(order);
