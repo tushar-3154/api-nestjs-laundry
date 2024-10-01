@@ -53,14 +53,7 @@ export class OrderService {
       payment_status: order.payment_status,
       payment_type: order.payment_type,
       transaction_id: order.transaction_id,
-      estimated_pickup_time: order.estimated_pickup_time,
 
-      user_details: {
-        first_name: order.user.first_name,
-        last_name: order.user.last_name,
-        email: order.user.email,
-        mobile_number: order.user.mobile_number,
-      },
       item_field: `product_id,  service_id,  category_id :price`,
       items: order.items.map((item) => ({
         item_details: `${item.product_id}_${item.service_id}_${item.category_id} : ${item.price}`,
@@ -109,13 +102,19 @@ export class OrderService {
       const paid_amount = createOrderDto.paid_amount || 0;
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
-      const isExpress = !!createOrderDto.express_delivery_charges;
+      const settingKeys = [
+        'estimate_pickup_normal_hour',
+        'estimate_pickup_express_hour',
+        'estimated_delivery_date',
+      ];
+      const settingsResponse = await this.settingService.findAll(settingKeys);
+      const settings = settingsResponse.data;
 
-      const deliveryDate = new Date();
-      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      const estimated_pickup_time = createOrderDto.express_delivery_charges
+        ? settings['estimate_pickup_express_hour']
+        : settings['estimate_pickup_normal_hour'];
 
-      const estimated_pickup_time =
-        await this.settingService.getEstimatedPickupTime(isExpress);
+      const estimated_delivery_date = settings['estimated_delivery_date'];
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
@@ -125,7 +124,7 @@ export class OrderService {
         address_details,
         kasar_amount,
         estimated_pickup_time,
-        delivery_date: deliveryDate,
+        estimated_delivery_date,
       });
 
       const savedOrder = await queryRunner.manager.save(order);
@@ -453,14 +452,11 @@ export class OrderService {
       data: orders,
     };
   }
-
-  async getOrdersWithAssignedDeliveryBoys(
-    delivery_boy_id: number,
-  ): Promise<Response> {
+  async getAssignedOrders(delivery_boy_id: number): Promise<Response> {
     const ordersWithAssignedDeliveryBoys = await this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('order.user', 'user')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('order.user', 'user')
       .where('order.delivery_boy_id = :delivery_boy_id', { delivery_boy_id })
       .select([
         'order.order_id As order_id',
@@ -476,7 +472,7 @@ export class OrderService {
       .getRawMany();
 
     return {
-      statusCode: 201,
+      statusCode: 200,
       message: 'Orders with assigned delivery boys retrieved successfully',
       data: ordersWithAssignedDeliveryBoys,
     };

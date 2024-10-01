@@ -27,6 +27,13 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Get('orders/assigned')
+  @Roles(Role.DELIVERY_BOY)
+  async getAssignedOrders(@Request() req): Promise<Response> {
+    const delivery_id = req.user;
+    return await this.orderService.getAssignedOrders(delivery_id.user_id);
+  }
+
   @Post('orders')
   @Roles(Role.CUSTOMER)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Response> {
@@ -105,15 +112,5 @@ export class OrderController {
     @Body('delivery_boy_id') delivery_boy_id: number,
   ): Promise<Response> {
     return this.orderService.assignDeliveryBoy(order_id, delivery_boy_id);
-  }
-
-  @Get('admin/orders/assigned-delivery-boys/:delivery_boy_id')
-  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async getAssignedDeliveryBoys(
-    @Param('delivery_boy_id') delivery_boy_id: number,
-  ): Promise<Response> {
-    return await this.orderService.getOrdersWithAssignedDeliveryBoys(
-      delivery_boy_id,
-    );
   }
 }

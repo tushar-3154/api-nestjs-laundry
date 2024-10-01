@@ -97,7 +97,7 @@ export class OrderDetail extends BaseEntity {
   delivery_boy_id: number;
 
   @Column({ type: 'date', nullable: true })
-  delivery_date: Date;
+  estimated_delivery_date: Date;
 
   @Column({ nullable: true })
   @IsOptional()

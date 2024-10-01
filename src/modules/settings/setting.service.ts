@@ -43,10 +43,16 @@ export class SettingService {
     }
   }
 
-  async findAll(): Promise<Response> {
-    const setting = await this.settingRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(keys?: string[]): Promise<Response> {
+    const query = this.settingRepository
+      .createQueryBuilder('setting')
+      .where('setting.deleted_at IS NULL');
+
+    if (keys && keys.length > 0) {
+      query.andWhere('setting.setting_key IN (:...keys)', { keys });
+    }
+
+    const setting = await query.getMany();
 
     const result = {};
     setting.map((element) => {
@@ -58,17 +64,5 @@ export class SettingService {
       message: 'settings retrieved successfully ',
       data: result,
     };
-  }
-
-  async getEstimatedPickupTime(isExpress: boolean): Promise<string> {
-    const settingKey = isExpress
-      ? 'estimate_pickup_express_hour'
-      : 'estimate_pickup_normal_hour';
-
-    const setting = await this.settingRepository.findOne({
-      where: { setting_key: settingKey },
-    });
-
-    return setting ? setting.setting_value : 'N/A';
   }
 }

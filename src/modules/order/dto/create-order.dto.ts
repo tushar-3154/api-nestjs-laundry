@@ -1,7 +1,6 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsDate,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -72,13 +71,6 @@ export class CreateOrderDto {
   @IsOptional()
   @IsNumber()
   kasar_amount?: number;
-
-  @IsOptional()
-  estimated_pickup_time?: string;
-
-  @IsOptional()
-  @IsDate()
-  delivery_date?: Date;
 }
 
 export class OrderItemDto {
