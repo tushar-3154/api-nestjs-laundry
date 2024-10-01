@@ -43,10 +43,16 @@ export class SettingService {
     }
   }
 
-  async findAll(): Promise<Response> {
-    const setting = await this.settingRepository.find({
-      where: { deleted_at: null },
-    });
+  async findAll(keys?: string[]): Promise<Response> {
+    const query = this.settingRepository
+      .createQueryBuilder('setting')
+      .where('setting.deleted_at IS NULL');
+
+    if (keys && keys.length > 0) {
+      query.andWhere('setting.setting_key IN (:...keys)', { keys });
+    }
+
+    const setting = await query.getMany();
 
     const result = {};
     setting.map((element) => {

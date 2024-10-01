@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { addDays, addHours } from 'date-fns';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
@@ -12,6 +13,7 @@ import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { NotificationService } from '../notification/notification.service';
+import { SettingService } from '../settings/setting.service';
 import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -34,6 +36,7 @@ export class OrderService {
     private readonly couponService: CouponService,
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
+    private readonly settingService: SettingService,
     private dataSource: DataSource,
   ) {}
 
@@ -47,7 +50,7 @@ export class OrderService {
       shipping_charge: order.shipping_charges,
       total: order.total,
       address_details: order.address_details,
-      ordre_status: order.order_status,
+      order_status: order.order_status,
       payment_status: order.payment_status,
       payment_type: order.payment_type,
       transaction_id: order.transaction_id,
@@ -100,6 +103,30 @@ export class OrderService {
       const paid_amount = createOrderDto.paid_amount || 0;
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
+      const settingKeys = [
+        'estimate_pickup_normal_hour',
+        'estimate_pickup_express_hour',
+        'estimate_delivery_normal_day',
+        'estimate_delivery_express_day',
+      ];
+      const settingsResponse = await this.settingService.findAll(settingKeys);
+      const settings = settingsResponse.data;
+      const estimat_pickup_time = createOrderDto.express_delivery_charges
+        ? addHours(
+            new Date(),
+            parseInt(settings['estimate_pickup_express_hour']),
+          )
+        : addHours(
+            new Date(),
+            parseInt(settings['estimate_pickup_normal_hour']),
+          );
+
+      const deliveryDaysToAdd = createOrderDto.express_delivery_charges
+        ? settings['estimate_delivery_express_day']
+        : settings['estimate_delivery_normal_day'];
+
+      const estimated_delivery_date = addDays(new Date(), deliveryDaysToAdd);
+
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
@@ -108,6 +135,8 @@ export class OrderService {
         coupon_discount,
         address_details,
         kasar_amount,
+        estimated_pickup_time: estimat_pickup_time,
+        estimated_delivery_time: estimated_delivery_date,
       });
 
       const savedOrder = await queryRunner.manager.save(order);
@@ -175,9 +204,29 @@ export class OrderService {
 
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('order.user', 'user')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('order.user', 'user')
+      .innerJoinAndSelect('items.category', 'category')
+      .innerJoinAndSelect('items.product', 'product')
+      .innerJoinAndSelect('items.service', 'service')
       .where('order.deleted_at IS NULL')
+      .select([
+        'order',
+        'user.first_name',
+        'user.last_name',
+        'user.mobile_number',
+        'user.email',
+        'items.item_id',
+        'items.order_id',
+        'category.category_id',
+        'category.name',
+        'product.product_id',
+        'product.name',
+        'product.image',
+        'service.service_id',
+        'service.name',
+        'service.image',
+      ])
       .take(perPage)
       .skip(skip);
 
@@ -207,19 +256,18 @@ export class OrderService {
     queryBuilder.orderBy(sortColumn, sortOrder);
 
     const [orders, total] = await queryBuilder.getManyAndCount();
-    const result = orders.map((order) => this.mapOrderToResponse(order));
-
     return {
       statusCode: 200,
       message: 'Orders retrieved successfully',
       data: {
-        result,
+        orders,
         limit: perPage,
         page_number: pageNumber,
         count: total,
       },
     };
   }
+
   async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
       where: { order_id: order_id },
@@ -360,30 +408,30 @@ export class OrderService {
   async getOrderDetail(order_id: number): Promise<Response> {
     const order = await this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('items.category', 'category')
-      .leftJoinAndSelect('items.product', 'product')
-      .leftJoinAndSelect('items.service', 'service')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('items.category', 'category')
+      .innerJoinAndSelect('items.product', 'product')
+      .innerJoinAndSelect('items.service', 'service')
       .where('order.order_id = :orderId', { orderId: order_id })
       .andWhere('order.deleted_at IS NULL')
       .select([
-        'order.order_id',
+        'order',
         'items.item_id',
-        'items.order_id',
+        'COUNT(items.item_id) As total_item',
         'category.category_id',
         'category.name',
         'product.product_id',
         'product.name',
+        'product.image',
         'service.service_id',
         'service.name',
+        'service.image',
         'items.price ',
-        'order.sub_total ',
-        'order.shipping_charges',
-        'order.total',
-        'order.address_details',
-        'order.transaction_id',
       ])
-      .getOne();
+      .groupBy(
+        'order.order_id, items.item_id, category.category_id, product.product_id, service.service_id',
+      )
+      .getRawMany();
 
     if (!order) {
       throw new NotFoundException('Order not found');
@@ -414,6 +462,31 @@ export class OrderService {
       statusCode: 200,
       message: 'order retrived',
       data: orders,
+    };
+  }
+  async getAssignedOrders(delivery_boy_id: number): Promise<Response> {
+    const ordersWithAssignedDeliveryBoys = await this.orderRepository
+      .createQueryBuilder('order')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('order.user', 'user')
+      .where('order.delivery_boy_id = :delivery_boy_id', { delivery_boy_id })
+      .select([
+        'order.order_id As order_id',
+        'user.user_id As delivery_boy_id',
+        'user.first_name As first_name',
+        'user.last_name As last_name',
+        'user.mobile_number As mobile_number',
+        'order.address_details As address',
+        'COUNT(items.item_id) As total_item',
+        'order.estimated_pickup_time As estimated_pickup_time_hour',
+      ])
+      .groupBy('order.order_id')
+      .getRawMany();
+
+    return {
+      statusCode: 200,
+      message: 'Orders with assigned delivery boys retrieved successfully',
+      data: ordersWithAssignedDeliveryBoys,
     };
   }
 }

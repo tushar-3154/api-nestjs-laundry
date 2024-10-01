@@ -10,6 +10,7 @@ import { Service } from 'src/entities/service.entity';
 import { User } from 'src/entities/user.entity';
 import { CouponModule } from '../coupon/coupon.module';
 import { NotificationModule } from '../notification/notification.module';
+import { SettingModule } from '../settings/setting.module';
 import { UsersModule } from '../user/user.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
@@ -28,6 +29,7 @@ import { OrderService } from './order.service';
     ]),
     CouponModule,
     UsersModule,
+    SettingModule,
     forwardRef(() => NotificationModule),
   ],
   providers: [OrderService],

@@ -27,10 +27,25 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Get('orders/assigned')
+  @Roles(Role.DELIVERY_BOY)
+  async getAssignedOrders(@Request() req): Promise<Response> {
+    const delivery_id = req.user;
+    return await this.orderService.getAssignedOrders(delivery_id.user_id);
+  }
+
   @Post('orders')
   @Roles(Role.CUSTOMER)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Response> {
     return this.orderService.create(createOrderDto);
+  }
+
+  @Get('admin/orders/:order_id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async getOrderDetails(
+    @Param('order_id') order_id: number,
+  ): Promise<Response> {
+    return this.orderService.getOrderDetail(order_id);
   }
 
   @Get('orders/:order_id')
