@@ -40,6 +40,14 @@ export class OrderController {
     return this.orderService.create(createOrderDto);
   }
 
+  @Get('admin/orders/:order_id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async getOrderDetails(
+    @Param('order_id') order_id: number,
+  ): Promise<Response> {
+    return this.orderService.getOrderDetail(order_id);
+  }
+
   @Get('orders/:order_id')
   @Roles(Role.CUSTOMER)
   async getOrderDetail(@Param('order_id') order_id: number): Promise<Response> {

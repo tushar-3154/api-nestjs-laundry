@@ -204,11 +204,11 @@ export class OrderService {
 
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('order.user', 'user')
-      .leftJoinAndSelect('items.category', 'category')
-      .leftJoinAndSelect('items.product', 'product')
-      .leftJoinAndSelect('items.service', 'service')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('order.user', 'user')
+      .innerJoinAndSelect('items.category', 'category')
+      .innerJoinAndSelect('items.product', 'product')
+      .innerJoinAndSelect('items.service', 'service')
       .where('order.deleted_at IS NULL')
       .select([
         'order',
@@ -408,30 +408,30 @@ export class OrderService {
   async getOrderDetail(order_id: number): Promise<Response> {
     const order = await this.orderRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('items.category', 'category')
-      .leftJoinAndSelect('items.product', 'product')
-      .leftJoinAndSelect('items.service', 'service')
+      .innerJoinAndSelect('order.items', 'items')
+      .innerJoinAndSelect('items.category', 'category')
+      .innerJoinAndSelect('items.product', 'product')
+      .innerJoinAndSelect('items.service', 'service')
       .where('order.order_id = :orderId', { orderId: order_id })
       .andWhere('order.deleted_at IS NULL')
       .select([
-        'order.order_id',
+        'order',
         'items.item_id',
-        'items.order_id',
+        'COUNT(items.item_id) As total_item',
         'category.category_id',
         'category.name',
         'product.product_id',
         'product.name',
+        'product.image',
         'service.service_id',
         'service.name',
+        'service.image',
         'items.price ',
-        'order.sub_total ',
-        'order.shipping_charges',
-        'order.total',
-        'order.address_details',
-        'order.transaction_id',
       ])
-      .getOne();
+      .groupBy(
+        'order.order_id, items.item_id, category.category_id, product.product_id, service.service_id',
+      )
+      .getRawMany();
 
     if (!order) {
       throw new NotFoundException('Order not found');
