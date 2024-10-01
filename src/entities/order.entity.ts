@@ -103,7 +103,7 @@ export class OrderDetail extends BaseEntity {
   @IsOptional()
   created_by_user_id?: number;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'date', nullable: true })
   @IsOptional()
   estimated_pickup_time?: Date;
 }

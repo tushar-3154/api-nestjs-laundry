@@ -106,12 +106,12 @@ export class OrderService {
       const settingKeys = [
         'estimate_pickup_normal_hour',
         'estimate_pickup_express_hour',
-        'estimated_normal_delivery_day',
-        'estimated_express_delivery_day',
+        'estimate_delivery_normal_day',
+        'estimate_delivery_express_day',
       ];
       const settingsResponse = await this.settingService.findAll(settingKeys);
       const settings = settingsResponse.data;
-      const estimated_pickup_time = createOrderDto.express_delivery_charges
+      const estimat_pickup_time = createOrderDto.express_delivery_charges
         ? addHours(
             new Date(),
             parseInt(settings['estimate_pickup_express_hour']),
@@ -122,8 +122,8 @@ export class OrderService {
           );
 
       const deliveryDaysToAdd = createOrderDto.express_delivery_charges
-        ? settings['estimated_express_delivery_day']
-        : settings['estimated_normal_delivery_day'];
+        ? settings['estimate_delivery_express_day']
+        : settings['estimate_delivery_normal_day'];
 
       const estimated_delivery_date = addDays(new Date(), deliveryDaysToAdd);
 
@@ -135,7 +135,7 @@ export class OrderService {
         coupon_discount,
         address_details,
         kasar_amount,
-        estimated_pickup_time: estimated_pickup_time,
+        estimated_pickup_time: estimat_pickup_time,
         estimated_delivery_time: estimated_delivery_date,
       });
 
