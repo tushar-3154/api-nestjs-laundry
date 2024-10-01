@@ -97,7 +97,7 @@ export class OrderDetail extends BaseEntity {
   delivery_boy_id: number;
 
   @Column({ type: 'date', nullable: true })
-  estimated_delivery_date: Date;
+  estimated_delivery_time: Date;
 
   @Column({ nullable: true })
   @IsOptional()
@@ -105,5 +105,5 @@ export class OrderDetail extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
-  estimated_pickup_time?: string;
+  estimated_pickup_time?: Date;
 }

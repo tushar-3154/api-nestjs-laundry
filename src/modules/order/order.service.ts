@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { addDays, format } from 'date-fns';
+import { addDays, addHours } from 'date-fns';
 import { Response } from 'src/dto/response.dto';
 import { UserAddress } from 'src/entities/address.entity';
 import { Category } from 'src/entities/category.entity';
@@ -106,23 +106,26 @@ export class OrderService {
       const settingKeys = [
         'estimate_pickup_normal_hour',
         'estimate_pickup_express_hour',
-        'estimated_delivery_date',
+        'estimated_normal_delivery_day',
+        'estimated_express_delivery_day',
       ];
       const settingsResponse = await this.settingService.findAll(settingKeys);
       const settings = settingsResponse.data;
-
       const estimated_pickup_time = createOrderDto.express_delivery_charges
-        ? settings['estimate_pickup_express_hour']
-        : settings['estimate_pickup_normal_hour'];
+        ? addHours(
+            new Date(),
+            parseInt(settings['estimate_pickup_express_hour']),
+          )
+        : addHours(
+            new Date(),
+            parseInt(settings['estimate_pickup_normal_hour']),
+          );
 
-      const estimated_delivery_date = new Date(
-        settings['estimated_delivery_date'],
-      );
-      const deliveryDaysToAdd = 3;
-      const updated_delivery_date = addDays(
-        estimated_delivery_date,
-        deliveryDaysToAdd,
-      );
+      const deliveryDaysToAdd = createOrderDto.express_delivery_charges
+        ? settings['estimated_express_delivery_day']
+        : settings['estimated_normal_delivery_day'];
+
+      const estimated_delivery_date = addDays(new Date(), deliveryDaysToAdd);
 
       const order = this.orderRepository.create({
         ...createOrderDto,
@@ -132,8 +135,8 @@ export class OrderService {
         coupon_discount,
         address_details,
         kasar_amount,
-        estimated_pickup_time,
-        estimated_delivery_date: format(updated_delivery_date, 'yyyy-MM-dd'),
+        estimated_pickup_time: estimated_pickup_time,
+        estimated_delivery_time: estimated_delivery_date,
       });
 
       const savedOrder = await queryRunner.manager.save(order);

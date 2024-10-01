@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddEstimatedPickupAndDeliveryDateTimeInOrderTable1727706558437
+export class AddEstimatedPickupAndDeliveryTimeInOrderTable1727773786092
   implements MigrationInterface
 {
-  name = 'AddEstimatedPickupAndDeliveryDateTimeInOrderTable1727706558437';
+  name = 'AddEstimatedPickupAndDeliveryTimeInOrderTable1727773786092';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`orders\` ADD \`estimated_delivery_date\` date NULL`,
+      `ALTER TABLE \`orders\` ADD \`estimated_delivery_time\` date NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE \`orders\` ADD \`estimated_pickup_time\` varchar(255) NULL`,
@@ -19,7 +19,7 @@ export class AddEstimatedPickupAndDeliveryDateTimeInOrderTable1727706558437
       `ALTER TABLE \`orders\` DROP COLUMN \`estimated_pickup_time\``,
     );
     await queryRunner.query(
-      `ALTER TABLE \`orders\` DROP COLUMN \`estimated_delivery_date\``,
+      `ALTER TABLE \`orders\` DROP COLUMN \`estimated_delivery_time\``,
     );
   }
 }
