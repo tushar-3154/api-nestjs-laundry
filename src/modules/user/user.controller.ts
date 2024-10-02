@@ -20,17 +20,18 @@ import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
 import { SignupDto } from '../auth/dto/signup.dto';
 import { RolesGuard } from '../auth/guard/role.guard';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 @UseGuards(RolesGuard)
+@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Patch('change-password')
-  @UseGuards(AuthGuard('jwt'))
   async changePassword(
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
@@ -66,7 +67,6 @@ export class UserController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async updateUser(
     @Param('id') id: number,
@@ -76,24 +76,23 @@ export class UserController {
   }
 
   @Get('delivery-boys')
-  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getDeliveryBoys(): Promise<Response> {
     return await this.userService.getAllDeliveryBoys();
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getUserById(@Param('id') id: number): Promise<Response> {
     return await this.userService.getUserById(id);
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
-  async getAllUsers(): Promise<Response> {
-    return await this.userService.getAllUsers();
+  async getAllUsers(
+    @Query() paginationQueryDto: PaginationQueryDto,
+  ): Promise<Response> {
+    return await this.userService.getAllUsers(paginationQueryDto);
   }
 
   @Delete(':id')

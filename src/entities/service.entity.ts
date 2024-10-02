@@ -13,6 +13,9 @@ export class Service extends BaseEntity {
   @Column()
   image: string;
 
+  @Column()
+  description: string;
+
   @OneToMany(() => Cart, (cart) => cart.service)
   carts: Cart[];
 }

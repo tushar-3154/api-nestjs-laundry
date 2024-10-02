@@ -16,6 +16,7 @@ import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
 import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
+import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -219,14 +220,49 @@ export class UserService {
     };
   }
 
-  async getAllUsers(): Promise<Response> {
-    const users = await this.userRepository.find({
-      where: { deleted_at: null },
-    });
+  async getAllUsers(paginationQueryDto: PaginationQueryDto): Promise<Response> {
+    const { per_page, page_number, search, sort_by, order } =
+      paginationQueryDto;
+
+    const pageNumber = page_number ?? 1;
+    const perPage = per_page ?? 10;
+    const skip = (pageNumber - 1) * perPage;
+
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.deleted_at IS NULL')
+      .take(perPage)
+      .skip(skip);
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.first_name LIKE :search OR ' +
+          'user.last_name LIKE :search OR ' +
+          'user.email LIKE :search OR ' +
+          'user.mobile_number LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    let sortColumn = 'user.created_at';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
+
+    if (sort_by) {
+      sortColumn = sort_by;
+    }
+
+    if (order) {
+      sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    }
+
+    queryBuilder.orderBy(sortColumn, sortOrder);
+
+    const [result, total] = await queryBuilder.getManyAndCount();
+
     return {
       statusCode: 200,
-      message: 'users retrived successfully,',
-      data: { users },
+      message: 'Users retrieved successfully',
+      data: { result, limit: perPage, page_number: pageNumber, count: total },
     };
   }
 

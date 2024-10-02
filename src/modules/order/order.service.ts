@@ -217,7 +217,6 @@ export class OrderService {
         'user.mobile_number',
         'user.email',
         'items.item_id',
-        'items.order_id',
         'category.category_id',
         'category.name',
         'product.product_id',
@@ -271,6 +270,7 @@ export class OrderService {
   async findOne(order_id: number): Promise<Response> {
     const order = await this.orderRepository.findOne({
       where: { order_id: order_id },
+      relations: ['user'],
     });
 
     if (!order) {

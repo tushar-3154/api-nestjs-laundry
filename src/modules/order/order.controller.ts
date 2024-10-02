@@ -80,10 +80,12 @@ export class OrderController {
     return this.orderService.findAll(paginationQuery);
   }
 
-  @Get('admin/orders/:id')
+  @Get('admin/order/:order_id')
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Response> {
-    return this.orderService.findOne(id);
+  async findOne(
+    @Param('order_id', ParseIntPipe) order_id: number,
+  ): Promise<Response> {
+    return this.orderService.findOne(order_id);
   }
 
   @Put('admin/orders/:id')
