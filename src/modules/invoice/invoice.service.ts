@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import ejs from 'ejs';
 import { promises as fs } from 'fs';
 import path from 'path';
-import puppeteer from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
 import { FilePath } from 'src/constants/FilePath';
 import { OrderDetail } from 'src/entities/order.entity';
 import numberToWords from 'src/utils/numberToWords';
@@ -37,16 +37,32 @@ export class InvoiceService {
   }
 
   private async createPdfBuffer(html: string): Promise<Buffer> {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    let browser: Browser | undefined;
+    try {
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+        ],
+      });
 
-    const pdfBufferUint8: Uint8Array = await page.pdf({ format: 'A4' });
-    const pdfBuffer: Buffer = Buffer.from(pdfBufferUint8);
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: 'networkidle0' });
 
-    await browser.close();
+      const pdfBufferUint8: Uint8Array = await page.pdf({ format: 'A4' });
+      const pdfBuffer: Buffer = Buffer.from(pdfBufferUint8);
 
-    return pdfBuffer;
+      return pdfBuffer;
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      throw new Error('Failed to generate PDF');
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
   }
 
   private async savePdfToFile(
