@@ -7,6 +7,7 @@ import { dataSourceOptions } from './database/data-source';
 import { AddressModule } from './modules/address/address.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BannerModule } from './modules/banner/banner.module';
+import { BillModule } from './modules/bill/bill.module';
 import { BranchModule } from './modules/branch/branch.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CategoryModule } from './modules/categories/category.module';
@@ -47,6 +48,7 @@ import { MorganMiddleware } from './morgan.middleware';
     MobileApiModule,
     CartModule,
     NotificationModule,
+    BillModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
