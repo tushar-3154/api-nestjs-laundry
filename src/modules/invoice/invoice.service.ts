@@ -9,7 +9,7 @@ import numberToWords from 'src/utils/numberToWords';
 import { OrderService } from '../order/order.service';
 
 @Injectable()
-export class BillService {
+export class InvoiceService {
   constructor(private readonly orderService: OrderService) {}
 
   async generateAndSaveInvoicePdf(order_id: number): Promise<Buffer> {

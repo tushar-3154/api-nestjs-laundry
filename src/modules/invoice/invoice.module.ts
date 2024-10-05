@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderDetail } from 'src/entities/order.entity';
 import { OrderModule } from '../order/order.module';
 import { ProductModule } from '../products/product.module';
-import { BillController } from './bill.controller';
-import { BillService } from './bill.service';
+import { InvoiceController } from './invoice.controller';
+import { InvoiceService } from './invoice.service';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { BillService } from './bill.service';
     OrderModule,
     ProductModule,
   ],
-  providers: [BillService],
-  controllers: [BillController],
+  providers: [InvoiceService],
+  controllers: [InvoiceController],
 })
-export class BillModule {}
+export class InvoiceModule {}

@@ -8,11 +8,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { BillService } from './bill.service';
+import { InvoiceService } from './invoice.service';
 
 @Controller('pdf')
-export class BillController {
-  constructor(private readonly billService: BillService) {}
+export class InvoiceController {
+  constructor(private readonly invoiceService: InvoiceService) {}
 
   @Post('invoice/:order_id')
   async generateInvoice(
@@ -21,7 +21,7 @@ export class BillController {
   ) {
     try {
       const pdfBuffer =
-        await this.billService.generateAndSaveInvoicePdf(order_id);
+        await this.invoiceService.generateAndSaveInvoicePdf(order_id);
       if (!pdfBuffer) {
         throw new NotFoundException(
           `Invoice could not be generated for order ID ${order_id}`,
