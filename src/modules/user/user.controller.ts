@@ -26,8 +26,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
-@UseGuards(RolesGuard)
-@UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -50,12 +48,15 @@ export class UserController {
   }
 
   @Get('customers')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async getAllCustomers(@Query('search') search?: string): Promise<Response> {
     return this.userService.getAllCustomers(search);
   }
 
   @Post()
+  @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async createUser(
@@ -67,6 +68,8 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async updateUser(
     @Param('id') id: number,
@@ -76,18 +79,24 @@ export class UserController {
   }
 
   @Get('delivery-boys')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getDeliveryBoys(): Promise<Response> {
     return await this.userService.getAllDeliveryBoys();
   }
 
   @Get(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getUserById(@Param('id') id: number): Promise<Response> {
     return await this.userService.getUserById(id);
   }
 
   @Get()
+  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async getAllUsers(
     @Query() paginationQueryDto: PaginationQueryDto,
@@ -96,6 +105,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
   async deleteUser(@Param('id') id: number): Promise<Response> {

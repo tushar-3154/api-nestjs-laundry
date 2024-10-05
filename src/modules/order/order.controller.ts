@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -122,5 +123,13 @@ export class OrderController {
     @Body('delivery_boy_id') delivery_boy_id: number,
   ): Promise<Response> {
     return this.orderService.assignDeliveryBoy(order_id, delivery_boy_id);
+  }
+
+  @Delete('admin/order/:order_id')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
+  async deleteOrder(
+    @Param('order_id', ParseIntPipe) order_id: number,
+  ): Promise<Response> {
+    return await this.orderService.delete(order_id);
   }
 }

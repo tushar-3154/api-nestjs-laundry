@@ -1,3 +1,4 @@
+import { IsOptional } from 'class-validator';
 import {
   Column,
   Entity,
@@ -45,4 +46,8 @@ export class OrderItem {
 
   @Column({ type: 'decimal' })
   price: number;
+
+  @Column({ type: 'int', default: 1 })
+  @IsOptional()
+  quantity?: number;
 }

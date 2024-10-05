@@ -408,6 +408,7 @@ export class OrderService {
   async getOrderDetail(order_id: number): Promise<Response> {
     const order = await this.orderRepository
       .createQueryBuilder('order')
+      .innerJoinAndSelect('order.user', 'user')
       .innerJoinAndSelect('order.items', 'items')
       .innerJoinAndSelect('items.category', 'category')
       .innerJoinAndSelect('items.product', 'product')
@@ -416,8 +417,11 @@ export class OrderService {
       .andWhere('order.deleted_at IS NULL')
       .select([
         'order',
-        'items.item_id',
-        'COUNT(items.item_id) As total_item',
+        'user.first_name',
+        'user.last_name',
+        'user.mobile_number',
+        'user.email',
+        'items',
         'category.category_id',
         'category.name',
         'product.product_id',
@@ -426,17 +430,14 @@ export class OrderService {
         'service.service_id',
         'service.name',
         'service.image',
-        'items.price ',
       ])
       .groupBy(
         'order.order_id, items.item_id, category.category_id, product.product_id, service.service_id',
       )
-      .getRawMany();
-
+      .getOne();
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-
     return {
       statusCode: 200,
       message: 'Order retrived successfully',
@@ -487,6 +488,24 @@ export class OrderService {
       statusCode: 200,
       message: 'Orders with assigned delivery boys retrieved successfully',
       data: ordersWithAssignedDeliveryBoys,
+    };
+  }
+
+  async delete(order_id: number): Promise<Response> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: order_id, deleted_at: null },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with id ${order_id} not found`);
+    }
+
+    order.deleted_at = new Date();
+    await this.orderRepository.save(order);
+
+    return {
+      statusCode: 200,
+      message: 'Order deleted successfully',
     };
   }
 }

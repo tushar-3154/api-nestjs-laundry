@@ -6,4 +6,7 @@ export class UpdateServiceDto {
 
   @IsOptional()
   image: string;
+
+  @IsOptional()
+  description: string;
 }
