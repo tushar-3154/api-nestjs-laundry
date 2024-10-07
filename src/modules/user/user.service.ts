@@ -183,6 +183,8 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { user_id, deleted_at: null },
     });
+    const salt = await bcrypt.genSalt(10);
+    const hashedpassword = await bcrypt.hash(updateUserDto.password, salt);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -191,6 +193,7 @@ export class UserService {
     const updatedUser = await this.userRepository.save({
       ...user,
       ...updateUserDto,
+      password: hashedpassword,
     });
 
     return {

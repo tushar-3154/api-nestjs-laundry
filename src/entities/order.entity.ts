@@ -106,4 +106,7 @@ export class OrderDetail extends BaseEntity {
   @Column({ type: 'date', nullable: true })
   @IsOptional()
   estimated_pickup_time?: Date;
+
+  @Column('decimal', { nullable: true })
+  gst: number;
 }

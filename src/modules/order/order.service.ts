@@ -80,6 +80,15 @@ export class OrderService {
       const user = await this.userService.findUserById(createOrderDto.user_id);
 
       const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
+      const settingKeys = [
+        'estimate_pickup_normal_hour',
+        'estimate_pickup_express_hour',
+        'estimate_delivery_normal_day',
+        'estimate_delivery_express_day',
+        'gst_percentage',
+      ];
+      const settingsResponse = await this.settingService.findAll(settingKeys);
+      const settings = settingsResponse.data;
 
       let sub_total = createOrderDto.sub_total;
       let coupon_discount = 0;
@@ -94,23 +103,15 @@ export class OrderService {
         coupon_discount = couponValidation.data.discountAmount;
         sub_total -= coupon_discount;
       }
-
-      const total =
-        sub_total +
-        createOrderDto.shipping_charges +
+      const gst_percetage = parseFloat(settings['gst_percentage'] || 0);
+      const gst_amount = (sub_total * gst_percetage) / 100;
+      const total = sub_total + gst_amount;
+      createOrderDto.shipping_charges +
         (createOrderDto.express_delivery_charges || 0);
 
       const paid_amount = createOrderDto.paid_amount || 0;
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
-      const settingKeys = [
-        'estimate_pickup_normal_hour',
-        'estimate_pickup_express_hour',
-        'estimate_delivery_normal_day',
-        'estimate_delivery_express_day',
-      ];
-      const settingsResponse = await this.settingService.findAll(settingKeys);
-      const settings = settingsResponse.data;
       const estimat_pickup_time = createOrderDto.express_delivery_charges
         ? addHours(
             new Date(),
@@ -130,6 +131,7 @@ export class OrderService {
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
+        gst: gst_amount,
         total,
         coupon_code,
         coupon_discount,
