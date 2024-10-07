@@ -119,7 +119,7 @@ export class InvoiceService {
       totalAmount +
       gst +
       shippingCharges +
-      expressDeliveryCharges +
+      expressDeliveryCharges -
       adjustmentCharges -
       discount;
 
