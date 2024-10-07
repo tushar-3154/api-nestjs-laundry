@@ -113,12 +113,15 @@ export class InvoiceService {
       ? parseFloat(orderData.kasar_amount.toString())
       : 0;
 
+    const gst = orderData.gst ? parseFloat(orderData.gst.toString()) : 0;
+
     const finalTotal =
       totalAmount +
+      gst +
       shippingCharges +
-      expressDeliveryCharges -
-      discount +
-      adjustmentCharges;
+      expressDeliveryCharges +
+      adjustmentCharges -
+      discount;
 
     const invoiceData = {
       invoiceNumber: orderData.order_id?.toString() || 'N/A',
@@ -135,6 +138,7 @@ export class InvoiceService {
       items,
       total: finalTotal,
       subTotal: totalAmount,
+      Gst: gst,
       shippingCharges,
       expressDeliveryCharges,
       discount,
