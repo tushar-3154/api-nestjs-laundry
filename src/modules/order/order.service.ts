@@ -313,7 +313,25 @@ export class OrderService {
       order.address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
     }
 
-    Object.assign(order, orderUpdates);
+    const settingKeys = ['gst_percentage'];
+    const settingsResponse = await this.settingService.findAll(settingKeys);
+    const settings = settingsResponse.data;
+
+    const gst_percentage = parseFloat(settings['gst_percentage'] || 0);
+    const sub_total = updateOrderDto.sub_total;
+    const gst_amount = (sub_total * gst_percentage) / 100;
+    const total =
+      sub_total +
+      gst_amount +
+      (updateOrderDto.shipping_charges || 0) +
+      (updateOrderDto.express_delivery_charges || 0);
+
+    Object.assign(order, {
+      ...orderUpdates,
+      sub_total,
+      gst: gst_amount,
+      total,
+    });
 
     const updatedOrder = await this.orderRepository.save(order);
 
