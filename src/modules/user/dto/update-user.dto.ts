@@ -1,4 +1,10 @@
-import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsDecimal,
+  IsEmail,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -14,7 +20,7 @@ export class UpdateUserDto {
   email?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsDecimal()
   mobile_number?: number;
 
   @IsOptional()
