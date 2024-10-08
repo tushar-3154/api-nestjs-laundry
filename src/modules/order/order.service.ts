@@ -9,6 +9,7 @@ import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { Role } from 'src/enum/role.enum';
+import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { DataSource, Repository } from 'typeorm';
 import { CouponService } from '../coupon/coupon.service';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
@@ -458,6 +459,14 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
+    order.items = order.items.map((item) => {
+      item.product = appendBaseUrlToImages([item.product])[0];
+
+      item.service = appendBaseUrlToImages([item.service])[0];
+
+      return item;
+    });
     return {
       statusCode: 200,
       message: 'Order retrived successfully',

@@ -188,13 +188,18 @@
                         <span><%= invoice.expressDeliveryCharges.toFixed(2) %></span>
                     </p>
                     <p>
-                        <span>Urgent Charges:</span>
+                        <span>Kasar Amount:</span>
                         <span><%= invoice.adjustmentCharges.toFixed(2) %></span>
+                    </p>
+                    <p>
+                        <span>Gst:</span>
+                        <span><%= invoice.Gst.toFixed(2) %></span>
                     </p>
                     <p>
                         <span>Discount:</span>
                         <span><%= invoice.discount.toFixed(2) %></span>
                     </p>
+                   
                     <p>
                         <span>Total Amount:</span>
                         <span><%= invoice.finalTotal.toFixed(2) %></span>
