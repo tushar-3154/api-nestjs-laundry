@@ -48,6 +48,14 @@ export class User extends BaseEntity {
   @IsOptional()
   created_by_user_id?: number;
 
+  @Column({ nullable: true })
+  @IsOptional()
+  vendor_code?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  @IsOptional()
+  vendor_code_expiry?: Date;
+
   @ManyToOne(() => Role, (role) => role.users, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',

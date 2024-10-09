@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { Response } from 'src/dto/response.dto';
 import { DeviceUser } from 'src/entities/device-user.entity';
 import { LoginHistory } from 'src/entities/login-history.entity';
@@ -472,5 +473,40 @@ export class UserService {
       message: 'Customers fetched successfully',
       data: customers,
     };
+  }
+
+  async createVendor(
+    admin_id: number,
+    signUpDto: SignupDto,
+    expiryDuration: number,
+  ): Promise<Response> {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+
+    signUpDto.created_by_user_id = admin_id;
+
+    const vendorCode = crypto.randomBytes(4).toString('hex');
+
+    const vendorCodeExpiry = new Date();
+    vendorCodeExpiry.setDate(vendorCodeExpiry.getDate() + expiryDuration);
+
+    const user = this.userRepository.create({
+      ...signUpDto,
+      password: hashedPassword,
+      vendor_code: vendorCode,
+      vendor_code_expiry: vendorCodeExpiry,
+    });
+
+    const result = await this.userRepository.save(user);
+
+    return {
+      statusCode: 201,
+      message: 'Vendor added successfully',
+      data: { result },
+    };
+  }
+
+  generateVendorCode(): string {
+    return crypto.randomBytes(4).toString('hex');
   }
 }

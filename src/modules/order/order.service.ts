@@ -150,6 +150,7 @@ export class OrderService {
         product_id: item.product_id,
         service_id: item.service_id,
         price: item.price,
+        quantity: item.quantity,
       }));
 
       await queryRunner.manager.insert(OrderItem, orderItems);

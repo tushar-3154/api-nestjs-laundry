@@ -133,4 +133,20 @@ export class UserController {
       throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Post('vendors')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async createVendor(
+    @Request() req,
+    @Body() signUpDto: SignupDto,
+    @Query('expiryDuration') expiryDuration: number = 30,
+  ): Promise<Response> {
+    const user = req.user;
+    return await this.userService.createVendor(
+      user.user_id,
+      signUpDto,
+      expiryDuration,
+    );
+  }
 }
