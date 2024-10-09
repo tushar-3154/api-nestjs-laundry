@@ -100,13 +100,11 @@ export class PriceService {
       relations: ['category'],
     });
 
-    const uniqueCategories = price
-      .map((price) => price.category)
-      .filter(
-        (category, index, self) =>
-          index ===
-          self.findIndex((c) => c.category_id === category.category_id),
-      );
+    const uniqueCategories = [
+      ...new Map(
+        price.map((price) => [price.category.category_id, price.category]),
+      ).values(),
+    ];
 
     return uniqueCategories;
   }
