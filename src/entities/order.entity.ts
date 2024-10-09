@@ -74,6 +74,10 @@ export class OrderDetail extends BaseEntity {
   @Column({ type: 'decimal', nullable: true })
   kasar_amount?: number;
 
+  @Column({ type: 'decimal', nullable: true })
+  @IsOptional()
+  paid_amount?: number;
+
   @Column({ type: 'int', default: PaymentType.ONLINE_PAYMENT })
   payment_type: PaymentType;
 
