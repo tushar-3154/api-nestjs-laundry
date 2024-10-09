@@ -505,8 +505,4 @@ export class UserService {
       data: { result },
     };
   }
-
-  generateVendorCode(): string {
-    return crypto.randomBytes(4).toString('hex');
-  }
 }
