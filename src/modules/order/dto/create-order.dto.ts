@@ -88,4 +88,8 @@ export class OrderItemDto {
 
   @IsNumber()
   price: number;
+
+  @IsNumber()
+  @IsOptional()
+  quantity?: number;
 }

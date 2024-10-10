@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { Response } from 'src/dto/response.dto';
 import { DeviceUser } from 'src/entities/device-user.entity';
 import { LoginHistory } from 'src/entities/login-history.entity';
@@ -159,21 +160,35 @@ export class UserService {
 
   async createUser(admin_id: number, signUpDto: SignupDto): Promise<Response> {
     const salt = await bcrypt.genSalt(10);
-    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
+    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
 
     signUpDto.created_by_user_id = admin_id;
+
+    if (signUpDto.role_id === Role.Vendor) {
+      signUpDto.vendor_code = crypto.randomBytes(6).toString('hex');
+
+      const expiryDays = signUpDto.vendor_code_expiry as unknown as number;
+      signUpDto.vendor_code_expiry = this.getVendorCodeExpiry(expiryDays);
+    }
+
     const user = this.userRepository.create({
       ...signUpDto,
-      password: hashedpassword,
+      password: hashedPassword,
     });
 
     const result = await this.userRepository.save(user);
 
     return {
       statusCode: 201,
-      message: 'user added successfully',
+      message: 'User added successfully',
       data: { result },
     };
+  }
+
+  getVendorCodeExpiry(expiryDays: number): Date {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + expiryDays);
+    return currentDate;
   }
 
   async updateUser(

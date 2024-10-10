@@ -150,6 +150,7 @@ export class OrderService {
         product_id: item.product_id,
         service_id: item.service_id,
         price: item.price,
+        quantity: item.quantity,
       }));
 
       await queryRunner.manager.insert(OrderItem, orderItems);
@@ -234,7 +235,13 @@ export class OrderService {
 
     if (search) {
       queryBuilder.andWhere(
-        'order.description LIKE :search OR order.coupon_code LIKE :search OR order.address_details LIKE :search OR user.first_name LIKE :search OR user.last_name LIKE :search OR user.email LIKE :search',
+        'order.description LIKE :search OR' +
+          ' order.coupon_code LIKE :search' +
+          ' OR order.address_details LIKE :search OR' +
+          ' user.first_name LIKE :search' +
+          ' OR user.last_name LIKE :search' +
+          ' OR user.email LIKE :search+' +
+          'OR user.mobile_number LIKE :search',
         { search: `%${search}%` },
       );
     }
@@ -246,7 +253,8 @@ export class OrderService {
       sortColumn =
         sort_by === 'first_name' ||
         sort_by === 'last_name' ||
-        sort_by === 'email'
+        sort_by === 'email' ||
+        sort_by === 'mobile_number'
           ? `user.${sort_by}`
           : `order.${sort_by}`;
     }
