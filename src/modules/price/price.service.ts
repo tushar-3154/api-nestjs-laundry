@@ -93,18 +93,14 @@ export class PriceService {
   }
 
   async getCategoriesByService(service_id: number) {
-    const price = await this.priceRepository.find({
-      where: {
-        service: { service_id: service_id },
-      },
-      relations: ['category'],
-    });
-
-    const uniqueCategories = [
-      ...new Map(
-        price.map((price) => [price.category.category_id, price.category]),
-      ).values(),
-    ];
+    const uniqueCategories = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.service', 'service')
+      .where('service.service_id = :service_id', { service_id: service_id })
+      .groupBy('category.category_id')
+      .select(['category.category_id', 'category.name'])
+      .getRawMany();
 
     return uniqueCategories;
   }

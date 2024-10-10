@@ -49,4 +49,10 @@ export class SignupDto {
   @IsNumber()
   @IsOptional()
   created_by_user_id?: number;
+
+  @IsOptional()
+  vendor_code?: string;
+
+  @IsOptional()
+  vendor_code_expiry?: Date;
 }

@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddColumnVendorCodeAndExpiryDateInUserTable1728372443954
+export class AddColumnVendorCodeAndExpiryDateInUserTable1728535844268
   implements MigrationInterface
 {
-  name = 'AddColumnVendorCodeAndExpiryDateInUserTable1728372443954';
+  name = 'AddColumnVendorCodeAndExpiryDateInUserTable1728535844268';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
