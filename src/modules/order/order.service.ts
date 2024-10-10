@@ -168,11 +168,13 @@ export class OrderService {
         },
       };
 
-      await this.notificationService.sendOrderNotification(orderDetail);
+      const result =
+        await this.notificationService.sendOrderNotification(orderDetail);
 
       return {
         statusCode: 201,
         message: 'Order details added successfully',
+        data: result,
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -189,14 +191,7 @@ export class OrderService {
     await this.userService.findOneByRole(createOrderDto.user_id, Role.CUSTOMER);
     createOrderDto.created_by_user_id = admin_id;
 
-    const result = await this.create(createOrderDto);
-    return {
-      statusCode: 201,
-      message: 'Order created successfully',
-      data: {
-        result,
-      },
-    };
+    return await this.create(createOrderDto);
   }
 
   async findAll(paginationQuery: PaginationQueryDto): Promise<Response> {
