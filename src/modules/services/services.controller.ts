@@ -93,7 +93,7 @@ export class ServicesController {
     return await this.serviceService.delete(id);
   }
 
-  @Get('category/:category_id/product/:product_id')
+  @Get('category/:category_id/product/:product_id/service')
   async getServiceByCategoryAndProduct(
     @Param('category_id', ParseIntPipe) category_id: number,
     @Param('product_id', ParseIntPipe) product_id: number,

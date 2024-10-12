@@ -92,7 +92,7 @@ export class ProductController {
     return await this.productService.delete(id);
   }
 
-  @Get('category/:category_id')
+  @Get('category/:category_id/product')
   async getProductByCategory(
     @Param('category_id') category_id: number,
   ): Promise<Response> {
