@@ -11,5 +11,6 @@ import { PriceService } from './price.service';
   imports: [TypeOrmModule.forFeature([Price, Category, Product, Service])],
   providers: [PriceService],
   controllers: [PriceController],
+  exports: [PriceService],
 })
 export class PriceModule {}

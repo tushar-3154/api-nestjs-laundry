@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import ejs from 'ejs';
+import * as fs from 'fs';
+import path from 'path';
+import puppeteer from 'puppeteer';
 import { Response } from 'src/dto/response.dto';
 import { Category } from 'src/entities/category.entity';
 import { Price } from 'src/entities/price.entity';
@@ -92,6 +96,26 @@ export class PriceService {
     }));
   }
 
+  async getServiceByCategoryAndProduct(
+    category_id: number,
+    product_id: number,
+  ) {
+    const services = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.product', 'product')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.service', 'service')
+      .where('product.product_id = :product_id', { product_id: product_id })
+      .andWhere('category.category_id = :category_id', {
+        category_id: category_id,
+      })
+      .select(['service.service_id', 'service.name'])
+      .groupBy('service.service_id')
+      .getRawMany();
+
+    return services;
+  }
+
   async getCategoriesByService(service_id: number) {
     const uniqueCategories = await this.priceRepository
       .createQueryBuilder('price')
@@ -103,5 +127,57 @@ export class PriceService {
       .getRawMany();
 
     return uniqueCategories;
+  }
+
+  async getProductByCategory(category_id: number): Promise<any[]> {
+    const uniqueProducts = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.product', 'product')
+      .where('category.category_id = :category_id', { category_id })
+      .select(['product.product_id', 'product.name'])
+      .groupBy('product.product_id')
+      .getRawMany();
+
+    return uniqueProducts;
+  }
+
+  async generatePriceListPDF(): Promise<Buffer> {
+    const base_url = process.env.BASE_URL;
+    const prices = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.product', 'product')
+      .innerJoinAndSelect('price.service', 'service')
+      .select(['category.name', 'product.name', 'service.name', 'price.price'])
+      .orderBy('category.category_id', 'ASC')
+      .addOrderBy('product.product_id', 'ASC')
+      .addOrderBy('service.service_id', 'ASC')
+      .getRawMany();
+
+    const templatePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'src/templates/price-list-template.ejs',
+    );
+
+    const templateFile = fs.readFileSync(templatePath, 'utf8');
+
+    const data = {
+      logoUrl: `${base_url}/images/logo/logo.png`,
+      prices,
+    };
+
+    const htmlContent = ejs.render(templateFile, data);
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    return Buffer.from(pdfBuffer);
   }
 }

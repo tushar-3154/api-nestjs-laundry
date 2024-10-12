@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header img {
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="<%= logoUrl %>" alt="Company Logo" width="100" />
+    <h1>Price List</h1>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Index</th>
+        <th>Category</th>
+        <th>Product</th>
+        <th>Service</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% prices.forEach((price, index) => { %>
+        <tr>
+            <td><%= index + 1 %></td>
+            <td><%= price.category_name %></td> 
+            <td><%= price.product_name %></td> 
+            <td><%= price.service_name %></td> 
+            <td><%= price.price_price %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -23,6 +23,7 @@ import { Role } from 'src/enum/role.enum';
 import { fileUpload } from '../../multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
+import { PriceService } from '../price/price.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductService } from './product.service';
@@ -31,7 +32,10 @@ import { ProductService } from './product.service';
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly priceService: PriceService,
+  ) {}
 
   @Get('products')
   @Roles(Role.CUSTOMER)
@@ -86,5 +90,18 @@ export class ProductController {
   @Delete('admin/products/:id')
   async delete(@Param('id', ParseIntPipe) id: number): Promise<Response> {
     return await this.productService.delete(id);
+  }
+
+  @Get('category/:category_id/product')
+  async getProductByCategory(
+    @Param('category_id') category_id: number,
+  ): Promise<Response> {
+    const categories =
+      await this.priceService.getProductByCategory(category_id);
+    return {
+      statusCode: 200,
+      message: 'Products retrieved successfully',
+      data: categories,
+    };
   }
 }

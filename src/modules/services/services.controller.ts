@@ -23,6 +23,7 @@ import { Role } from 'src/enum/role.enum';
 import { fileUpload } from '../../multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
+import { PriceService } from '../price/price.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
@@ -33,7 +34,10 @@ import { ServicesService } from './services.service';
 @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
 @Controller('services')
 export class ServicesController {
-  constructor(private readonly serviceService: ServicesService) {}
+  constructor(
+    private readonly serviceService: ServicesService,
+    private readonly priceService: PriceService,
+  ) {}
 
   @Get('services')
   @Roles(Role.CUSTOMER)
@@ -87,5 +91,21 @@ export class ServicesController {
   @Delete('admin/services/:id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return await this.serviceService.delete(id);
+  }
+
+  @Get('category/:category_id/product/:product_id/service')
+  async getServiceByCategoryAndProduct(
+    @Param('category_id', ParseIntPipe) category_id: number,
+    @Param('product_id', ParseIntPipe) product_id: number,
+  ): Promise<Response> {
+    const services = await this.priceService.getServiceByCategoryAndProduct(
+      category_id,
+      product_id,
+    );
+    return {
+      statusCode: 200,
+      message: 'service retrieved successfully',
+      data: services,
+    };
   }
 }
