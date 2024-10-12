@@ -96,6 +96,26 @@ export class PriceService {
     }));
   }
 
+  async getServiceByCategoryAndProduct(
+    category_id: number,
+    product_id: number,
+  ) {
+    const services = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.product', 'product')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.service', 'service')
+      .where('product.product_id = :product_id', { product_id: product_id })
+      .andWhere('category.category_id = :category_id', {
+        category_id: category_id,
+      })
+      .select(['service.service_id', 'service.name'])
+      .groupBy('service.service_id')
+      .getRawMany();
+
+    return services;
+  }
+
   async getCategoriesByService(service_id: number) {
     const uniqueCategories = await this.priceRepository
       .createQueryBuilder('price')
@@ -107,6 +127,19 @@ export class PriceService {
       .getRawMany();
 
     return uniqueCategories;
+  }
+
+  async getProductByCategory(category_id: number): Promise<any[]> {
+    const uniqueProducts = await this.priceRepository
+      .createQueryBuilder('price')
+      .innerJoinAndSelect('price.category', 'category')
+      .innerJoinAndSelect('price.product', 'product')
+      .where('category.category_id = :category_id', { category_id })
+      .select(['product.product_id', 'product.name'])
+      .groupBy('product.product_id')
+      .getRawMany();
+
+    return uniqueProducts;
   }
 
   async generatePriceListPDF(): Promise<Buffer> {
