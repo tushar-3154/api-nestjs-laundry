@@ -47,7 +47,7 @@ export class CategoryService {
     }
 
     let sortColumn = 'category.created_at';
-    let sortOrder: 'ASC' | 'DESC' = 'ASC';
+    let sortOrder: 'ASC' | 'DESC' = 'DESC';
 
     if (sort_by) {
       sortColumn = sort_by;
