@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import ejs from 'ejs';
+import * as fs from 'fs';
+import path from 'path';
+import puppeteer from 'puppeteer';
 import { Response } from 'src/dto/response.dto';
 import { Category } from 'src/entities/category.entity';
 import { Price } from 'src/entities/price.entity';
@@ -103,5 +107,41 @@ export class PriceService {
       .getRawMany();
 
     return uniqueCategories;
+  }
+
+  async generatePriceListPDF(): Promise<Buffer> {
+    const base_url = process.env.BASE_URL;
+    const prices = await this.priceRepository
+      .createQueryBuilder('price')
+      .leftJoinAndSelect('price.category', 'category')
+      .leftJoinAndSelect('price.product', 'product')
+      .leftJoinAndSelect('price.service', 'service')
+      .select(['category.name', 'product.name', 'service.name', 'price.price'])
+      .getRawMany();
+
+    const templatePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'src/templates/price-list-template.ejs',
+    );
+
+    const templateFile = fs.readFileSync(templatePath, 'utf8');
+
+    const data = {
+      logoUrl: `${base_url}/images/logo/logo.png`,
+      prices,
+    };
+
+    const htmlContent = ejs.render(templateFile, data);
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    return Buffer.from(pdfBuffer);
   }
 }

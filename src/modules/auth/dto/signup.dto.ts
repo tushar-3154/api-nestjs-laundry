@@ -30,9 +30,9 @@ export class SignupDto {
   @IsUnique({ tablename: User.name, column: 'mobile_number' })
   mobile_number: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  otp: number;
+  otp?: number;
 
   @IsNotEmpty()
   @MinLength(6)

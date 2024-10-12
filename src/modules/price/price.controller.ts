@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  StreamableFile,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { createReadStream, writeFileSync } from 'fs';
+import { join } from 'path';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
@@ -22,5 +31,16 @@ export class PriceController {
   @Get()
   async findAll(): Promise<Response> {
     return await this.priceService.findAll();
+  }
+
+  @Get('download-pdf')
+  async downloadPDF(): Promise<StreamableFile> {
+    const pdfBuffer = await this.priceService.generatePriceListPDF();
+
+    const filePath = join(process.cwd(), 'pdf/priceList.pdf');
+    writeFileSync(filePath, pdfBuffer);
+
+    const file = createReadStream(filePath);
+    return new StreamableFile(file, { type: 'application/pdf' });
   }
 }
