@@ -1,13 +1,13 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Response } from 'src/dto/response.dto';
 import { BannerService } from '../banner/banner.service';
-import { MobileApiService } from '../mobileapi/mobileapi.service';
+import { ApiService } from '../mobileapi/api.service';
 import { ServicesService } from '../services/services.service';
 
 @Controller('web')
 export class WebController {
   constructor(
-    private readonly mobileApiService: MobileApiService,
+    private readonly apiService: ApiService,
     private readonly serviceService: ServicesService,
     private readonly bannerService: BannerService,
   ) {}
@@ -22,7 +22,7 @@ export class WebController {
     @Query('category_id') category_id: number,
     @Query('service_id') service_id: number,
   ): Promise<Response> {
-    return await this.mobileApiService.getProductsByCategoryAndService(
+    return await this.apiService.getProductsByCategoryAndService(
       category_id,
       service_id,
     );
@@ -32,7 +32,7 @@ export class WebController {
   async getCategoriesByService(
     @Query('service_id') service_id: number,
   ): Promise<Response> {
-    return await this.mobileApiService.getCategoriesByService(service_id);
+    return await this.apiService.getCategoriesByService(service_id);
   }
 
   @Get('services')

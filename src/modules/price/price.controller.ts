@@ -33,7 +33,7 @@ export class PriceController {
     return await this.priceService.findAll();
   }
 
-  @Get('download-pdf')
+  @Post('download-pdf')
   async downloadPDF(): Promise<StreamableFile> {
     const pdfBuffer = await this.priceService.generatePriceListPDF();
 

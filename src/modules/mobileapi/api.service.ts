@@ -5,7 +5,7 @@ import { PriceService } from '../price/price.service';
 import { ServicesService } from '../services/services.service';
 
 @Injectable()
-export class MobileApiService {
+export class ApiService {
   constructor(
     private readonly serviceService: ServicesService,
     private readonly bannerService: BannerService,

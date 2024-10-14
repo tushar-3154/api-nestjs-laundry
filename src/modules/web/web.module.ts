@@ -8,7 +8,7 @@ import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
 import { BannerService } from '../banner/banner.service';
 import { CartService } from '../cart/cart.service';
-import { MobileApiService } from '../mobileapi/mobileapi.service';
+import { ApiService } from '../mobileapi/api.service';
 import { PriceService } from '../price/price.service';
 import { ServicesService } from '../services/services.service';
 import { WebController } from './web.controller';
@@ -19,7 +19,7 @@ import { WebController } from './web.controller';
   ],
   controllers: [WebController],
   providers: [
-    MobileApiService,
+    ApiService,
     ServicesService,
     BannerService,
     CartService,

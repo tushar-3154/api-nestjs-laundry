@@ -8,8 +8,8 @@ import { Service } from 'src/entities/service.entity';
 import { BannerService } from '../banner/banner.service';
 import { PriceService } from '../price/price.service';
 import { ServicesService } from '../services/services.service';
+import { ApiService } from './api.service';
 import { MobileApiController } from './mobileapi.controller';
-import { MobileApiService } from './mobileapi.service';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { MobileApiService } from './mobileapi.service';
     ]),
   ],
   controllers: [MobileApiController],
-  providers: [MobileApiService, BannerService, ServicesService, PriceService],
-  exports: [MobileApiService],
+  providers: [ApiService, BannerService, ServicesService, PriceService],
+  exports: [ApiService],
 })
 export class MobileApiModule {}
