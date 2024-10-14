@@ -4,18 +4,18 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
-import { MobileApiService } from './mobileapi.service';
+import { ApiService } from './api.service';
 
 @Controller('mobile')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Roles(Role.CUSTOMER)
 export class MobileApiController {
-  constructor(private readonly mobileApiService: MobileApiService) {}
+  constructor(private readonly apiService: ApiService) {}
 
   @Get('/home')
   async findAll(): Promise<Response> {
-    return await this.mobileApiService.findAll();
+    return await this.apiService.findAll();
   }
 
   @Get('products')
@@ -23,7 +23,7 @@ export class MobileApiController {
     @Query('category_id') category_id: number,
     @Query('service_id') service_id: number,
   ): Promise<Response> {
-    return await this.mobileApiService.getProductsByCategoryAndService(
+    return await this.apiService.getProductsByCategoryAndService(
       category_id,
       service_id,
     );
@@ -33,6 +33,6 @@ export class MobileApiController {
   async getCategoriesByService(
     @Query('service_id') service_id: number,
   ): Promise<Response> {
-    return await this.mobileApiService.getCategoriesByService(service_id);
+    return await this.apiService.getCategoriesByService(service_id);
   }
 }

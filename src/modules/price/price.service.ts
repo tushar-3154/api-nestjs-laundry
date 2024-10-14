@@ -144,15 +144,17 @@ export class PriceService {
 
   async generatePriceListPDF(): Promise<Buffer> {
     const base_url = process.env.BASE_URL;
+
     const prices = await this.priceRepository
       .createQueryBuilder('price')
       .innerJoinAndSelect('price.category', 'category')
       .innerJoinAndSelect('price.product', 'product')
       .innerJoinAndSelect('price.service', 'service')
       .select(['category.name', 'product.name', 'service.name', 'price.price'])
-      .orderBy('category.category_id', 'ASC')
-      .addOrderBy('product.product_id', 'ASC')
-      .addOrderBy('service.service_id', 'ASC')
+      .groupBy('category.name, product.name, service.name,price.price')
+      .orderBy('MAX(category.category_id)', 'ASC')
+      .addOrderBy('MAX(product.product_id)', 'ASC')
+      .addOrderBy('MAX(service.service_id)', 'ASC')
       .getRawMany();
 
     const templatePath = path.join(

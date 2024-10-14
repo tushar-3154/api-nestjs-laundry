@@ -104,6 +104,7 @@ export class OrderService {
         coupon_discount = couponValidation.data.discountAmount;
         sub_total -= coupon_discount;
       }
+
       const gst_percetage = parseFloat(settings['gst_percentage'] || 0);
       const gst_amount = (sub_total * gst_percetage) / 100;
       const total = sub_total + gst_amount;
