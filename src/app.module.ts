@@ -23,6 +23,7 @@ import { ServicesModule } from './modules/services/services.module';
 import { SettingModule } from './modules/settings/setting.module';
 import { UsersModule } from './modules/user/user.module';
 import { IsUniqueConstraint } from './modules/validator/is-unique-constarint';
+import { WebModule } from './modules/web/web.module';
 import { MorganMiddleware } from './morgan.middleware';
 
 @Module({
@@ -49,6 +50,7 @@ import { MorganMiddleware } from './morgan.middleware';
     CartModule,
     NotificationModule,
     InvoiceModule,
+    WebModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
