@@ -179,7 +179,6 @@ export class OrderService {
         });
 
         if (existingItem) {
-          existingItem.quantity += orderItem.quantity;
           await queryRunner.manager.save(OrderItem, existingItem);
         } else {
           await queryRunner.manager.insert(OrderItem, orderItem);
