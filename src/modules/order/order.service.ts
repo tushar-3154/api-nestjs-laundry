@@ -266,13 +266,13 @@ export class OrderService {
 
     if (search) {
       queryBuilder.andWhere(
-        'order.description LIKE :search OR' +
-          ' order.coupon_code LIKE :search' +
-          ' OR order.address_details LIKE :search OR' +
-          ' user.first_name LIKE :search' +
-          ' OR user.last_name LIKE :search' +
-          ' OR user.email LIKE :search+' +
-          'OR user.mobile_number LIKE :search',
+        '(order.description LIKE :search OR ' +
+          'order.coupon_code LIKE :search OR ' +
+          'order.address_details LIKE :search OR ' +
+          'user.first_name LIKE :search OR ' +
+          'user.last_name LIKE :search OR ' +
+          'user.email LIKE :search OR ' +
+          'user.mobile_number LIKE :search)',
         { search: `%${search}%` },
       );
     }

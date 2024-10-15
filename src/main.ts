@@ -7,12 +7,14 @@ import { useContainer, ValidationError } from 'class-validator';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { join } from 'path';
+import { TrimPipe } from './pipes/trim.pipe';
 
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalPipes(
+    new TrimPipe(),
     new ValidationPipe({
       whitelist: true,
       exceptionFactory: (validationErrors: ValidationError[] = []) => {

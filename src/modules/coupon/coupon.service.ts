@@ -80,9 +80,7 @@ export class CouponService {
     if (order) {
       sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
     }
-    console.log('sort_by', sortColumn);
 
-    console.log('order', sortOrder);
     queryBuilder.orderBy(sortColumn, sortOrder);
 
     const [result, total] = await queryBuilder.getManyAndCount();
