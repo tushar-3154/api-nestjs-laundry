@@ -32,16 +32,16 @@ export class OrderDetail extends BaseEntity {
   @IsOptional()
   express_delivery_charges?: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'float' })
   sub_total: number;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'float', nullable: true })
   coupon_discount?: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'float' })
   shipping_charges: number;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'float' })
   total: number;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
@@ -71,10 +71,10 @@ export class OrderDetail extends BaseEntity {
   @IsOptional()
   transaction_id?: string;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'float', nullable: true })
   kasar_amount?: number;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'float', nullable: true })
   @IsOptional()
   paid_amount?: number;
 
@@ -111,6 +111,6 @@ export class OrderDetail extends BaseEntity {
   @IsOptional()
   estimated_pickup_time?: Date;
 
-  @Column('decimal', { nullable: true })
+  @Column('float', { nullable: true })
   gst: number;
 }

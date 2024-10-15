@@ -79,7 +79,6 @@ export class OrderService {
       }
 
       const user = await this.userService.findUserById(createOrderDto.user_id);
-
       const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
       const settingKeys = [
         'estimate_pickup_normal_hour',
@@ -100,21 +99,22 @@ export class OrderService {
           { coupon_Code: coupon_code, order_Total: sub_total },
           createOrderDto.user_id,
         );
-
         coupon_discount = couponValidation.data.discountAmount;
         sub_total -= coupon_discount;
       }
 
-      const gst_percetage = parseFloat(settings['gst_percentage'] || 0);
-      const gst_amount = (sub_total * gst_percetage) / 100;
-      const total = sub_total + gst_amount;
-      createOrderDto.shipping_charges +
+      const gst_percentage = parseFloat(settings['gst_percentage'] || 0);
+      const gst_amount = (sub_total * gst_percentage) / 100;
+      const total =
+        sub_total +
+        gst_amount +
+        createOrderDto.shipping_charges +
         (createOrderDto.express_delivery_charges || 0);
 
       const paid_amount = createOrderDto.paid_amount || 0;
       const kasar_amount = paid_amount < total ? total - paid_amount : 0;
 
-      const estimat_pickup_time = createOrderDto.express_delivery_charges
+      const estimated_pickup_time = createOrderDto.express_delivery_charges
         ? addHours(
             new Date(),
             parseInt(settings['estimate_pickup_express_hour']),
@@ -130,6 +130,24 @@ export class OrderService {
 
       const estimated_delivery_date = addDays(new Date(), deliveryDaysToAdd);
 
+      const orderItemsMap = new Map();
+
+      for (const item of createOrderDto.items) {
+        const key = `${item.category_id}-${item.product_id}-${item.service_id}`;
+        if (orderItemsMap.has(key)) {
+          const existingItem = orderItemsMap.get(key);
+          existingItem.quantity += item.quantity || 1;
+        } else {
+          orderItemsMap.set(key, {
+            category_id: item.category_id,
+            product_id: item.product_id,
+            service_id: item.service_id,
+            price: item.price,
+            quantity: item.quantity || 1,
+          });
+        }
+      }
+
       const order = this.orderRepository.create({
         ...createOrderDto,
         sub_total,
@@ -139,22 +157,34 @@ export class OrderService {
         coupon_discount,
         address_details,
         kasar_amount,
-        estimated_pickup_time: estimat_pickup_time,
+        estimated_pickup_time,
         estimated_delivery_time: estimated_delivery_date,
       });
 
       const savedOrder = await queryRunner.manager.save(order);
 
-      const orderItems = createOrderDto.items.map((item) => ({
+      const orderItems = Array.from(orderItemsMap.values()).map((item) => ({
         order: savedOrder,
-        category_id: item.category_id,
-        product_id: item.product_id,
-        service_id: item.service_id,
-        price: item.price,
-        quantity: item.quantity,
+        ...item,
       }));
 
-      await queryRunner.manager.insert(OrderItem, orderItems);
+      for (const orderItem of orderItems) {
+        const existingItem = await queryRunner.manager.findOne(OrderItem, {
+          where: {
+            category_id: orderItem.category_id,
+            product_id: orderItem.product_id,
+            service_id: orderItem.service_id,
+            order_id: savedOrder.order_id,
+          },
+        });
+
+        if (existingItem) {
+          existingItem.quantity += orderItem.quantity;
+          await queryRunner.manager.save(OrderItem, existingItem);
+        } else {
+          await queryRunner.manager.insert(OrderItem, orderItem);
+        }
+      }
 
       await queryRunner.commitTransaction();
       const orderDetail = {

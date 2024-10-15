@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsTrimmedString } from 'src/decorator/trim.decorator';
 
 export class PaginationQueryDto {
   @IsOptional()
@@ -14,6 +15,7 @@ export class PaginationQueryDto {
 
   @IsOptional()
   @IsString()
+  @IsTrimmedString({ message: 'Search cannot be empty or just whitespace' })
   search?: string;
 
   @IsOptional()
