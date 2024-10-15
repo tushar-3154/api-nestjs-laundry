@@ -6,13 +6,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BaseEntity } from './base.entity';
 import { Category } from './category.entity';
 import { OrderDetail } from './order.entity';
 import { Product } from './product.entity';
 import { Service } from './service.entity';
 
 @Entity({ name: 'order_items' })
-export class OrderItem {
+export class OrderItem extends BaseEntity {
   @PrimaryGeneratedColumn()
   item_id: number;
 

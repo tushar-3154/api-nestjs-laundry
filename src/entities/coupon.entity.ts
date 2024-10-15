@@ -31,7 +31,7 @@ export class Coupon extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   discount_type: DiscountType;
 
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'float', nullable: false })
   discount_value: number;
 
   @Column({ type: 'int', nullable: true })
