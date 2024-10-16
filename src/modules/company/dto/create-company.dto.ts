@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Length,
 } from 'class-validator';
 import { CompanyOwed } from 'src/enum/company_owed.enum';
 
@@ -22,6 +23,7 @@ export class CreateCompanyDto {
   state: string;
 
   @IsString()
+  @Length(6, 6)
   zip_code: string;
 
   @IsString()

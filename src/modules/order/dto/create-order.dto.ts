@@ -64,6 +64,9 @@ export class CreateOrderDto {
   @IsEnum(PaymentStatus)
   payment_status: PaymentStatus;
 
+  @IsOptional()
+  description?: string;
+
   @IsNumber()
   @IsOptional()
   paid_amount?: number;

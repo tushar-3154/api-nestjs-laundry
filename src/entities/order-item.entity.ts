@@ -29,6 +29,10 @@ export class OrderItem extends BaseEntity {
   @Column()
   order_id: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  @IsOptional()
+  description?: string;
+
   @ManyToOne(() => OrderDetail, (orderDetail) => orderDetail.items)
   @JoinColumn({ name: 'order_id' })
   order: OrderDetail;
