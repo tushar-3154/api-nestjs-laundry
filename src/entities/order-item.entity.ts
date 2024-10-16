@@ -29,7 +29,7 @@ export class OrderItem extends BaseEntity {
   @Column()
   order_id: number;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   @IsOptional()
   description?: string;
 

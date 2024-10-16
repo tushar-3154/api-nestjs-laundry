@@ -1,13 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddColumnDescriptionInOrderItemTable1728991974074
+export class AddColumnDescriptionInOrderItemTable1729053936849
   implements MigrationInterface
 {
-  name = 'AddColumnDescriptionInOrderItemTable1728991974074';
+  name = 'AddColumnDescriptionInOrderItemTable1729053936849';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`order_items\` ADD \`description\` varchar(255) NOT NULL`,
+      `ALTER TABLE \`order_items\` ADD \`description\` varchar(255) NULL`,
     );
   }
 
