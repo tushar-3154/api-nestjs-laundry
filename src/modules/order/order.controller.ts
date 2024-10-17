@@ -19,6 +19,7 @@ import { Role } from 'src/enum/role.enum';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { RefundOrderDto } from './dto/refund-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
 
@@ -131,5 +132,10 @@ export class OrderController {
     @Param('order_id', ParseIntPipe) order_id: number,
   ): Promise<Response> {
     return await this.orderService.delete(order_id);
+  }
+
+  @Post('refund')
+  async refundOrder(@Body() refundOrderDto: RefundOrderDto) {
+    return await this.orderService.createRefund(refundOrderDto);
   }
 }

@@ -1,6 +1,7 @@
 import { IsOptional } from 'class-validator';
 import { OrderStatus } from 'src/enum/order-status.eum';
 import { PaymentStatus, PaymentType } from 'src/enum/payment.enum';
+import { RefundStatus } from 'src/enum/refund_status.enum';
 import {
   Column,
   Entity,
@@ -113,4 +114,14 @@ export class OrderDetail extends BaseEntity {
 
   @Column('float', { nullable: true })
   gst: number;
+
+  @Column({ type: 'decimal', nullable: true, default: 0 })
+  refund_amount: number;
+
+  @Column({ type: 'int', default: RefundStatus.NONE })
+  refund_status: RefundStatus;
+
+  @Column({ type: 'varchar', nullable: true })
+  @IsOptional()
+  refund_descriptions?: string;
 }

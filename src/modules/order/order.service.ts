@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { addDays, addHours } from 'date-fns';
 import { Response } from 'src/dto/response.dto';
@@ -8,6 +12,7 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { RefundStatus } from 'src/enum/refund_status.enum';
 import { Role } from 'src/enum/role.enum';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import { DataSource, Repository } from 'typeorm';
@@ -17,6 +22,7 @@ import { NotificationService } from '../notification/notification.service';
 import { SettingService } from '../settings/setting.service';
 import { UserService } from '../user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { RefundOrderDto } from './dto/refund-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
@@ -573,6 +579,37 @@ export class OrderService {
     return {
       statusCode: 200,
       message: 'Order deleted successfully',
+    };
+  }
+
+  async createRefund(refundOrderDto: RefundOrderDto): Promise<Response> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: refundOrderDto.order_id },
+    });
+
+    if (order.refund_amount > 0) {
+      throw new BadRequestException(
+        'Refund has already been processed for this order.',
+      );
+    }
+
+    let newRefundAmount = 0;
+
+    if (refundOrderDto.refund_status === RefundStatus.FULL) {
+      newRefundAmount = order.total;
+    } else if (refundOrderDto.refund_status === RefundStatus.PARTIAL) {
+      newRefundAmount = refundOrderDto.refund_amount;
+    }
+
+    order.refund_amount = parseFloat(newRefundAmount.toFixed(2));
+    order.refund_status = refundOrderDto.refund_status;
+    order.refund_descriptions = refundOrderDto.refund_description;
+
+    await this.orderRepository.save(order);
+
+    return {
+      statusCode: 200,
+      message: 'Refund processed successfully',
     };
   }
 }
