@@ -22,28 +22,31 @@ import { UpdateUserAddressDto } from './dto/update-address.dto';
 @Controller('address')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
-@Roles(Role.CUSTOMER, Role.SUB_ADMIN, Role.SUPER_ADMIN)
 export class AddressController {
   constructor(private readonly userAddressService: AddressService) {}
 
   @Get()
+  @Roles(Role.CUSTOMER)
   async getAll(@Request() req): Promise<Response> {
     const user = req.user;
     return this.userAddressService.getAll(user.user_id);
   }
 
   @Get(':id')
+  @Roles(Role.CUSTOMER)
   async findOne(@Request() req, @Param('id') id: number): Promise<Response> {
     const user = req.user;
     return this.userAddressService.findOne(user.user_id, id);
   }
 
   @Get(':user_id/user')
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async getOne(@Param('user_id') user_id: number): Promise<Response> {
     return this.userAddressService.getOne(user_id);
   }
 
   @Post()
+  @Roles(Role.CUSTOMER, Role.SUB_ADMIN, Role.SUPER_ADMIN)
   async create(
     @Request() req,
     @Body() userAddress: CreateAddressDto,
@@ -53,6 +56,7 @@ export class AddressController {
   }
 
   @Put(':id')
+  @Roles(Role.CUSTOMER)
   async update(
     @Request() req,
     @Param('id') id: number,
@@ -64,6 +68,7 @@ export class AddressController {
   }
 
   @Delete(':id')
+  @Roles(Role.CUSTOMER)
   async delete(@Request() req, @Param('id') id: number): Promise<Response> {
     const user = req.user;
     return this.userAddressService.delete(user.user_id, id);
