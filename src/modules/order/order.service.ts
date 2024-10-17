@@ -610,10 +610,7 @@ export class OrderService {
       (previousRefundAmount + newRefundAmount).toFixed(2),
     );
     order.refund_status = refundOrderDto.refund_status;
-
-    if (refundOrderDto.refund_description) {
-      order.refund_descriptions = refundOrderDto.refund_description;
-    }
+    order.refund_descriptions = refundOrderDto.refund_description;
 
     await this.orderRepository.save(order);
 

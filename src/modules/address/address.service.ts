@@ -41,22 +41,6 @@ export class AddressService {
     };
   }
 
-  async getOne(user_id: number): Promise<Response> {
-    const result = await this.userAddressRepository.findOne({
-      where: { user_id: user_id, deleted_at: null },
-    });
-
-    if (!result) {
-      throw new NotFoundException('Address not found');
-    }
-
-    return {
-      statusCode: 200,
-      message: 'Address retrieved successfully',
-      data: { result },
-    };
-  }
-
   async create(
     user_id: number,
     createAddressdto: CreateAddressDto,

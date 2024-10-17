@@ -42,7 +42,7 @@ export class AddressController {
   @Get(':user_id/user')
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async getOne(@Param('user_id') user_id: number): Promise<Response> {
-    return this.userAddressService.getOne(user_id);
+    return this.userAddressService.getAll(user_id);
   }
 
   @Post()
