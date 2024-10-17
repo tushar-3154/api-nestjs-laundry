@@ -46,13 +46,21 @@ export class AddressController {
   }
 
   @Post()
-  @Roles(Role.CUSTOMER, Role.SUB_ADMIN, Role.SUPER_ADMIN)
+  @Roles(Role.CUSTOMER)
   async create(
     @Request() req,
     @Body() userAddress: CreateAddressDto,
   ): Promise<Response> {
     const user = req.user;
     return this.userAddressService.create(user.user_id, userAddress);
+  }
+
+  @Post('admin')
+  @Roles(Role.SUPER_ADMIN)
+  async createAdminAddress(
+    @Body() userAddress: CreateAddressDto,
+  ): Promise<Response> {
+    return this.userAddressService.createAdminAddress(userAddress);
   }
 
   @Put(':id')
