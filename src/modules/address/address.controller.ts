@@ -38,6 +38,11 @@ export class AddressController {
     return this.userAddressService.findOne(user.user_id, id);
   }
 
+  @Get(':user_id/user')
+  async getOne(@Param('user_id') user_id: number): Promise<Response> {
+    return this.userAddressService.getOne(user_id);
+  }
+
   @Post()
   async create(
     @Request() req,
