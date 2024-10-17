@@ -587,9 +587,9 @@ export class OrderService {
       where: { order_id: refundOrderDto.order_id },
     });
 
-    if (!order) {
-      throw new NotFoundException(
-        `Order with id ${refundOrderDto.order_id} not found`,
+    if (order.refund_amount > 0) {
+      throw new BadRequestException(
+        'Refund has already been processed for this order.',
       );
     }
 
@@ -598,17 +598,10 @@ export class OrderService {
     if (refundOrderDto.refund_status === RefundStatus.FULL) {
       newRefundAmount = order.total;
     } else if (refundOrderDto.refund_status === RefundStatus.PARTIAL) {
-      if (refundOrderDto.refund_amount > order.total - order.refund_amount) {
-        throw new BadRequestException('Refund amount exceeds allowable limit.');
-      }
       newRefundAmount = refundOrderDto.refund_amount;
     }
 
-    const previousRefundAmount =
-      parseFloat(order.refund_amount.toString()) || 0;
-    order.refund_amount = parseFloat(
-      (previousRefundAmount + newRefundAmount).toFixed(2),
-    );
+    order.refund_amount = parseFloat(newRefundAmount.toFixed(2));
     order.refund_status = refundOrderDto.refund_status;
     order.refund_descriptions = refundOrderDto.refund_description;
 
