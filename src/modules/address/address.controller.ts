@@ -22,7 +22,7 @@ import { UpdateUserAddressDto } from './dto/update-address.dto';
 @Controller('address')
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
-@Roles(Role.CUSTOMER)
+@Roles(Role.CUSTOMER, Role.SUB_ADMIN, Role.SUPER_ADMIN)
 export class AddressController {
   constructor(private readonly userAddressService: AddressService) {}
 
