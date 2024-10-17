@@ -58,6 +58,21 @@ export class AddressService {
     };
   }
 
+  async createAdminAddress(
+    createAddressdto: CreateAddressDto,
+  ): Promise<Response> {
+    const newAddress = this.userAddressRepository.create({
+      ...createAddressdto,
+    });
+    const result = await this.userAddressRepository.save(newAddress);
+
+    return {
+      statusCode: 201,
+      message: 'Address added successfully',
+      data: { result },
+    };
+  }
+
   async update(
     user_id: number,
     id: number,
