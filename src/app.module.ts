@@ -12,6 +12,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CompanyModule } from './modules/company/company.module';
 import { CouponModule } from './modules/coupon/coupon.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { MobileApiModule } from './modules/mobileapi/mobileapi.module';
 import { NotesModule } from './modules/notes/note.module';
@@ -51,6 +52,7 @@ import { MorganMiddleware } from './morgan.middleware';
     NotificationModule,
     InvoiceModule,
     WebModule,
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
