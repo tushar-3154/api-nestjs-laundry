@@ -4,7 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -29,7 +29,7 @@ export class Feedback extends BaseEntity {
   @IsOptional()
   is_publish?: IsPublish;
 
-  @ManyToOne(() => OrderDetail)
+  @OneToOne(() => OrderDetail)
   @JoinColumn({ name: 'order_id' })
   order: OrderDetail;
 

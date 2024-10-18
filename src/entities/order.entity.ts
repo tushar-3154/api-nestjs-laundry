@@ -8,6 +8,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserAddress } from './address.entity';
@@ -95,8 +96,8 @@ export class OrderDetail extends BaseEntity {
   @OneToMany(() => Note, (note) => note.order)
   notes: Note[];
 
-  @OneToMany(() => Feedback, (feedback) => feedback.order)
-  feedback: Feedback[];
+  @OneToOne(() => Feedback, (feedback) => feedback.order)
+  feedback: Feedback;
 
   @ManyToOne(() => User, (user) => user.ordersAsDeliveryBoy)
   @JoinColumn({ name: 'delivery_boy_id' })
