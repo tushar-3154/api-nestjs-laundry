@@ -35,9 +35,9 @@ export class OrderController {
     @Request() req,
     @Query() paginationQuery: PaginationQueryDto,
   ): Promise<Response> {
-    const delivery_id = req.user;
+    const user = req.user;
     return await this.orderService.getAssignedOrders(
-      delivery_id.user_id,
+      user.user_id,
       paginationQuery.search,
     );
   }
