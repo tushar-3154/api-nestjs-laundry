@@ -19,6 +19,7 @@ import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 const twilioClient = twilio(
@@ -52,6 +53,7 @@ export class UserService {
     if (!isValidOtp) {
       throw new BadRequestException('Invalid or expired OTP');
     }
+
     let vendor_id = null;
     if (vendor_code) {
       const vendor = await this.userRepository.findOne({
@@ -64,17 +66,16 @@ export class UserService {
       vendor_id = vendor.user_id;
       delete signUpDto.vendor_code;
     }
-    const salt = await bcrypt.genSalt(10);
 
-    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+
     const user = this.userRepository.create({
       ...signUpDto,
-      password: hashedpassword,
+      password: hashedPassword,
       vendor_id,
     });
-    const result = await this.userRepository.save(user);
-
-    return result;
+    return await this.userRepository.save(user);
   }
 
   async login(loginDto: LoginDto): Promise<Response> {
@@ -171,24 +172,26 @@ export class UserService {
     await this.deviceUserRepository.save(deviceUser);
   }
 
-  async createUser(admin_id: number, signUpDto: SignupDto): Promise<Response> {
+  async createUser(
+    admin_id: number,
+    createUserDto: CreateUserDto,
+  ): Promise<Response> {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    signUpDto.created_by_user_id = admin_id;
+    createUserDto.created_by_user_id = admin_id;
 
-    if (signUpDto.role_id === Role.Vendor) {
-      signUpDto.vendor_code = crypto.randomBytes(6).toString('hex');
-
-      const expiryDays = signUpDto.vendor_code_expiry as unknown as number;
-      signUpDto.vendor_code_expiry = this.getVendorCodeExpiry(expiryDays);
-
-      signUpDto.commission_percentage = signUpDto.commission_percentage || 0;
-      signUpDto.security_deposit = signUpDto.security_deposit || 0;
+    if (createUserDto.role_id === Role.Vendor) {
+      createUserDto.vendor_code = crypto.randomBytes(6).toString('hex');
+      const expiryDays = createUserDto.vendor_code_expiry as unknown as number;
+      createUserDto.vendor_code_expiry = this.getVendorCodeExpiry(expiryDays);
+      createUserDto.commission_percentage =
+        createUserDto.commission_percentage || 0;
+      createUserDto.security_deposit = createUserDto.security_deposit || 0;
     }
 
     const user = this.userRepository.create({
-      ...signUpDto,
+      ...createUserDto,
       password: hashedPassword,
     });
 

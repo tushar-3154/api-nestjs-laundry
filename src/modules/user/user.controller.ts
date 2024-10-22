@@ -18,10 +18,10 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
-import { SignupDto } from '../auth/dto/signup.dto';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -45,9 +45,9 @@ export class UserController {
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async createCustomer(@Request() req, @Body() signupDto: SignupDto) {
+  async createCustomer(@Request() req, @Body() createUserDto: CreateUserDto) {
     const user = req.user;
-    return await this.userService.createUser(user.user_id, signupDto);
+    return await this.userService.createUser(user.user_id, createUserDto);
   }
 
   @Get('by-role')
@@ -67,10 +67,10 @@ export class UserController {
   @Roles(Role.SUPER_ADMIN)
   async createUser(
     @Request() req,
-    @Body() signUpDto: SignupDto,
+    @Body() createUserDto: CreateUserDto,
   ): Promise<Response> {
     const user = req.user;
-    return await this.userService.createUser(user.user_id, signUpDto);
+    return await this.userService.createUser(user.user_id, createUserDto);
   }
 
   @Put(':id')
