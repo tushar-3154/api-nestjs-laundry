@@ -2,6 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { FilePath } from 'src/constants/FilePath';
 
 export const fileUpload = (destination: string) => ({
   storage: diskStorage({
@@ -16,10 +17,10 @@ export const fileUpload = (destination: string) => ({
     },
   }),
   limits: {
-    fileSize: 2 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+    if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
       cb(
         new HttpException(
           'Only JPEG, JPG, or PNG image files are allowed!',
@@ -32,3 +33,15 @@ export const fileUpload = (destination: string) => ({
     }
   },
 });
+
+export const logoUploadPath = (req, file, cb) => {
+  const uploadPath = path.join(process.cwd(), FilePath.COMPANY_LOGO);
+  fs.mkdirSync(uploadPath, { recursive: true });
+  cb(null, uploadPath);
+};
+
+export const contractDocumentUploadPath = (req, file, cb) => {
+  const uploadPath = path.join(process.cwd(), FilePath.CONTRACT_DOCUMENT);
+  fs.mkdirSync(uploadPath, { recursive: true });
+  cb(null, uploadPath);
+};

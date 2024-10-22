@@ -18,19 +18,22 @@ export class CompanyService {
   async create(
     createCompanyDto: CreateCompanyDto,
     logoPath: string,
+    contractDocumentPath: string,
   ): Promise<Response> {
     const company = this.companyRepository.create({
       ...createCompanyDto,
       logo: logoPath,
+      contract_document: contractDocumentPath,
     });
+
     const result = await this.companyRepository.save(company);
 
-    const Company = appendBaseUrlToLogo([result])[0];
+    const companyWithLogoUrl = appendBaseUrlToLogo([result])[0];
 
     return {
       statusCode: 201,
-      message: 'company added successfully',
-      data: { result: Company },
+      message: 'Company added successfully',
+      data: { result: companyWithLogoUrl },
     };
   }
 

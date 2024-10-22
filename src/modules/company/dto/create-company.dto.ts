@@ -41,7 +41,8 @@ export class CreateCompanyDto {
   @IsString()
   website: string;
 
-  logo: string;
+  @IsOptional()
+  logo?: string;
 
   @IsString()
   registration_number: string;
@@ -59,6 +60,5 @@ export class CreateCompanyDto {
   company_ownedby: number;
 
   @IsOptional()
-  @IsString()
   contract_document?: string;
 }
