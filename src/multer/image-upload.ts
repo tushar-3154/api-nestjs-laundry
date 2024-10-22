@@ -2,7 +2,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { FilePath } from 'src/constants/FilePath';
 
 export const fileUpload = (destination: string) => ({
   storage: diskStorage({
@@ -33,15 +32,3 @@ export const fileUpload = (destination: string) => ({
     }
   },
 });
-
-export const logoUploadPath = (req, file, cb) => {
-  const uploadPath = path.join(process.cwd(), FilePath.COMPANY_LOGO);
-  fs.mkdirSync(uploadPath, { recursive: true });
-  cb(null, uploadPath);
-};
-
-export const contractDocumentUploadPath = (req, file, cb) => {
-  const uploadPath = path.join(process.cwd(), FilePath.CONTRACT_DOCUMENT);
-  fs.mkdirSync(uploadPath, { recursive: true });
-  cb(null, uploadPath);
-};
