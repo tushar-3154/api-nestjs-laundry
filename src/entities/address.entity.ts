@@ -11,7 +11,7 @@ export class UserAddress extends BaseEntity {
 
   @Column({ type: 'int', nullable: true })
   @IsOptional()
-  address_title?: AddressType;
+  address_type?: AddressType;
 
   @Column({ nullable: true })
   full_name: string;
