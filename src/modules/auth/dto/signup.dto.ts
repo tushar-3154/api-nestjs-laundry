@@ -49,9 +49,6 @@ export class SignupDto {
   created_by_user_id?: number;
 
   @IsOptional()
-  vendor_id?: number;
-
-  @IsOptional()
   vendor_code?: string;
 
   @IsOptional()

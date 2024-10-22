@@ -52,7 +52,7 @@ export class UserService {
     if (!isValidOtp) {
       throw new BadRequestException('Invalid or expired OTP');
     }
-
+    let vendor_id = null;
     if (vendor_code) {
       const vendor = await this.userRepository.findOne({
         where: { vendor_code },
@@ -61,7 +61,7 @@ export class UserService {
       if (!vendor) {
         throw new BadRequestException('invalid vendor code');
       }
-      signUpDto.vendor_id = vendor.user_id;
+      vendor_id = vendor.user_id;
       delete signUpDto.vendor_code;
     }
     const salt = await bcrypt.genSalt(10);
@@ -70,6 +70,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...signUpDto,
       password: hashedpassword,
+      vendor_id,
     });
     const result = await this.userRepository.save(user);
 

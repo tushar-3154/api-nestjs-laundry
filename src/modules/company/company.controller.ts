@@ -24,6 +24,7 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { Role } from 'src/enum/role.enum';
 import { fileUpload } from 'src/multer/image-upload';
+import { pdfUpload } from 'src/multer/pdf-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { CompanyService } from './company.service';
@@ -44,7 +45,44 @@ export class CompanyController {
         { name: 'logo', maxCount: 1 },
         { name: 'contract_document', maxCount: 1 },
       ],
-      fileUpload(FilePath.CONTRACT_DOCUMENT),
+      {
+        storage: fileUpload(FilePath.COMPANY_LOGO).storage,
+        limits: {
+          fileSize: Math.max(
+            fileUpload(FilePath.COMPANY_LOGO).limits.fileSize,
+            pdfUpload(FilePath.CONTRACT_DOCUMENT).limits.fileSize,
+          ),
+        },
+        fileFilter: (req, file, cb) => {
+          if (file.fieldname === 'logo') {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+              cb(
+                new HttpException(
+                  'Only JPEG, JPG, or PNG image files are allowed!',
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            } else {
+              cb(null, true);
+            }
+          } else if (file.fieldname === 'contract_document') {
+            if (!file.mimetype.match(/\/(pdf)$/)) {
+              cb(
+                new HttpException(
+                  'Only PDF files are allowed!',
+                  HttpStatus.BAD_REQUEST,
+                ),
+                false,
+              );
+            } else {
+              cb(null, true);
+            }
+          } else {
+            cb(null, false);
+          }
+        },
+      },
     ),
   )
   async create(

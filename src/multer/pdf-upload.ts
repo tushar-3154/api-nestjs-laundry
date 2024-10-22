@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 
-export const fileUpload = (destination: string) => ({
+export const pdfUpload = (destination: string) => ({
   storage: diskStorage({
     destination: (req, file, cb) => {
       const uploadPath = path.join(process.cwd(), destination);
@@ -16,13 +16,13 @@ export const fileUpload = (destination: string) => ({
     },
   }),
   limits: {
-    fileSize: 2 * 1024 * 1024,
+    fileSize: 10 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+    if (!file.mimetype.match(/\/(pdf)$/)) {
       cb(
         new HttpException(
-          'Only JPEG, JPG, or PNG image files are allowed!',
+          'Only PDF files are allowed!',
           HttpStatus.BAD_REQUEST,
         ),
         false,
