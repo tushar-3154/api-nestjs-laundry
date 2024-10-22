@@ -71,8 +71,6 @@ export class CompanyController {
     const contractDocumentPath = contractFile
       ? FilePath.CONTRACT_DOCUMENT + '/' + contractFile.filename
       : null;
-    console.log(logoPath);
-    console.log(contractDocumentPath);
 
     return await this.companyService.create(
       createCompanyDto,
