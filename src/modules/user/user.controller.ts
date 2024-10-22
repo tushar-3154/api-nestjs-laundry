@@ -50,12 +50,15 @@ export class UserController {
     return await this.userService.createUser(user.user_id, signupDto);
   }
 
-  @Get('customers')
+  @Get('by-role')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async getAllCustomers(@Query('search') search?: string): Promise<Response> {
-    return this.userService.getAllCustomers(search);
+  async getAllUsersByRole(
+    @Query('role_id') role_id: number,
+    @Query('search') search?: string,
+  ): Promise<Response> {
+    return this.userService.getAllUsersByRole(role_id, search);
   }
 
   @Post()

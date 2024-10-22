@@ -1,4 +1,3 @@
-import { Transform } from 'class-transformer';
 import {
   IsDecimal,
   IsEmail,
@@ -39,9 +38,8 @@ export class SignupDto {
   password: string;
 
   @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value))
   @IsEnum(Gender)
-  gender: number;
+  gender: Gender;
 
   @IsNotEmpty()
   role_id: number;
@@ -51,8 +49,19 @@ export class SignupDto {
   created_by_user_id?: number;
 
   @IsOptional()
+  vendor_id?: number;
+
+  @IsOptional()
   vendor_code?: string;
 
   @IsOptional()
   vendor_code_expiry?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  commission_percentage?: number;
+
+  @IsOptional()
+  @IsNumber()
+  security_deposit?: number;
 }

@@ -1,10 +1,12 @@
 import {
   IsDecimal,
   IsEmail,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Gender } from 'src/enum/gender.enum';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -22,6 +24,10 @@ export class UpdateUserDto {
   @IsOptional()
   @IsDecimal()
   mobile_number?: number;
+
+  @IsOptional()
+  @IsEnum(Gender)
+  gender: Gender;
 
   @IsOptional()
   @IsString()

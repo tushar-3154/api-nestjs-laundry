@@ -1,9 +1,20 @@
-import { IsNumber, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
+import { AddressType } from 'src/enum/address_type.enum';
 
 export class CreateAddressDto {
   @IsNumber()
   @IsOptional()
   user_id: number;
+
+  @IsOptional()
+  @IsEnum(AddressType)
+  address_title?: AddressType;
 
   @IsString()
   @IsOptional()

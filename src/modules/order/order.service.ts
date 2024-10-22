@@ -85,6 +85,7 @@ export class OrderService {
       }
 
       const user = await this.userService.findUserById(createOrderDto.user_id);
+
       const address_details = `${address.building_number}, ${address.area}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`;
       const settingKeys = [
         'estimate_pickup_normal_hour',
@@ -187,7 +188,10 @@ export class OrderService {
         if (existingItem) {
           await queryRunner.manager.save(OrderItem, existingItem);
         } else {
-          await queryRunner.manager.insert(OrderItem, orderItem);
+          await queryRunner.manager.insert(OrderItem, {
+            ...orderItem,
+            order_id: savedOrder.order_id,
+          });
         }
       }
 
