@@ -14,7 +14,7 @@ export class CreateAddressDto {
 
   @IsOptional()
   @IsEnum(AddressType)
-  address_title?: AddressType;
+  address_type?: AddressType;
 
   @IsString()
   @IsOptional()
