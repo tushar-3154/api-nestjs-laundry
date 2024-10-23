@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'src/dto/response.dto';
@@ -89,6 +90,21 @@ export class CouponService {
       statusCode: 200,
       message: 'Discount coupons retrieved successfully',
       data: { result, limit: perPage, page_number: pageNumber, count: total },
+    };
+  }
+
+  async findOne(coupon_id: number): Promise<Response> {
+    const coupon = await this.couponRepository.findOne({
+      where: { coupon_id: coupon_id, deleted_at: null },
+    });
+
+    if (!coupon) {
+      throw new NotFoundException('coupon not found');
+    }
+    return {
+      statusCode: 200,
+      message: 'Coupon retrived successfully',
+      data: coupon,
     };
   }
 

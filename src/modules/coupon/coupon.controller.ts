@@ -48,6 +48,11 @@ export class CouponController {
     return this.couponService.applyCoupon(applyCouponDto, userId);
   }
 
+  @Get('admin/coupon/:coupon_id')
+  findOne(@Param('coupon_id') coupon_id: number): Promise<Response> {
+    return this.couponService.findOne(coupon_id);
+  }
+
   @Put('admin/coupon/:id')
   update(
     @Param('id') id: number,

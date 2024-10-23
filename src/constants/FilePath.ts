@@ -5,4 +5,5 @@ export const FilePath = {
   COMPANY_LOGO: 'images/logo',
   NOTE_IMAGES: 'images/note',
   PDF_DIRECTORY: 'pdf',
+  CONTRACT_DOCUMENT: 'pdf',
 };

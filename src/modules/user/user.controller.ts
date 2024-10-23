@@ -18,10 +18,10 @@ import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
-import { SignupDto } from '../auth/dto/signup.dto';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -41,33 +41,27 @@ export class UserController {
     );
   }
 
-  @Post('customers')
+  @Get('by-role')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async createCustomer(@Request() req, @Body() signupDto: SignupDto) {
-    const user = req.user;
-    return await this.userService.createUser(user.user_id, signupDto);
-  }
-
-  @Get('customers')
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async getAllCustomers(@Query('search') search?: string): Promise<Response> {
-    return this.userService.getAllCustomers(search);
+  async getAllUsersByRole(
+    @Query('role_id') role_id: number,
+    @Query('search') search?: string,
+  ): Promise<Response> {
+    return this.userService.getAllUsersByRole(role_id, search);
   }
 
   @Post()
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async createUser(
     @Request() req,
-    @Body() signUpDto: SignupDto,
+    @Body() createUserDto: CreateUserDto,
   ): Promise<Response> {
     const user = req.user;
-    return await this.userService.createUser(user.user_id, signUpDto);
+    return await this.userService.createUser(user.user_id, createUserDto);
   }
 
   @Put(':id')

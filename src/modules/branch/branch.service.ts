@@ -91,6 +91,24 @@ export class BranchService {
     };
   }
 
+  async getBranchesByCompanyId(company_id: number): Promise<Response> {
+    const result = await this.branchRepository.find({
+      where: { company_id: company_id, deleted_at: null },
+    });
+    if (!result) {
+      return {
+        statusCode: 404,
+        message: 'Branch not found',
+        data: null,
+      };
+    }
+    return {
+      statusCode: 200,
+      message: 'Branch retrived successfully',
+      data: result,
+    };
+  }
+
   async update(
     id: number,
     updateBranchDto: UpdateBranchDto,

@@ -41,6 +41,13 @@ export class BranchController {
     return await this.branchService.findOne(id);
   }
 
+  @Get('company/:company_id')
+  async getBranchesByCompanyId(
+    @Param('company_id') company_id: number,
+  ): Promise<Response> {
+    return await this.branchService.getBranchesByCompanyId(company_id);
+  }
+
   @Put(':id')
   async update(
     @Param('id') id: number,

@@ -19,6 +19,7 @@ import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 const twilioClient = twilio(
@@ -39,7 +40,7 @@ export class UserService {
   ) {}
 
   async signup(signUpDto: SignupDto): Promise<User> {
-    const { mobile_number, otp } = signUpDto;
+    const { mobile_number, otp, vendor_code } = signUpDto;
     const existingUser = await this.userRepository.findOne({
       where: { mobile_number },
     });
@@ -52,16 +53,29 @@ export class UserService {
     if (!isValidOtp) {
       throw new BadRequestException('Invalid or expired OTP');
     }
-    const salt = await bcrypt.genSalt(10);
 
-    const hashedpassword = await bcrypt.hash(signUpDto.password, salt);
+    let vendor_id = null;
+    if (vendor_code) {
+      const vendor = await this.userRepository.findOne({
+        where: { vendor_code },
+      });
+
+      if (!vendor) {
+        throw new BadRequestException('invalid vendor code');
+      }
+      vendor_id = vendor.user_id;
+      delete signUpDto.vendor_code;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+
     const user = this.userRepository.create({
       ...signUpDto,
-      password: hashedpassword,
+      password: hashedPassword,
+      vendor_id,
     });
-    const result = await this.userRepository.save(user);
-
-    return result;
+    return await this.userRepository.save(user);
   }
 
   async login(loginDto: LoginDto): Promise<Response> {
@@ -158,21 +172,26 @@ export class UserService {
     await this.deviceUserRepository.save(deviceUser);
   }
 
-  async createUser(admin_id: number, signUpDto: SignupDto): Promise<Response> {
+  async createUser(
+    admin_id: number,
+    createUserDto: CreateUserDto,
+  ): Promise<Response> {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(signUpDto.password, salt);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    signUpDto.created_by_user_id = admin_id;
+    createUserDto.created_by_user_id = admin_id;
 
-    if (signUpDto.role_id === Role.Vendor) {
-      signUpDto.vendor_code = crypto.randomBytes(6).toString('hex');
-
-      const expiryDays = signUpDto.vendor_code_expiry as unknown as number;
-      signUpDto.vendor_code_expiry = this.getVendorCodeExpiry(expiryDays);
+    if (createUserDto.role_id === Role.Vendor) {
+      createUserDto.vendor_code = crypto.randomBytes(6).toString('hex');
+      const expiryDays = createUserDto.vendor_code_expiry as unknown as number;
+      createUserDto.vendor_code_expiry = this.getVendorCodeExpiry(expiryDays);
+      createUserDto.commission_percentage =
+        createUserDto.commission_percentage || 0;
+      createUserDto.security_deposit = createUserDto.security_deposit || 0;
     }
 
     const user = this.userRepository.create({
-      ...signUpDto,
+      ...createUserDto,
       password: hashedPassword,
     });
 
@@ -198,18 +217,21 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { user_id, deleted_at: null },
     });
-    const salt = await bcrypt.genSalt(10);
-    const hashedpassword = await bcrypt.hash(updateUserDto.password, salt);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const updatedUser = await this.userRepository.save({
-      ...user,
-      ...updateUserDto,
-      password: hashedpassword,
-    });
+    const updatedData = { ...user, ...updateUserDto };
+
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt(10);
+      updatedData.password = await bcrypt.hash(updateUserDto.password, salt);
+    } else {
+      delete updatedData.password;
+    }
+
+    const updatedUser = await this.userRepository.save(updatedData);
 
     return {
       statusCode: 200,
@@ -457,14 +479,19 @@ export class UserService {
   async findUserById(userId: number): Promise<User> {
     return this.userRepository.findOne({
       where: { user_id: userId },
-      select: ['first_name', 'last_name', 'mobile_number'],
+      select: [
+        'first_name',
+        'last_name',
+        'mobile_number',
+        'commission_percentage',
+      ],
     });
   }
 
-  async getAllCustomers(search?: string): Promise<Response> {
+  async getAllUsersByRole(role_id: number, search?: string): Promise<Response> {
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
-      .where('user.role_id = :role_id', { role_id: Role.CUSTOMER })
+      .where('user.role_id = :role_id', { role_id })
       .select([
         'user.user_id',
         'user.first_name',
@@ -480,12 +507,12 @@ export class UserService {
       );
     }
 
-    const customers = await queryBuilder.take(20).getMany();
+    const users = await queryBuilder.take(20).getMany();
 
     return {
       statusCode: 200,
-      message: 'Customers fetched successfully',
-      data: customers,
+      message: 'Users fetched successfully',
+      data: users,
     };
   }
 }

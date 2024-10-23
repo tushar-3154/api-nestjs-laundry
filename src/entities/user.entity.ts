@@ -52,9 +52,21 @@ export class User extends BaseEntity {
   @IsOptional()
   vendor_code?: string;
 
+  @Column({ nullable: true })
+  @IsOptional()
+  vendor_id?: number;
+
   @Column({ type: 'timestamp', nullable: true })
   @IsOptional()
   vendor_code_expiry?: Date;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  @IsOptional()
+  commission_percentage?: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @IsOptional()
+  security_deposit?: number;
 
   @ManyToOne(() => Role, (role) => role.users, {
     onDelete: 'NO ACTION',

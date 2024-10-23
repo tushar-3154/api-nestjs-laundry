@@ -1,3 +1,5 @@
+import { IsOptional } from 'class-validator';
+import { AddressType } from 'src/enum/address_type.enum';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
@@ -6,6 +8,10 @@ import { User } from './user.entity';
 export class UserAddress extends BaseEntity {
   @PrimaryGeneratedColumn()
   address_id: number;
+
+  @Column({ type: 'int', nullable: true })
+  @IsOptional()
+  address_type?: AddressType;
 
   @Column({ nullable: true })
   full_name: string;
