@@ -12,6 +12,7 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { PaymentType } from 'src/enum/payment.enum';
 import { RefundStatus } from 'src/enum/refund_status.enum';
 import { Role } from 'src/enum/role.enum';
 import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
@@ -119,7 +120,11 @@ export class OrderService {
         (createOrderDto.express_delivery_charges || 0);
 
       const paid_amount = createOrderDto.paid_amount || 0;
-      const kasar_amount = paid_amount < total ? total - paid_amount : 0;
+
+      let kasar_amount = 0;
+      if (createOrderDto.payment_type === PaymentType.CASH_ON_DELIVERY) {
+        kasar_amount = paid_amount < total ? total - paid_amount : 0;
+      }
 
       const estimated_pickup_time = createOrderDto.express_delivery_charges
         ? addHours(
