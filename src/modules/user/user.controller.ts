@@ -41,15 +41,6 @@ export class UserController {
     );
   }
 
-  @Post('customers')
-  @UseGuards(RolesGuard)
-  @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
-  async createCustomer(@Request() req, @Body() createUserDto: CreateUserDto) {
-    const user = req.user;
-    return await this.userService.createUser(user.user_id, createUserDto);
-  }
-
   @Get('by-role')
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
@@ -64,7 +55,7 @@ export class UserController {
   @Post()
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.SUB_ADMIN)
   async createUser(
     @Request() req,
     @Body() createUserDto: CreateUserDto,
