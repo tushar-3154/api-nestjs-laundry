@@ -102,6 +102,7 @@ export class CompanyService {
     id: number,
     updateCompanyDto: UpdateCompanyDto,
     logoPath?: string,
+    contractDocumentPath?: string,
   ): Promise<Response> {
     const company = await this.companyRepository.findOne({
       where: { company_id: id, deleted_at: null },
@@ -110,7 +111,7 @@ export class CompanyService {
     if (!company) {
       return {
         statusCode: 404,
-        message: 'company not found',
+        message: 'Company not found',
         data: null,
       };
     }
@@ -123,18 +124,22 @@ export class CompanyService {
       updateData.logo = logoPath;
     }
 
+    if (contractDocumentPath) {
+      updateData.contract_document = contractDocumentPath;
+    }
+
     await this.companyRepository.update(id, updateData);
 
-    const update_company = await this.companyRepository.findOne({
+    const updatedCompany = await this.companyRepository.findOne({
       where: { company_id: id, deleted_at: null },
     });
 
-    const Company = appendBaseUrlToLogo([update_company])[0];
+    const companyWithLogoUrl = appendBaseUrlToLogo([updatedCompany])[0];
 
     return {
       statusCode: 200,
       message: 'Company updated successfully',
-      data: { update_company: Company },
+      data: { updatedCompany: companyWithLogoUrl },
     };
   }
 
