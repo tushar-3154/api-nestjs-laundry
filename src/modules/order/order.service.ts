@@ -555,8 +555,8 @@ export class OrderService {
   ): Promise<Response> {
     const queryBuilder = this.orderRepository
       .createQueryBuilder('order')
-      .innerJoinAndSelect('order.items', 'items')
-      .innerJoinAndSelect('order.user', 'user')
+      .leftJoinAndSelect('order.items', 'items')
+      .leftJoinAndSelect('order.user', 'user')
       .where('order.delivery_boy_id = :delivery_boy_id', { delivery_boy_id })
       .select([
         'order.order_id As order_id',
@@ -569,7 +569,7 @@ export class OrderService {
         'COUNT(items.item_id) As total_item',
         'order.estimated_pickup_time As estimated_pickup_time_hour',
       ])
-      .groupBy('order.order_id');
+      .groupBy('order.order_id,user.user_id');
 
     if (search) {
       queryBuilder.andWhere(
@@ -581,6 +581,7 @@ export class OrderService {
     }
 
     const ordersWithAssignedDeliveryBoys = await queryBuilder.getRawMany();
+
     return {
       statusCode: 200,
       message: 'Orders with assigned delivery boys retrieved successfully',
