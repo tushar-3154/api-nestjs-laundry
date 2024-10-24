@@ -1,4 +1,4 @@
-export function appendBaseUrlToImages<T extends { image: string }>(
+export function appendBaseUrlToImages<T extends { image?: string }>(
   items: T[],
 ): T[] {
   const baseUrl = process.env.BASE_URL || '';

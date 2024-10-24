@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  ValidateIf,
 } from 'class-validator';
 import { CompanyOwed } from 'src/enum/company_owed.enum';
 
@@ -59,6 +60,8 @@ export class CreateCompanyDto {
   @IsEnum(CompanyOwed)
   company_ownedby: number;
 
+  @ValidateIf((o) => o.company_ownedby === CompanyOwed.OTHER_COMPANY)
   @IsOptional()
+  @IsString()
   contract_document?: string;
 }

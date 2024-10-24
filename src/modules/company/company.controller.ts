@@ -96,7 +96,7 @@ export class CompanyController {
     const logoFile = files?.logo?.[0];
     const contractFile = files?.contract_document?.[0];
 
-    if (!logoFile || !contractFile) {
+    if (!logoFile && !contractFile) {
       throw new HttpException(
         'Both logo and contract document must be provided',
         HttpStatus.BAD_REQUEST,
