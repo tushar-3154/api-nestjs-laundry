@@ -132,5 +132,5 @@ export class OrderDetail extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   @IsOptional()
-  comment?: string;
+  pickup_comment?: string;
 }

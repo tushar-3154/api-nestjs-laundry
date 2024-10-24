@@ -602,7 +602,7 @@ export class OrderService {
       throw new NotFoundException(`Order with id ${order_id} not found`);
     }
 
-    order.comment = comment;
+    order.pickup_comment = comment;
     order.order_status = OrderStatus.READY_TO_DELIVERY;
 
     await this.orderRepository.save(order);
