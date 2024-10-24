@@ -15,6 +15,7 @@ import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
 import { LoginDto } from 'src/modules/auth/dto/login.dto';
 import { SignupDto } from 'src/modules/auth/dto/signup.dto';
+import { appendBaseUrlToImages } from 'src/utils/image-path.helper';
 import twilio from 'twilio';
 import { MoreThan, Repository } from 'typeorm';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
@@ -213,6 +214,7 @@ export class UserService {
   async updateUser(
     user_id: number,
     updateUserDto: UpdateUserDto,
+    imagePath?: string,
   ): Promise<Response> {
     const user = await this.userRepository.findOne({
       where: { user_id, deleted_at: null },
@@ -224,6 +226,10 @@ export class UserService {
 
     const updatedData = { ...user, ...updateUserDto };
 
+    if (imagePath) {
+      updatedData.image = imagePath;
+    }
+
     if (updateUserDto.password) {
       const salt = await bcrypt.genSalt(10);
       updatedData.password = await bcrypt.hash(updateUserDto.password, salt);
@@ -231,12 +237,16 @@ export class UserService {
       delete updatedData.password;
     }
 
-    const updatedUser = await this.userRepository.save(updatedData);
+    await this.userRepository.update(user_id, updatedData);
 
+    const users = appendBaseUrlToImages([user])[0];
     return {
       statusCode: 200,
       message: 'User updated successfully',
-      data: { updatedUser },
+      data: {
+        user,
+        users,
+      },
     };
   }
 

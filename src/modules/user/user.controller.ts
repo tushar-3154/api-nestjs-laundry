@@ -11,13 +11,18 @@ import {
   Put,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FilePath } from 'src/constants/FilePath';
 import { Roles } from 'src/decorator/roles.decorator';
 import { Response } from 'src/dto/response.dto';
 import { OtpType } from 'src/enum/otp.enum';
 import { Role } from 'src/enum/role.enum';
+import { fileUpload } from 'src/multer/image-upload';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -68,11 +73,14 @@ export class UserController {
   @UseGuards(RolesGuard)
   @UseGuards(AuthGuard('jwt'))
   @Roles(Role.SUPER_ADMIN)
+  @UseInterceptors(FileInterceptor('image', fileUpload(FilePath.USER_IMAGES)))
   async updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    return await this.userService.updateUser(id, updateUserDto);
+    const imagepath = file ? FilePath.USER_IMAGES + '/' + file.filename : null;
+    return await this.userService.updateUser(id, updateUserDto, imagepath);
   }
 
   @Get('delivery-boys')

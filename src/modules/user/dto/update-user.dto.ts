@@ -30,6 +30,9 @@ export class UpdateUserDto {
   gender: Gender;
 
   @IsOptional()
+  image?: string;
+
+  @IsOptional()
   @IsString()
   password?: string;
 

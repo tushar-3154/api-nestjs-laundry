@@ -41,6 +41,10 @@ export class User extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   gender: Gender;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  @IsOptional()
+  image?: string;
+
   @Column()
   role_id: number;
 
