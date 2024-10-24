@@ -12,6 +12,7 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { OrderDetail } from 'src/entities/order.entity';
 import { Product } from 'src/entities/product.entity';
 import { Service } from 'src/entities/service.entity';
+import { OrderStatus } from 'src/enum/order-status.eum';
 import { PaymentType } from 'src/enum/payment.enum';
 import { RefundStatus } from 'src/enum/refund_status.enum';
 import { Role } from 'src/enum/role.enum';
@@ -584,6 +585,30 @@ export class OrderService {
       statusCode: 200,
       message: 'Orders with assigned delivery boys retrieved successfully',
       data: ordersWithAssignedDeliveryBoys,
+    };
+  }
+
+  async pickupOrder(
+    order_id: number,
+    delivery_boy_id: number,
+    comment: string,
+  ): Promise<Response> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id, delivery_boy_id },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with id ${order_id} not found`);
+    }
+
+    order.comment = comment;
+    order.order_status = OrderStatus.READY_TO_DELIVERY;
+
+    await this.orderRepository.save(order);
+
+    return {
+      statusCode: 200,
+      message: 'Order picked up successfully',
     };
   }
 
